@@ -4690,7 +4690,7 @@ textarea.form-control {
 .role-badge-co-leader:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  background: #681eeb;
+  background: rgba(104, 30, 235, 1);
 }
 
 .old-btn-icon-danger:hover {
