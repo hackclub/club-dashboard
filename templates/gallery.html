@@ -1,0 +1,2087 @@
+{% extends "base.html" %} {% block title %}Club Gallery - Hack Club Dashboard{%
+endblock %} {% block extra_head %}
+<style>
+    .gallery-container {
+        min-height: 100vh;
+        background: #f5f7fa;
+        padding: 2rem 0;
+    }
+
+    .gallery-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .gallery-header {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .gallery-title {
+        font-size: clamp(2rem, 6vw, 3rem);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .gallery-title i {
+        color: #ec3750;
+    }
+
+    .gallery-subtitle {
+        font-size: 1.1rem;
+        color: #6b7280;
+        margin-bottom: 0;
+    }
+
+    .gallery-controls {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .search-container {
+        position: relative;
+        max-width: 400px;
+        flex: 1;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #1a202c;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-input::placeholder {
+        color: #9ca3af;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #ec3750;
+        box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+
+    .create-post-btn {
+        background: #ec3750;
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .create-post-btn:hover {
+        background: #d63146;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(236, 55, 80, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .post-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .post-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: #ec3750;
+    }
+
+    .post-image-container {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+        background: #f8fafc;
+    }
+
+    .post-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .post-card:hover .post-image {
+        transform: scale(1.05);
+    }
+
+    .post-no-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        font-size: 3rem;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    }
+
+    .image-count-badge {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+    }
+
+    .post-content {
+        padding: 1.5rem;
+    }
+
+    .post-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #1a202c;
+        line-height: 1.3;
+    }
+
+    .post-description {
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .post-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .post-club,
+    .post-author,
+    .post-date {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .post-club i,
+    .post-author i,
+    .post-date i {
+        font-size: 0.75rem;
+        color: #ec3750;
+    }
+
+    .empty-state {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        color: #6b7280;
+        padding: 4rem 2rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #d1d5db;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #374151;
+    }
+
+    /* Admin Delete Button */
+    .admin-delete-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: rgba(255, 193, 7, 0.9);
+        border: 2px dashed #ffc107;
+        color: #856404;
+        border-radius: 6px;
+        padding: 0.5rem;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+
+    .admin-delete-btn:hover {
+        background: rgba(255, 193, 7, 1);
+        transform: scale(1.1);
+    }
+
+    /* Admin Section */
+    .admin-section {
+        border: 2px dashed #ffc107;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        background: rgba(255, 193, 7, 0.05);
+    }
+
+    .admin-section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        color: #856404;
+        font-weight: 600;
+    }
+
+    .admin-section-header i {
+        margin-right: 0.5rem;
+        color: #ffc107;
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-checkbox {
+        width: auto;
+        margin: 0;
+    }
+
+    /* Image Zoom Modal */
+    .image-zoom-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 2000;
+        cursor: zoom-out;
+    }
+
+    .image-zoom-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 90vw;
+        max-height: 90vh;
+        transition: transform 0.3s ease;
+    }
+
+    .image-zoom-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .zoom-controls {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 10px;
+        z-index: 2001;
+    }
+
+    .zoom-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: #333;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .zoom-btn:hover {
+        background: white;
+        transform: scale(1.1);
+    }
+
+    .zoom-close {
+        background: rgba(236, 55, 80, 0.9);
+        color: white;
+    }
+
+    .zoom-close:hover {
+        background: #ec3750;
+    }
+
+    @keyframes zoomIn {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+
+    .image-zoom-container.zoom-in {
+        animation: zoomIn 0.3s ease-out;
+    }
+
+    .post-image {
+        cursor: zoom-in;
+    }
+
+    .post-detail-image {
+        cursor: zoom-in;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.2s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ec3750;
+        box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+    }
+
+    .file-upload-area {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    .file-upload-area:hover {
+        border-color: #ec3750;
+        background: #fef7f7;
+    }
+
+    .file-upload-area.dragover {
+        border-color: #ec3750;
+        background: #fef7f7;
+        transform: scale(1.02);
+    }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: #9ca3af;
+        margin-bottom: 1rem;
+    }
+
+    .upload-text {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-subtext {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .selected-files {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .file-preview {
+        position: relative;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .file-preview img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+    }
+
+    .file-info {
+        padding: 0.5rem;
+    }
+
+    .file-name {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.25rem;
+        word-break: break-all;
+    }
+
+    .file-size {
+        font-size: 0.625rem;
+        color: #6b7280;
+    }
+
+    .remove-file {
+        position: absolute;
+        top: 0.25rem;
+        right: 0.25rem;
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+    }
+
+    .remove-file:hover {
+        background: #dc2626;
+    }
+
+    /* Image Carousel Styles */
+    .image-carousel {
+        position: relative;
+        width: 100%;
+        height: 220px;
+        overflow: hidden;
+        border-radius: 12px;
+    }
+
+    .carousel-container {
+        display: flex;
+        transition: transform 0.3s ease;
+        height: 100%;
+    }
+
+    .carousel-slide {
+        min-width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    .carousel-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .carousel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        z-index: 5;
+    }
+
+    .carousel-nav:hover {
+        background: rgba(0, 0, 0, 0.9);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .carousel-prev {
+        left: 10px;
+    }
+
+    .carousel-next {
+        right: 10px;
+    }
+
+    .carousel-indicators {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 6px;
+        z-index: 5;
+    }
+
+    .carousel-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .carousel-dot.active {
+        background: white;
+        transform: scale(1.2);
+    }
+
+    .carousel-counter {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 5;
+    }
+</style>
+{% endblock %} {% block content %}
+<div class="gallery-container">
+    <div class="gallery-content">
+        <div class="gallery-header">
+            <h1 class="gallery-title">
+                <i class="fas fa-images"></i> Club Photo & Post Gallery
+            </h1>
+            <p class="gallery-subtitle">
+                Discover amazing projects and moments from Hack Clubs around the
+                world
+            </p>
+        </div>
+
+        <div class="gallery-controls">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="Search clubs and posts..."
+                />
+            </div>
+
+            {% if current_user and current_user.id and (current_user.led_clubs
+            or current_user.co_led_clubs) %}
+            <a
+                href="#"
+                class="create-post-btn"
+                onclick="openCreatePostModal(); return false;"
+            >
+                <i class="fas fa-plus"></i>
+                Create Post
+            </a>
+            {% endif %}
+        </div>
+
+        <div id="postsContainer" class="posts-grid">
+
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none">
+            <i class="fas fa-images"></i>
+            <h3>No posts yet</h3>
+            <p>Be the first to share your club's amazing work!</p>
+        </div>
+    </div>
+</div>
+
+
+<div id="createPostModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Create Gallery Post</h2>
+            <button class="modal-close" onclick="closeCreatePostModal()">
+                &times;
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="createPostForm">
+                {% if current_user and current_user.id and
+                ((current_user.led_clubs and current_user.led_clubs|length > 1)
+                or (current_user.co_led_clubs and
+                current_user.co_led_clubs|length > 0)) %}
+                <div class="form-group">
+                    <label class="form-label">Select Club</label>
+                    <select class="form-control" id="clubSelect" required>
+                        {% for club in current_user.led_clubs %}
+                        <option value="{{ club.id }}">
+                            {{ club.name }} (Leader)
+                        </option>
+                        {% endfor %} {% for club in current_user.co_led_clubs %}
+                        <option value="{{ club.id }}">
+                            {{ club.name }} (Co-Leader)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% elif current_user and current_user.id and
+                current_user.led_clubs %}
+                <input
+                    type="hidden"
+                    id="clubSelect"
+                    value="{{ current_user.led_clubs[0].id }}"
+                />
+                {% elif current_user and current_user.id and
+                current_user.co_led_clubs %}
+                <input
+                    type="hidden"
+                    id="clubSelect"
+                    value="{{ current_user.co_led_clubs[0].id }}"
+                />
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="form-label">Post Title</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="postTitle"
+                        placeholder="Give your post a catchy title..."
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea
+                        class="form-control"
+                        id="postDescription"
+                        placeholder="Tell the world about your club's awesome work..."
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tags (optional)</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="postTags"
+                        placeholder="hackathon, project, workshop (comma separated)"
+                    />
+                </div>
+
+
+                <div
+                    id="adminSection"
+                    class="admin-section"
+                    style="display: none"
+                >
+                    <div class="admin-section-header">
+                        <h4>
+                            <i class="fas fa-shield-alt"></i> Admin Controls
+                        </h4>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"
+                            >Custom Club Name (override)</label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="customClubName"
+                            placeholder="Leave empty to use actual club name"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Upload Mode</label>
+                        <div class="checkbox-wrapper">
+                            <input
+                                type="checkbox"
+                                id="bulkUpload"
+                                class="form-checkbox"
+                            />
+                            <label for="bulkUpload"
+                                >Upload each image as separate post (ignores 50
+                                image limit)</label
+                            >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Featured Post</label>
+                        <div class="checkbox-wrapper">
+                            <input
+                                type="checkbox"
+                                id="featuredPost"
+                                class="form-checkbox"
+                            />
+                            <label for="featuredPost"
+                                >Mark as featured post</label
+                            >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Post Priority</label>
+                        <select class="form-control" id="postPriority">
+                            <option value="normal">Normal</option>
+                            <option value="high">High Priority</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Admin Notes (internal)</label>
+                        <textarea
+                            class="form-control"
+                            id="adminNotes"
+                            placeholder="Internal notes visible only to admins"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Upload Photos (Optional but Encouraged!)</label>
+                    <div class="form-help-text" style="margin-bottom: 1rem; color: #6b7280; font-size: 0.875rem;">
+                        <i class="fas fa-lightbulb" style="color: #fbbf24; margin-right: 0.5rem;"></i>
+                        Adding images makes your post more engaging and helps other clubs learn from your work!
+                    </div>
+                    <div
+                        class="file-upload-area"
+                        id="fileUploadArea"
+                        onclick="document.getElementById('fileInput').click()"
+                    >
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">
+                            Click to upload or drag and drop
+                        </div>
+                        <div class="upload-subtext">
+                            PNG, JPG, GIF up to 50MB each (max 50 files) - Optional but recommended!
+                        </div>
+                    </div>
+                    <input
+                        type="file"
+                        id="fileInput"
+                        multiple
+                        accept="image/*"
+                        style="display: none"
+                    />
+                    <div id="selectedFiles" class="selected-files"></div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="closeCreatePostModal()"
+            >
+                Cancel
+            </button>
+            <button
+                type="button"
+                class="btn btn-primary"
+                id="submitPostBtn"
+                onclick="submitPost()"
+            >
+                <span id="submitBtnText">Create Post</span>
+                <div
+                    id="submitBtnSpinner"
+                    class="loading-spinner"
+                    style="display: none"
+                ></div>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div id="postDetailModal" class="modal post-detail-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="postDetailTitle"></h2>
+            <button class="modal-close" onclick="closePostDetailModal()">
+                &times;
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="postDetailContent"></div>
+        </div>
+    </div>
+</div>
+
+
+<div id="imageLightbox" class="image-lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <div class="lightbox-content">
+        <img id="lightboxImage" class="lightbox-image" src="" alt="" />
+    </div>
+</div>
+
+
+<div id="imageZoomModal" class="image-zoom-modal">
+    <div class="zoom-controls">
+        <button class="zoom-btn zoom-close" onclick="closeImageZoom()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="image-zoom-container" id="imageZoomContainer">
+        <img id="zoomedImage" src="" alt="" />
+    </div>
+</div>
+
+
+<div id="deletePostModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i> Confirm Delete</h3>
+            <button class="close-btn" onclick="closeDeleteModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+            <input type="hidden" id="deletePostId" value="">
+        </div>
+        <div class="modal-footer" style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="closeDeleteModal()">
+                Cancel
+            </button>
+            <button class="btn btn-danger" onclick="confirmDeletePost()" style="background: #dc3545; color: white;">
+                <i class="fas fa-trash" style="color: white;"></i> Delete Post
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedFiles = [];
+    let posts = [];
+
+    // Set current user data for JavaScript access
+    window.currentUser = {% if current_user %}{{ {
+        'id': current_user.id,
+        'username': current_user.username,
+        'is_admin': current_user.is_admin
+    } | tojson }}{% else %}null{% endif %};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadPosts();
+        setupFileUpload();
+        setupSearch();
+
+        // Show admin section if user is admin
+        if (window.currentUser && window.currentUser.is_admin) {
+            const adminSection = document.getElementById('adminSection');
+            if (adminSection) {
+                adminSection.style.display = 'block';
+            }
+        }
+
+        // Setup image zoom modal events
+        const imageZoomModal = document.getElementById('imageZoomModal');
+        if (imageZoomModal) {
+            imageZoomModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeImageZoom();
+                }
+            });
+        }
+
+        // Close zoom with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('imageZoomModal');
+                if (modal && modal.style.display === 'block') {
+                    closeImageZoom();
+                }
+            }
+        });
+    });
+
+    function setupFileUpload() {
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('fileUploadArea');
+        const selectedFilesContainer = document.getElementById('selectedFiles');
+
+        if (!fileInput || !uploadArea) return;
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        });
+    }
+
+    function handleFileSelect(e) {
+        const files = Array.from(e.target.files);
+        handleFiles(files);
+    }
+
+    function handleFiles(files) {
+        const validFiles = files.filter(file => {
+            if (!file.type.startsWith('image/')) {
+                showToast('error', `${file.name} is not an image file`);
+                return false;
+            }
+            if (file.size > 50 * 1024 * 1024) {
+                showToast('error', `${file.name} is too large (max 50MB)`);
+                return false;
+            }
+            return true;
+        });
+
+        selectedFiles = selectedFiles.concat(validFiles);
+
+        // Check if admin bulk upload is enabled
+        const isBulkUpload = window.currentUser && window.currentUser.is_admin &&
+                            document.getElementById('bulkUpload') &&
+                            document.getElementById('bulkUpload').checked;
+
+        // Limit to 50 files total unless admin bulk upload is enabled
+        if (!isBulkUpload && selectedFiles.length > 50) {
+            selectedFiles = selectedFiles.slice(0, 50);
+            showToast('warning', 'Maximum 50 images allowed per post');
+        } else if (isBulkUpload && selectedFiles.length > 200) {
+            // Even for admin, set a reasonable limit to prevent abuse
+            selectedFiles = selectedFiles.slice(0, 200);
+            showToast('warning', 'Maximum 200 images allowed for bulk upload');
+        }
+
+        renderSelectedFiles();
+    }
+
+    function renderSelectedFiles() {
+        const container = document.getElementById('selectedFiles');
+        if (!container) return;
+
+        container.innerHTML = selectedFiles.map((file, index) => `
+            <div class="file-preview">
+                <img src="${URL.createObjectURL(file)}" alt="${file.name}">
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${formatFileSize(file.size)}</div>
+                </div>
+                <button type="button" class="remove-file" onclick="removeFile(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        renderSelectedFiles();
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function setupSearch() {
+        const searchInput = document.getElementById('searchInput');
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            filterPosts(query);
+        });
+    }
+
+    function filterPosts(query) {
+        const filteredPosts = posts.filter(post =>
+            post.title.toLowerCase().includes(query) ||
+            post.description.toLowerCase().includes(query) ||
+            post.club_name.toLowerCase().includes(query) ||
+            (post.tags && post.tags.some(tag => tag.toLowerCase().includes(query)))
+        );
+        renderPosts(filteredPosts);
+    }
+
+    async function loadPosts() {
+        const postsContainer = document.getElementById('postsContainer');
+
+        // Show skeleton loading
+        postsContainer.innerHTML = Array(6).fill(0).map(() => `
+            <div class="post-card skeleton">
+                <div class="skeleton" style="height: 200px; border-radius: 12px 12px 0 0;"></div>
+                <div style="padding: 1.5rem;">
+                    <div class="skeleton" style="height: 20px; margin-bottom: 0.5rem; width: 70%;"></div>
+                    <div class="skeleton" style="height: 16px; margin-bottom: 0.5rem; width: 50%;"></div>
+                    <div class="skeleton" style="height: 14px; width: 80%;"></div>
+                </div>
+            </div>
+        `).join('');
+
+        try {
+            const response = await fetch('/api/gallery/posts');
+            if (response.ok) {
+                const data = await response.json();
+                posts = data.posts || [];
+                renderPosts(posts);
+            } else {
+                console.error('Failed to load posts');
+                document.getElementById('emptyState').style.display = 'block';
+                postsContainer.innerHTML = '';
+            }
+        } catch (error) {
+            console.error('Error loading posts:', error);
+            document.getElementById('emptyState').style.display = 'block';
+            postsContainer.innerHTML = '';
+        }
+    }
+
+    function renderPosts(postsToRender) {
+        const postsContainer = document.getElementById('postsContainer');
+        const emptyState = document.getElementById('emptyState');
+
+        if (!postsContainer) return;
+
+        if (!postsToRender || postsToRender.length === 0) {
+            postsContainer.innerHTML = '';
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+
+        if (emptyState) emptyState.style.display = 'none';
+
+        postsContainer.innerHTML = postsToRender.map(post => {
+            // Handle both array and JSON string formats
+            const images = Array.isArray(post.images) ? post.images : (post.images ? JSON.parse(post.images) : []);
+            const imageCount = images.length;
+
+            // Check if current user is admin
+            const isAdmin = window.currentUser && window.currentUser.is_admin;
+            const adminDeleteButton = isAdmin ? `
+                <button class="admin-delete-btn" onclick="event.stopPropagation(); deletePost(${post.id})" title="Delete Post (Admin Only)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            ` : '';
+
+            // Create image carousel or single image
+            let imageContent = '';
+            if (imageCount === 0) {
+                imageContent = '<div class="post-no-image"><i class="fas fa-image"></i></div>';
+            } else if (imageCount === 1) {
+                imageContent = `<img src="${images[0]}" alt="${post.title}" class="post-image" onclick="event.stopPropagation(); openImageZoom('${images[0]}')">`;
+            } else {
+                // Multiple images - create carousel
+                const carouselId = `carousel-${post.id}`;
+                const slidesHtml = images.map((image, index) => `
+                    <div class="carousel-slide">
+                        <img src="${image}" alt="${post.title}" onclick="event.stopPropagation(); openImageZoom('${image}')">
+                    </div>
+                `).join('');
+
+                const dotsHtml = images.map((_, index) => `
+                    <div class="carousel-dot ${index === 0 ? 'active' : ''}" onclick="event.stopPropagation(); goToSlide('${carouselId}', ${index})"></div>
+                `).join('');
+
+                imageContent = `
+                    <div class="image-carousel" id="${carouselId}">
+                        <div class="carousel-container">
+                            ${slidesHtml}
+                        </div>
+                        <button class="carousel-nav carousel-prev" onclick="event.stopPropagation(); previousSlide('${carouselId}')">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="carousel-nav carousel-next" onclick="event.stopPropagation(); nextSlide('${carouselId}')">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div class="carousel-indicators">
+                            ${dotsHtml}
+                        </div>
+                        <div class="carousel-counter">1 / ${imageCount}</div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="post-card" onclick="openPostDetail(${post.id})">
+                    ${adminDeleteButton}
+                    <div class="post-image-container">
+                        ${imageContent}
+                        ${imageCount > 1 ? `<div class="image-count-badge">${imageCount}</div>` : ''}
+                    </div>
+                    <div class="post-content">
+                        <h3 class="post-title">${post.title}</h3>
+                        <p class="post-description">${post.description}</p>
+                        <div class="post-meta">
+                            <div class="post-club">
+                                <i class="fas fa-users"></i>
+                                <span>${post.club_name}</span>
+                            </div>
+                            <div class="post-author">
+                                <i class="fas fa-user"></i>
+                                <span>${post.author.username}</span>
+                            </div>
+                        </div>
+                        <div class="post-date">
+                            <i class="fas fa-calendar"></i>
+                            <span>${new Date(post.created_at).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+    function truncateText(text, maxLength) {
+        if (text.length <= maxLength) return text;
+        return text.substr(0, maxLength) + '...';
+    }
+
+    function openCreatePostModal() {
+        document.getElementById('createPostModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCreatePostModal() {
+        document.getElementById('createPostModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+
+        // Reset form
+        document.getElementById('createPostForm').reset();
+        selectedFiles = [];
+        renderSelectedFiles();
+
+        const submitBtn = document.getElementById('submitPostBtn');
+        const submitBtnText = document.getElementById('submitBtnText');
+        const submitBtnSpinner = document.getElementById('submitBtnSpinner');
+
+        if (submitBtn && submitBtnText && submitBtnSpinner) {
+            submitBtn.disabled = false;
+            submitBtnText.style.display = 'inline';
+            submitBtnSpinner.style.display = 'none';
+        }
+    }
+
+    // Carousel control functions
+    function nextSlide(carouselId) {
+        const carousel = document.getElementById(carouselId);
+        if (!carousel) return;
+
+        const container = carousel.querySelector('.carousel-container');
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const dots = carousel.querySelectorAll('.carousel-dot');
+        const counter = carousel.querySelector('.carousel-counter');
+
+        let currentSlide = parseInt(carousel.dataset.currentSlide || '0');
+        currentSlide = (currentSlide + 1) % slides.length;
+
+        updateCarousel(carousel, container, dots, counter, currentSlide, slides.length);
+    }
+
+    function previousSlide(carouselId) {
+        const carousel = document.getElementById(carouselId);
+        if (!carousel) return;
+
+        const container = carousel.querySelector('.carousel-container');
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const dots = carousel.querySelectorAll('.carousel-dot');
+        const counter = carousel.querySelector('.carousel-counter');
+
+        let currentSlide = parseInt(carousel.dataset.currentSlide || '0');
+        currentSlide = currentSlide === 0 ? slides.length - 1 : currentSlide - 1;
+
+        updateCarousel(carousel, container, dots, counter, currentSlide, slides.length);
+    }
+
+    function goToSlide(carouselId, slideIndex) {
+        const carousel = document.getElementById(carouselId);
+        if (!carousel) return;
+
+        const container = carousel.querySelector('.carousel-container');
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const dots = carousel.querySelectorAll('.carousel-dot');
+        const counter = carousel.querySelector('.carousel-counter');
+
+        updateCarousel(carousel, container, dots, counter, slideIndex, slides.length);
+    }
+
+    function updateCarousel(carousel, container, dots, counter, currentSlide, totalSlides) {
+        carousel.dataset.currentSlide = currentSlide;
+        container.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+        // Update dots
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentSlide);
+        });
+
+        // Update counter
+        if (counter) {
+            counter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+    }
+
+    async function submitPost() {
+        const clubSelect = document.getElementById('clubSelect');
+        const postTitle = document.getElementById('postTitle');
+        const postDescription = document.getElementById('postDescription');
+        const postTags = document.getElementById('postTags');
+
+        if (!clubSelect || !postTitle || !postDescription) {
+            showToast('error', 'Please fill in all required fields');
+            return;
+        }
+
+        const clubId = clubSelect.value;
+        const title = postTitle.value.trim();
+        const description = postDescription.value.trim();
+        const tagsInput = postTags.value.trim();
+
+        if (!clubId || !title || !description) {
+            showToast('error', 'Please fill in all required fields');
+            return;
+        }
+
+        // Allow posts without images, but show a confirmation
+        if (selectedFiles.length === 0) {
+            if (!confirm('You are creating a post without images. While this is allowed, adding images makes your post more engaging. Do you want to continue?')) {
+                return;
+            }
+        }
+
+        // Check if admin wants bulk upload
+        const isBulkUpload = window.currentUser && window.currentUser.is_admin &&
+                            document.getElementById('bulkUpload') &&
+                            document.getElementById('bulkUpload').checked;
+
+        const submitBtn = document.getElementById('submitPostBtn');
+        const submitBtnText = document.getElementById('submitBtnText');
+        const submitBtnSpinner = document.getElementById('submitBtnSpinner');
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtnText.style.display = 'none';
+        submitBtnSpinner.style.display = 'inline-block';
+
+        try {
+            if (isBulkUpload) {
+                // Upload each image as separate post
+                let successCount = 0;
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    try {
+                        const imageUrls = await uploadImages([selectedFiles[i]]);
+
+                        const postData = {
+                            club_id: clubId,
+                            title: `${title} (${i + 1}/${selectedFiles.length})`,
+                            description: description,
+                            images: imageUrls,
+                            tags: tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
+                            bulk_upload: true
+                        };
+
+                        // Add admin override
+                        const customClubName = document.getElementById('customClubName');
+                        if (customClubName && customClubName.value.trim()) {
+                            postData.custom_club_name = customClubName.value.trim();
+                        }
+
+                        const response = await fetch('/api/gallery/posts', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(postData)
+                        });
+
+                        if (response.ok) {
+                            successCount++;
+                        }
+                    } catch (error) {
+                        console.error(`Error uploading image ${i + 1}:`, error);
+                    }
+                }
+
+                showToast('success', `Created ${successCount} posts successfully!`);
+            } else {
+                // Regular upload - respect 50 image limit
+                if (selectedFiles.length > 50) {
+                    showToast('error', 'Maximum 50 images allowed per post');
+                    return;
+                }
+
+                // Upload images to HackClub CDN (if any)
+                const imageUrls = selectedFiles.length > 0 ? await uploadImages(selectedFiles) : [];
+
+                // Create post
+                const postData = {
+                    club_id: clubId,
+                    title: title,
+                    description: description,
+                    images: imageUrls,
+                    tags: tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : []
+                };
+
+                // Add admin override if user is admin and custom club name is provided
+                if (window.currentUser && window.currentUser.is_admin) {
+                    const customClubName = document.getElementById('customClubName');
+                    if (customClubName && customClubName.value.trim()) {
+                        postData.custom_club_name = customClubName.value.trim();
+                    }
+                }
+
+                const response = await fetch('/api/gallery/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(postData)
+                });
+
+                if (response.ok) {
+                    showToast('success', 'Post created successfully!');
+                } else {
+                    const error = await response.json();
+                    showToast('error', error.error || 'Failed to create post');
+                }
+            }
+
+            closeCreatePostModal();
+            loadPosts(); // Reload posts
+        } catch (error) {
+            console.error('Error creating post:', error);
+            showToast('error', 'Failed to create post');
+        } finally {
+            // Reset loading state
+            submitBtn.disabled = false;
+            submitBtnText.style.display = 'inline';
+            submitBtnSpinner.style.display = 'none';
+        }
+    }
+
+    async function uploadImages(files) {
+        try {
+            // Convert files to base64 data URLs for HackClub CDN upload
+            const base64Files = await Promise.all(
+                files.map(file => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                })
+            );
+
+            const response = await fetch('/api/upload-images', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    images: base64Files
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to upload images');
+            }
+
+            const data = await response.json();
+            return data.urls;
+        } catch (error) {
+            console.error('Error uploading images:', error);
+            throw error;
+        }
+    }
+
+    function openPostDetail(postId) {
+        const post = posts.find(p => p.id == postId);
+        if (!post) return;
+
+        const images = JSON.parse(post.images || '[]');
+        const tags = JSON.parse(post.tags || '[]');
+
+        document.getElementById('postDetailTitle').textContent = post.title;
+        document.getElementById('postDetailContent').innerHTML = `
+            <div class="post-header" style="margin-bottom: 2rem;">
+                <div class="club-avatar">
+                    ${post.club_name ? post.club_name.charAt(0).toUpperCase() : 'C'}
+                </div>
+                <div class="post-meta">
+                    <h4 class="club-name" style="color: #1a202c;">${post.club_name || 'Unknown Club'}</h4>
+                    <p class="post-date" style="color: #6b7280;">${formatDate(post.created_at)}</p>
+                </div>
+            </div>
+
+            ${images.length > 0 ? `
+                <div class="post-detail-images">
+                    ${images.map(image => `
+                        <img src="${image}" alt="${post.title}" class="post-detail-image" onclick="openImageZoom('${image}')">
+                    `).join('')}
+                </div>
+            ` : ''}
+
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="color: #1a202c; margin-bottom: 0.5rem;">Description</h4>
+                <p style="color: #4b5563; line-height: 1.6;">${post.description}</p>
+            </div>
+
+            ${tags.length > 0 ? `
+                <div>
+                    <h4 style="color: #1a202c; margin-bottom: 0.5rem;">Tags</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        ${tags.map(tag => `<span style="background: #f3f4f6; color: #374151; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.875rem;">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        `;
+
+        document.getElementById('postDetailModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function openImageZoom(imageSrc) {
+        const modal = document.getElementById('imageZoomModal');
+        const container = document.getElementById('imageZoomContainer');
+        const image = document.getElementById('zoomedImage');
+
+        image.src = imageSrc;
+        modal.style.display = 'block';
+        container.classList.add('zoom-in');
+
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageZoom() {
+        const modal = document.getElementById('imageZoomModal');
+        const container = document.getElementById('imageZoomContainer');
+
+        container.classList.remove('zoom-in');
+        modal.style.display = 'none';
+
+        // Restore body scroll
+        document.body.style.overflow = 'auto';
+    }
+
+    function deletePost(postId) {
+        // Show delete confirmation modal
+        document.getElementById('deletePostId').value = postId;
+        document.getElementById('deletePostModal').style.display = 'block';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deletePostModal').style.display = 'none';
+        document.getElementById('deletePostId').value = '';
+    }
+
+    function confirmDeletePost() {
+        const postId = document.getElementById('deletePostId').value;
+        if (!postId) return;
+
+        // Close modal first
+        closeDeleteModal();
+
+        fetch(`/api/gallery/posts/${postId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error(`HTTP ${response.status}`);
+            }
+        })
+        .then(data => {
+            if (data.success || data.message) {
+                showToast('success', data.message || 'Post deleted successfully');
+                loadPosts(); // Reload posts
+            } else {
+                showToast('error', data.error || 'Failed to delete post');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting post:', error);
+            showToast('error', 'Failed to delete post');
+            // Reload posts anyway in case the deletion actually worked
+            loadPosts();
+        });
+    }
+
+    function closePostDetailModal() {
+        document.getElementById('postDetailModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function openLightbox(imageSrc) {
+        document.getElementById('lightboxImage').src = imageSrc;
+        document.getElementById('imageLightbox').style.display = 'block';
+    }
+
+    function closeLightbox() {
+        document.getElementById('imageLightbox').style.display = 'none';
+    }
+
+    // Close modals when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal')) {
+            if (e.target.id === 'createPostModal') closeCreatePostModal();
+            if (e.target.id === 'postDetailModal') closePostDetailModal();
+            if (e.target.id === 'deletePostModal') closeDeleteModal();
+        }
+    });
+
+    // Close modals with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const lightbox = document.getElementById('imageLightbox');
+            if (lightbox && lightbox.style.display === 'block') {
+                closeLightbox();
+                return;
+            }
+
+            const createModal = document.getElementById('createPostModal');
+            const detailModal = document.getElementById('postDetailModal');
+            const deleteModal = document.getElementById('deletePostModal');
+
+            if (deleteModal && deleteModal.style.display === 'block') {
+                closeDeleteModal();
+            } else if (createModal && createModal.style.display === 'block') {
+                closeCreatePostModal();
+            } else if (detailModal && detailModal.style.display === 'block') {
+                closePostDetailModal();
+            }
+        }
+    });
+
+    // Tutorial System for Gallery
+    function checkTutorialRestore() {
+        const tutorialInProgress = localStorage.getItem('tutorialInProgress');
+        const savedStep = localStorage.getItem('tutorialCurrentStep');
+
+        if (tutorialInProgress === 'true' && savedStep) {
+            // Clear stored state
+            localStorage.removeItem('tutorialInProgress');
+            localStorage.removeItem('tutorialCurrentStep');
+
+            // Show gallery-specific tutorial step
+            showGalleryTutorialStep();
+            return true;
+        }
+        return false;
+    }
+
+    let galleryTutorialStep = 0;
+    const galleryTutorialSteps = [
+        {
+            title: "Welcome to the Gallery! 📸",
+            text: "Here you can see amazing projects from clubs worldwide and share your own work. Posting here contributes to your weekly quest progress!",
+            target: ".gallery-header",
+            position: "bottom",
+            action: null
+        },
+        {
+            title: "Browse Club Projects",
+            text: "Scroll through posts from other clubs to get inspiration. You can see what other Hack Clubs are building and working on!",
+            target: ".gallery-grid",
+            position: "top",
+            action: null
+        },
+        {
+            title: "Create Your Own Post",
+            text: "Click this button to share your club's projects with the world! Let me open the create post modal to show you how it works.",
+            target: ".create-post-btn",
+            position: "bottom",
+            action: () => {
+                const createBtn = document.querySelector('.create-post-btn');
+                if (createBtn) {
+                    createBtn.click();
+                }
+            }
+        },
+        {
+            title: "Post Creation Modal",
+            text: "This is where you create your gallery posts! You can add a title, description, and upload photos of your club's projects.",
+            target: "#createPostModal .modal-content",
+            position: "top",
+            action: null
+        },
+        {
+            title: "Add Post Details",
+            text: "Fill in your post title and description here. Make it engaging so other clubs can learn from your work!",
+            target: "#postTitle",
+            position: "bottom",
+            action: null
+        },
+        {
+            title: "Upload Project Photos",
+            text: "Click here to upload photos of your project. You can add multiple images to showcase different aspects of your work!",
+            target: "#postImages",
+            position: "top",
+            action: null
+        },
+        {
+            title: "Submit Your Post",
+            text: "Once you've added your content, click this button to publish your post to the gallery and earn quest progress! Let's close this modal now.",
+            target: ".modal .close",
+            position: "left",
+            action: () => {
+                const closeBtn = document.querySelector('#createPostModal .close');
+                if (closeBtn) {
+                    closeBtn.click();
+                }
+            }
+        }
+    ];
+
+    function showGalleryTutorialStep() {
+        // Create tutorial overlay if it doesn't exist
+        if (!document.getElementById('tutorialOverlay')) {
+            createTutorialOverlay();
+        }
+
+        document.getElementById('tutorialOverlay').style.display = 'block';
+        showCurrentGalleryStep();
+    }
+
+    function showCurrentGalleryStep() {
+        const step = galleryTutorialSteps[galleryTutorialStep];
+
+        // Update content
+        document.getElementById('tutorialTitle').textContent = step.title;
+        document.getElementById('tutorialText').textContent = step.text;
+        document.getElementById('tutorialStep').textContent = galleryTutorialStep + 1;
+        document.getElementById('tutorialTotal').textContent = galleryTutorialSteps.length;
+
+        // Update buttons
+        const nextBtn = document.getElementById('nextBtn');
+        const finishBtn = document.getElementById('finishBtn');
+        const prevBtn = document.getElementById('prevBtn');
+
+        prevBtn.disabled = galleryTutorialStep === 0;
+        prevBtn.style.display = galleryTutorialStep === 0 ? 'none' : 'inline-block';
+
+        if (galleryTutorialStep === galleryTutorialSteps.length - 1) {
+            nextBtn.textContent = 'Back to Dashboard';
+            nextBtn.onclick = function() {
+                localStorage.setItem('tutorialInProgress', 'true');
+                localStorage.setItem('tutorialCurrentStep', '13');
+                window.location.href = '/dashboard';
+            };
+        } else {
+            nextBtn.textContent = 'Next';
+            nextBtn.onclick = function() {
+                // Execute step action before moving to next step
+                if (step.action) {
+                    step.action();
+                    // Wait a bit for modal to open/close
+                    setTimeout(() => {
+                        galleryTutorialStep++;
+                        showCurrentGalleryStep();
+                    }, 500);
+                } else {
+                    galleryTutorialStep++;
+                    showCurrentGalleryStep();
+                }
+            };
+        }
+
+        prevBtn.onclick = function() {
+            if (galleryTutorialStep > 0) {
+                galleryTutorialStep--;
+                showCurrentGalleryStep();
+            }
+        };
+
+        // Position bubble
+        const bubble = document.getElementById('tutorialBubble');
+        let target = document.querySelector(step.target);
+
+        // Wait for modal to appear if targeting modal content
+        if (!target && (step.target.includes('Modal') || step.target.includes('#post') || step.target.includes('.modal'))) {
+            setTimeout(() => {
+                target = document.querySelector(step.target);
+                if (target) {
+                    positionGalleryTutorialBubble(bubble, target, step);
+                }
+            }, 600);
+            return;
+        }
+
+        if (bubble && target) {
+            positionGalleryTutorialBubble(bubble, target, step);
+        }
+    }
+
+    function positionGalleryTutorialBubble(bubble, target, step) {
+        const rect = target.getBoundingClientRect();
+        const navbarHeight = 70;
+
+        let bubbleX = rect.left + rect.width / 2 - 200;
+        let bubbleY = step.position === 'top' ? rect.top - 200 : rect.bottom + 20;
+
+        // Special positioning for modal elements
+        if (step.target.includes('Modal') || step.target.includes('#post')) {
+            bubbleX = rect.left + rect.width / 2 - 200;
+            bubbleY = rect.top + 50;
+        }
+
+        // Keep within viewport and below navbar
+        bubbleX = Math.max(20, Math.min(window.innerWidth - 400 - 20, bubbleX));
+        bubbleY = Math.max(navbarHeight + 20, Math.min(window.innerHeight - 200 - 20, bubbleY));
+
+        bubble.style.left = bubbleX + 'px';
+        bubble.style.top = bubbleY + 'px';
+
+        const arrow = document.getElementById('tutorialArrow');
+        if (arrow) {
+            arrow.className = `tutorial-arrow ${step.position === 'top' ? 'bottom' : 'top'}`;
+        }
+
+        // Highlight target
+        document.querySelectorAll('.tutorial-highlight').forEach(el => {
+            el.classList.remove('tutorial-highlight');
+        });
+        target.classList.add('tutorial-highlight');
+    }
+
+    function createTutorialOverlay() {
+        const overlay = document.createElement('div');
+        overlay.id = 'tutorialOverlay';
+        overlay.className = 'tutorial-overlay';
+        overlay.style.display = 'none';
+
+        overlay.innerHTML = `
+            <div class="tutorial-backdrop"></div>
+            <div class="tutorial-bubble" id="tutorialBubble">
+                <div class="tutorial-content">
+                    <div class="tutorial-header">
+                        <h3 id="tutorialTitle"></h3>
+                        <button class="tutorial-close" onclick="closeTutorial()">&times;</button>
+                    </div>
+                    <div class="tutorial-body">
+                        <p id="tutorialText"></p>
+                    </div>
+                    <div class="tutorial-footer">
+                        <div class="tutorial-progress">
+                            <span id="tutorialStep">1</span> of <span id="tutorialTotal">7</span>
+                        </div>
+                        <div class="tutorial-buttons">
+                            <button class="tutorial-btn tutorial-btn-secondary" id="prevBtn">Previous</button>
+                            <button class="tutorial-btn tutorial-btn-primary" id="nextBtn">Next</button>
+                            <button class="tutorial-btn tutorial-btn-primary" id="finishBtn" style="display: none;">Finish</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="tutorial-arrow" id="tutorialArrow"></div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+    }
+
+    function closeTutorial() {
+        const overlay = document.getElementById('tutorialOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+        localStorage.setItem('clubDashboardTutorialCompleted', 'true');
+    }
+
+    // Check for tutorial restore on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        checkTutorialRestore();
+    });
+</script>
+
+
+<style>
+    .tutorial-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 20000;
+        pointer-events: none;
+    }
+
+    .tutorial-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        pointer-events: all;
+    }
+
+    .tutorial-bubble {
+        position: absolute;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        max-width: 400px;
+        min-width: 300px;
+        pointer-events: all;
+        transform-origin: center center;
+        animation: tutorialAppear 0.3s ease-out;
+        border: 2px solid #ec3750;
+    }
+
+    @keyframes tutorialAppear {
+        0% {
+            opacity: 0;
+            transform: scale(0.8) translateY(10px);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .tutorial-content {
+        padding: 0;
+    }
+
+    .tutorial-header {
+        padding: 20px 20px 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .tutorial-header h3 {
+        margin: 0;
+        color: #1a202c;
+        font-size: 1.25rem;
+        font-weight: 600;
+        line-height: 1.4;
+        flex: 1;
+        padding-right: 10px;
+    }
+
+    .tutorial-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .tutorial-close:hover {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .tutorial-body {
+        padding: 15px 20px 20px 20px;
+    }
+
+    .tutorial-body p {
+        margin: 0;
+        color: #4b5563;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    .tutorial-footer {
+        padding: 0 20px 20px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .tutorial-progress {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .tutorial-progress #tutorialStep {
+        color: #ec3750;
+        font-weight: 600;
+    }
+
+    .tutorial-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .tutorial-btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        min-width: 80px;
+    }
+
+    .tutorial-btn-primary {
+        background: #ec3750;
+        color: white;
+    }
+
+    .tutorial-btn-primary:hover:not(:disabled) {
+        background: #dc2626;
+        transform: translateY(-1px);
+    }
+
+    .tutorial-btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+
+    .tutorial-btn-secondary:hover:not(:disabled) {
+        background: #e5e7eb;
+    }
+
+    .tutorial-arrow {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        background: #ffffff;
+        border: 2px solid #ec3750;
+        transform: rotate(45deg);
+        border-radius: 0 0 4px 0;
+    }
+
+    .tutorial-arrow.top {
+        top: -10px;
+        left: 50%;
+        margin-left: -8px;
+        border-top: none;
+        border-left: none;
+    }
+
+    .tutorial-arrow.bottom {
+        bottom: -10px;
+        left: 50%;
+        margin-left: -8px;
+        border-bottom: none;
+        border-right: none;
+    }
+
+    .tutorial-highlight {
+        position: relative;
+        z-index: 9999;
+        box-shadow:
+            0 0 0 4px rgba(236, 55, 80, 0.3),
+            0 0 0 8px rgba(236, 55, 80, 0.1);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+</style>
+
+{% endblock %}

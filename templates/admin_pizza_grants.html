@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Pizza Grants - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <h1>Pizza Grants</h1>
+
+    <div style="background: white; padding: 2rem; border-radius: 10px; margin-top: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        {% if grants %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f1f5f9; border-bottom: 2px solid #e2e8f0;">
+                    <th style="padding: 1rem; text-align: left;">Grant ID</th>
+                    <th style="padding: 1rem; text-align: left;">Club</th>
+                    <th style="padding: 1rem; text-align: left;">Amount</th>
+                    <th style="padding: 1rem; text-align: left;">Status</th>
+                    <th style="padding: 1rem; text-align: left;">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grant in grants %}
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 1rem;">{{ grant.id }}</td>
+                    <td style="padding: 1rem;">{{ grant.club_name or 'N/A' }}</td>
+                    <td style="padding: 1rem;">${{ grant.amount }}</td>
+                    <td style="padding: 1rem;">{{ grant.status }}</td>
+                    <td style="padding: 1rem;">{{ grant.created_at.strftime('%Y-%m-%d') if grant.created_at else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No grants found.</p>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('admin.dashboard') }}" style="color: #3b82f6;">← Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

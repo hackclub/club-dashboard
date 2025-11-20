@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Connection Required - Hack Clubs Dash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        min-height: 100vh;
+        background: #f8fafc;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .connection-required-container {
+        background: white;
+        border-radius: 16px;
+        padding: 3rem;
+        max-width: 600px;
+        width: 100%;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        animation: slideUp 0.6s ease-out;
+        border: 1px solid #e2e8f0;
+    }
+
+    .connection-icon {
+        width: 80px;
+        height: 80px;
+        background: #ec3750;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .connection-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1a202c;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .club-name {
+        color: #ec3750;
+        font-weight: 800;
+    }
+
+    .connection-subtitle {
+        font-size: 1.2rem;
+        color: #4a5568;
+        margin-bottom: 2.5rem;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+
+    .migration-deadline {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        font-weight: 600;
+        color: #991b1b;
+        font-size: 0.95rem;
+    }
+
+    .deadline-icon {
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+        display: inline;
+    }
+
+    .connection-benefits {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+    .connection-benefits h3 {
+        color: #16a34a;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+    }
+
+    .benefit-item:hover {
+        transform: translateY(-2px);
+    }
+
+    .benefit-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .benefit-text {
+        color: #2d3748;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .action-section {
+        margin-top: 3rem;
+    }
+
+    .connection-action {
+        background: #ec3750;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .connection-action:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .leader-required {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        color: #4a5568;
+        font-size: 0.95rem;
+        font-weight: 500;
+        line-height: 1.6;
+    }
+
+    .leader-required .leader-name {
+        color: #ec3750;
+        font-weight: 800;
+    }
+
+    .footer-info {
+        margin-top: 2rem;
+        font-size: 0.9rem;
+        color: #718096;
+        line-height: 1.6;
+    }
+
+    .footer-info a {
+        color: #ec3750;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .footer-info a:hover {
+        text-decoration: underline;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .connection-required-container {
+            padding: 2rem;
+            margin: 1rem;
+        }
+
+        .connection-title {
+            font-size: 2rem;
+        }
+
+        .connection-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .connection-action {
+            font-size: 1.1rem;
+            padding: 1rem 2rem;
+        }
+
+        .benefits-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .connection-icon {
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="connection-required-container">
+    <div class="connection-icon">
+        <i class="fas fa-unlink"></i>
+    </div>
+
+    <h1 class="connection-title">
+        Club Connection Required
+    </h1>
+
+    <p class="connection-subtitle">
+        <span class="club-name">{{ club.name }}</span> is not connected to the official Hack Club directory and needs immediate action to continue operating.
+    </p>
+
+    <div class="migration-deadline">
+        <span class="deadline-icon">⏰</span>
+        <strong>Migration Period Expired</strong><br>
+        Your club was created before our directory migration and the 3-month transfer window has closed. All club dashboard features are disabled until you complete the connection process.
+    </div>
+
+    <div class="connection-benefits">
+        <h3>🎯 What You'll Get After Connecting</h3>
+        <div class="benefits-grid">
+            <div class="benefit-item">
+                <span class="benefit-icon">🚀</span>
+                <span class="benefit-text">Full dashboard access restored</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">🏆</span>
+                <span class="benefit-text">Official Hack Club recognition</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">💰</span>
+                <span class="benefit-text">Funding & grant opportunities</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">🌍</span>
+                <span class="benefit-text">Global directory listing</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">🎓</span>
+                <span class="benefit-text">Exclusive resources & workshops</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">🤝</span>
+                <span class="benefit-text">Priority Hack Club support</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-section">
+        {% if current_user.id == club.leader_id %}
+        <a href="{{ url_for('verify_leader') }}" class="connection-action">
+            <i class="fas fa-link"></i>
+            Connect Club Now
+        </a>
+        {% else %}
+        <div class="leader-required">
+            <i class="fas fa-info-circle" style="color: #4299e1; margin-right: 0.5rem; font-size: 1.2rem;"></i>
+            <strong>Club Leader Action Required</strong><br><br>
+            Only <span class="leader-name">{{ club.leader.username }}</span> (club leader) can connect this club to the directory. Please contact them immediately to complete this process and restore club access.
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="footer-info">
+        <strong>Need help?</strong> Contact the Hack Club team at
+        <a href="mailto:clubs@hackclub.com">clubs@hackclub.com</a>
+        or visit our <a href="https://hackclub.com/slack" target="_blank">community Slack</a> for assistance.
+    </div>
+</div>
+
+<script>
+// Prevent going back to dashboard
+window.history.pushState(null, null, window.location.href);
+window.addEventListener('popstate', function() {
+    window.history.pushState(null, null, window.location.href);
+});
+
+// Disable common keyboard shortcuts that might bypass this page
+document.addEventListener('keydown', function(e) {
+    // Disable F5 refresh
+    if (e.key === 'F5') {
+        e.preventDefault();
+    }
+    // Disable Ctrl+R refresh
+    if (e.ctrlKey && e.key === 'r') {
+        e.preventDefault();
+    }
+    // Disable Alt+Left (back)
+    if (e.altKey && e.key === 'ArrowLeft') {
+        e.preventDefault();
+    }
+    // Disable Alt+Right (forward)
+    if (e.altKey && e.key === 'ArrowRight') {
+        e.preventDefault();
+    }
+});
+</script>
+</body>
+</html>

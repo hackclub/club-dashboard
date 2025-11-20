@@ -1,0 +1,20 @@
+{% extends "errors/base_error.html" %}
+
+{% block error_icon %}
+<i class="fas fa-lock"></i>
+{% endblock %}
+
+{% block error_title %}Unauthorized{% endblock %}
+
+{% block error_message %}
+You need to be logged in to access this page. Please log in and try again.
+{% endblock %}
+
+{% block error_actions %}
+<a href="{{ url_for('auth.login') }}" class="error-btn error-btn-primary">
+    <i class="fas fa-sign-in-alt"></i> Log In
+</a>
+<a href="{{ url_for('main.index') }}" class="error-btn error-btn-secondary">
+    <i class="fas fa-home"></i> Go Home
+</a>
+{% endblock %}

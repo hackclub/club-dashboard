@@ -1,0 +1,15 @@
+{% extends "errors/base_error.html" %}
+
+{% block error_icon %}
+<i class="fas fa-wrench"></i>
+{% endblock %}
+
+{% block error_title %}Service Unavailable{% endblock %}
+
+{% block error_message %}
+The service is temporarily unavailable. We're working on it and will be back shortly.
+{% endblock %}
+
+{% block error_help %}
+Check our <a href="{{ url_for('status.status_page') }}">Status Page</a> for updates
+{% endblock %}

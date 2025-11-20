@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Log - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <h1>Activity Log</h1>
+
+    <div style="background: white; padding: 2rem; border-radius: 10px; margin-top: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        {% if logs %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f1f5f9; border-bottom: 2px solid #e2e8f0;">
+                    <th style="padding: 1rem; text-align: left;">Time</th>
+                    <th style="padding: 1rem; text-align: left;">User</th>
+                    <th style="padding: 1rem; text-align: left;">Action</th>
+                    <th style="padding: 1rem; text-align: left;">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 1rem;">{{ log.timestamp.strftime('%Y-%m-%d %H:%M') if log.timestamp else 'N/A' }}</td>
+                    <td style="padding: 1rem;">
+                        {% if log.user %}
+                        <a href="{{ url_for('admin.user_detail', user_id=log.user_id) }}">{{ log.user.username }}</a>
+                        {% else %}
+                        System
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;"><code>{{ log.action_type }}</code></td>
+                    <td style="padding: 1rem;">{{ log.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+        <div style="margin-top: 2rem; text-align: center;">
+            {% if page > 1 %}
+            <a href="{{ url_for('admin.activity', page=page-1) }}" style="color: #3b82f6; margin: 0 1rem;">← Previous</a>
+            {% endif %}
+            <span>Page {{ page }} of {{ total_pages }}</span>
+            {% if page < total_pages %}
+            <a href="{{ url_for('admin.activity', page=page+1) }}" style="color: #3b82f6; margin: 0 1rem;">Next →</a>
+            {% endif %}
+        </div>
+        {% else %}
+        <p>No activity logs found.</p>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('admin.dashboard') }}" style="color: #3b82f6;">← Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1339 @@
+{% extends "base.html" %}
+
+{% block title %}Project Review - Hack Club Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+    .review-container {
+        min-height: 100vh;
+        background: #f5f7fa;
+        padding: 2rem 0;
+    }
+
+    .review-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .review-header {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 2.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .review-title {
+        font-size: clamp(2rem, 6vw, 3rem);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .review-title i {
+        color: #3b82f6;
+    }
+
+    .review-subtitle {
+        font-size: 1.1rem;
+        color: #6b7280;
+        margin-bottom: 0;
+    }
+
+    .review-controls {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .filter-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .filter-select {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: white;
+        font-size: 0.875rem;
+        min-width: 120px;
+    }
+
+    .search-container {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        background: white;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .refresh-btn {
+        padding: 0.75rem 1.5rem;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .project-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .project-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .project-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .project-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .project-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .project-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .project-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-approved {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-flagged {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .auto-review-flags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .auto-review-flag {
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .flag-ai {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .flag-screenshot {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .flag-pass {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .flag-invalid {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .project-content {
+        padding: 1.5rem;
+    }
+
+    .project-field {
+        margin-bottom: 1rem;
+    }
+
+    .field-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.25rem;
+    }
+
+    .field-value {
+        color: #6b7280;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    .field-value a {
+        color: #3b82f6;
+        text-decoration: none;
+    }
+
+    .field-value a:hover {
+        text-decoration: underline;
+    }
+
+    .project-description {
+        background: #f9fafb;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #3b82f6;
+        margin: 1rem 0;
+    }
+
+    .project-screenshot {
+        width: 100%;
+        max-width: 200px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .project-screenshot:hover {
+        transform: scale(1.05);
+    }
+
+    .project-actions {
+        padding: 1.5rem;
+        border-top: 1px solid #f3f4f6;
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-approve {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-approve:hover {
+        background: #059669;
+    }
+
+    .btn-reject {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-reject:hover {
+        background: #dc2626;
+    }
+
+    .btn-flag {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .btn-flag:hover {
+        background: #d97706;
+    }
+
+    .btn-view {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #4b5563;
+    }
+
+    .btn-grant-override {
+        border: 2px dotted #f59e0b !important;
+        background: white !important;
+        color: #f59e0b !important;
+    }
+
+    .btn-grant-override:hover {
+        background: #fef3c7 !important;
+        border-color: #d97706 !important;
+        color: #d97706 !important;
+    }
+
+    .btn-delete {
+        background: #dc2626;
+        color: white;
+        border: 2px dotted #fbbf24 !important;
+    }
+
+    .btn-delete:hover {
+        background: #b91c1c;
+        border-color: #f59e0b !important;
+    }
+
+    .empty-state {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+        color: #6b7280;
+        padding: 4rem 2rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 1rem;
+    }
+
+    .loading-spinner {
+        border: 2px solid #f3f4f6;
+        border-top: 2px solid #3b82f6;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: 120px auto 2% auto;
+        padding: 0;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .modal-header {
+        padding: 2rem 2rem 1rem 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #6b7280;
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .modal-footer {
+        padding: 1rem 2rem 2rem 2rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #4b5563;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .projects-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .review-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-section {
+            justify-content: space-between;
+        }
+
+        .search-container {
+            max-width: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="review-container">
+    <div class="review-content">
+        <div class="review-header">
+            <h1 class="review-title">
+                <i class="fas fa-clipboard-check"></i> Project Review
+            </h1>
+            <p class="review-subtitle">
+                Review and manage submitted projects for club grants!</g>
+            </p>
+        </div>
+
+        <div class="review-nav" style="background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #e2e8f0;">
+            <div style="display: flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap;">
+                <a href="/admin/projects/review" style="background: #3b82f6; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
+                    <i class="fas fa-clipboard-check"></i> Project Review
+                </a>
+                {% if current_user.has_permission('orders.view') %}
+                <a href="/admin/orders/review" style="background: #8b5cf6; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
+                    <i class="fas fa-box-open"></i> Order Review
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="review-controls">
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Flagged">Flagged</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Auto Review</label>
+                    <select id="autoReviewFilter" class="filter-select">
+                        <option value="">All Reviews</option>
+                        <option value="Pass">Pass</option>
+                        <option value="Flagged For AI">Flagged For AI</option>
+                        <option value="Screenshot Error">Screenshot Error</option>
+                        <option value="Invalid Repo">Invalid Repo</option>
+                    </select>
+                </div>
+
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="search-input"
+                        placeholder="Search projects, names, emails..."
+                    />
+                </div>
+            </div>
+
+            <button class="refresh-btn" onclick="loadProjects()">
+                <i class="fas fa-sync-alt"></i>
+                Refresh
+            </button>
+        </div>
+
+        <div id="projectsContainer" class="projects-grid">
+
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none">
+            <i class="fas fa-clipboard-list"></i>
+            <h3>No projects found</h3>
+            <p>No projects match your current filters</p>
+        </div>
+
+        <div id="loadingState" class="empty-state">
+            <div class="loading-spinner" style="width: 40px; height: 40px; margin: 0 auto 1rem;"></div>
+            <h3>Loading projects...</h3>
+            <p>Fetching project data from Airtable</p>
+        </div>
+    </div>
+</div>
+
+
+<div id="reviewModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="reviewModalTitle">Review Project</h2>
+            <button class="modal-close" onclick="closeReviewModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="reviewForm">
+                <input type="hidden" id="projectId" />
+
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-control" id="newStatus" required>
+                        <option value="">Select Status</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Flagged">Flagged</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Decision Reason</label>
+                    <textarea
+                        class="form-control"
+                        id="decisionReason"
+                        rows="4"
+                        placeholder="Explain your decision..."
+                        required
+                    ></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeReviewModal()">
+                Cancel
+            </button>
+            <button type="button" class="btn btn-primary" onclick="submitReview()">
+                <span id="submitBtnText">Update Review</span>
+                <div id="submitBtnSpinner" class="loading-spinner" style="display: none;"></div>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div id="projectDetailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="projectDetailTitle">Project Details</h2>
+            <button class="modal-close" onclick="closeProjectDetailModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="projectDetailContent">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="grantOverrideModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="grantOverrideTitle">Grant Amount Override</h2>
+            <button class="modal-close" onclick="closeGrantOverrideModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="grantOverrideForm">
+                <input type="hidden" id="overrideProjectId" />
+
+                <div class="form-group">
+                    <label class="form-label">Current Grant Amount (Calculated by Airtable)</label>
+                    <div id="currentGrantAmount" style="font-size: 1.2rem; font-weight: 600; color: #10b981; padding: 0.75rem; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
+                        Loading...
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Override Amount (USD)</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="overrideGrantAmount"
+                        placeholder="Enter override amount"
+                        min="0"
+                        step="0.01"
+                        style="border: 2px dotted #f59e0b;"
+                        required
+                    />
+                    <small style="color: #6b7280; margin-top: 0.5rem; display: block;">
+                        Leave empty to use Airtable calculated amount
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Override Reason</label>
+                    <textarea
+                        class="form-control"
+                        id="overrideReason"
+                        rows="3"
+                        placeholder="Explain why you're overriding the calculated amount..."
+                        required
+                    ></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeGrantOverrideModal()">
+                Cancel
+            </button>
+            <button type="button" class="btn" onclick="submitGrantOverride()" style="background: #f59e0b; color: white; border: 2px dotted #d97706;">
+                <span id="overrideBtnText">Apply Override</span>
+                <div id="overrideBtnSpinner" class="loading-spinner" style="display: none;"></div>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div id="deleteModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2 class="modal-title">Delete Project Submission</h2>
+            <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="deleteProjectId" />
+
+            <div style="text-align: center; padding: 1rem 0;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc2626; margin-bottom: 1rem;"></i>
+                <h3 style="color: #1f2937; margin-bottom: 1rem;">Are you sure?</h3>
+                <p style="color: #6b7280; margin-bottom: 1.5rem;">
+                    This will permanently delete the project submission from Airtable.
+                    <br><strong>This action cannot be undone.</strong>
+                </p>
+                <div id="deleteProjectInfo" style="background: #f3f4f6; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">
+                Cancel
+            </button>
+            <button type="button" class="btn btn-delete" onclick="confirmDelete()">
+                <span id="deleteBtnText">
+                    <i class="fas fa-trash"></i> Delete Permanently
+                </span>
+                <div id="deleteBtnSpinner" class="loading-spinner" style="display: none;"></div>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let projects = [];
+    let filteredProjects = [];
+    const CAN_SUBMIT_REVIEWS = {{ 'true' if current_user.has_permission('reviews.submit') else 'false' }};
+    const IS_ADMIN = {{ 'true' if current_user.is_admin else 'false' }};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setupFilters(); // Setup filters with defaults first
+        loadProjects(); // Then load projects which will apply the filters
+    });
+
+    async function loadProjects() {
+        const loadingState = document.getElementById('loadingState');
+        const emptyState = document.getElementById('emptyState');
+        const projectsContainer = document.getElementById('projectsContainer');
+
+        loadingState.style.display = 'block';
+        emptyState.style.display = 'none';
+        projectsContainer.innerHTML = '';
+
+        try {
+            const response = await fetch('/api/projects/review');
+
+            if (response.ok) {
+                const data = await response.json();
+                projects = data.projects || [];
+                applyFilters(); // Use applyFilters to maintain current filter state
+            } else {
+                console.error('Failed to load projects, status:', response.status);
+                showError('Failed to load projects from Airtable');
+            }
+        } catch (error) {
+            console.error('Error loading projects:', error);
+            showError('Error connecting to project data');
+        } finally {
+            loadingState.style.display = 'none';
+        }
+    }
+
+    function setupFilters() {
+        const statusFilter = document.getElementById('statusFilter');
+        const autoReviewFilter = document.getElementById('autoReviewFilter');
+        const searchInput = document.getElementById('searchInput');
+
+        // Set default status filter to show all projects
+        statusFilter.value = '';
+
+        statusFilter.addEventListener('change', applyFilters);
+        autoReviewFilter.addEventListener('change', applyFilters);
+        searchInput.addEventListener('input', applyFilters);
+    }
+
+    function applyFilters() {
+        const statusFilter = document.getElementById('statusFilter').value;
+        const autoReviewFilter = document.getElementById('autoReviewFilter').value;
+        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+
+        filteredProjects = projects.filter(project => {
+            const matchesStatus = !statusFilter || project.status === statusFilter;
+            const matchesAutoReview = !autoReviewFilter ||
+                (project.autoReviewStatus && project.autoReviewStatus.includes(autoReviewFilter));
+            const matchesSearch = !searchQuery ||
+                (project.firstName && project.firstName.toLowerCase().includes(searchQuery)) ||
+                (project.lastName && project.lastName.toLowerCase().includes(searchQuery)) ||
+                (project.email && project.email.toLowerCase().includes(searchQuery)) ||
+                (project.description && project.description.toLowerCase().includes(searchQuery)) ||
+                (project.clubName && project.clubName.toLowerCase().includes(searchQuery));
+
+            return matchesStatus && matchesAutoReview && matchesSearch;
+        });
+
+        renderProjects();
+    }
+
+    function renderProjects() {
+        const projectsContainer = document.getElementById('projectsContainer');
+        const emptyState = document.getElementById('emptyState');
+
+        if (!filteredProjects || filteredProjects.length === 0) {
+            projectsContainer.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+
+        projectsContainer.innerHTML = filteredProjects.map(project => {
+            const autoReviewFlags = Array.isArray(project.autoReviewStatus)
+                ? project.autoReviewStatus
+                : (project.autoReviewStatus ? [project.autoReviewStatus] : []);
+
+            return `
+                <div class="project-card">
+                    <div class="project-header">
+                        <h3 class="project-title">
+                            ${project.firstName} ${project.lastName}
+                            ${project.age ? `<span style="font-size: 0.75rem; color: #6b7280;">(${project.age})</span>` : ''}
+                        </h3>
+                        <div class="project-meta">
+                            <span><i class="fas fa-envelope"></i> ${project.email}</span>
+                            <span><i class="fas fa-users"></i> ${project.clubName || 'N/A'}</span>
+                            <span><i class="fas fa-clock"></i> ${project.hours || 0}h</span>
+                        </div>
+                        <div class="project-status status-${project.status.toLowerCase()}">
+                            <i class="fas fa-circle"></i>
+                            ${project.status}
+                        </div>
+                        ${autoReviewFlags.length > 0 ? `
+                            <div class="auto-review-flags">
+                                ${autoReviewFlags.map(flag => `
+                                    <span class="auto-review-flag flag-${flag.toLowerCase().replace(/\s+/g, '-')}">
+                                        ${flag}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="project-content">
+                        ${project.description ? `
+                            <div class="project-description">
+                                <div class="field-label">Description</div>
+                                <div class="field-value">${project.description}</div>
+                            </div>
+                        ` : ''}
+
+                        <div class="project-field">
+                            <div class="field-label">Code URL</div>
+                            <div class="field-value">
+                                ${project.codeUrl ? `<a href="${project.codeUrl}" target="_blank">${project.codeUrl}</a>` : 'Not provided'}
+                            </div>
+                        </div>
+
+                        <div class="project-field">
+                            <div class="field-label">Playable URL</div>
+                            <div class="field-value">
+                                ${project.playableUrl ? `<a href="${project.playableUrl}" target="_blank">${project.playableUrl}</a>` : 'Not provided'}
+                            </div>
+                        </div>
+
+                        ${project.githubUsername ? `
+                            <div class="project-field">
+                                <div class="field-label">GitHub Username</div>
+                                <div class="field-value">
+                                    <a href="https://github.com/${project.githubUsername}" target="_blank">@${project.githubUsername}</a>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${project.grantAmount ? `
+                            <div class="project-field">
+                                <div class="field-label">Grant Amount</div>
+                                <div class="field-value">${Math.round(parseFloat(project.grantAmount) * 100)} tokens</div>
+                            </div>
+                        ` : ''}
+
+                        ${project.decisionReason ? `
+                            <div class="project-field">
+                                <div class="field-label">Decision Reason</div>
+                                <div class="field-value">${project.decisionReason}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="project-actions">
+                        <button class="action-btn btn-view" onclick="viewProjectDetails('${project.id}')">
+                            <i class="fas fa-eye"></i> View Details
+                        </button>
+                        ${CAN_SUBMIT_REVIEWS ? `
+                        <button class="action-btn btn-approve" onclick="openReviewModal('${project.id}', 'Approved')">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="action-btn btn-reject" onclick="openReviewModal('${project.id}', 'Rejected')">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        <button class="action-btn btn-flag" onclick="openReviewModal('${project.id}', 'Flagged')">
+                            <i class="fas fa-flag"></i> Flag
+                        </button>
+                        ` : ''}
+                        ${IS_ADMIN ? `
+                        <button class="action-btn btn-grant-override" onclick="openGrantOverrideModal('${project.id}')">
+                            <i class="fas fa-coins"></i> Grant Override
+                        </button>
+                        <button class="action-btn btn-delete" onclick="openDeleteModal('${project.id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function openReviewModal(projectId, suggestedStatus) {
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return;
+
+        document.getElementById('projectId').value = projectId;
+        document.getElementById('newStatus').value = suggestedStatus;
+        document.getElementById('decisionReason').value = project.decisionReason || '';
+
+        document.getElementById('reviewModalTitle').textContent = `Review: ${project.firstName} ${project.lastName}`;
+        document.getElementById('reviewModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    async function submitReview() {
+        const projectId = document.getElementById('projectId').value;
+        const newStatus = document.getElementById('newStatus').value;
+        const decisionReason = document.getElementById('decisionReason').value;
+
+        if (!newStatus || !decisionReason) {
+            showToast('error', 'Please fill in all required fields');
+            return;
+        }
+
+        const submitBtn = document.querySelector('#reviewModal .btn-primary');
+        const submitBtnText = document.getElementById('submitBtnText');
+        const submitBtnSpinner = document.getElementById('submitBtnSpinner');
+
+        submitBtn.disabled = true;
+        submitBtnText.style.display = 'none';
+        submitBtnSpinner.style.display = 'inline-block';
+
+        try {
+            const response = await fetch(`/api/projects/review/${projectId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    status: newStatus,
+                    decisionReason: decisionReason
+                })
+            });
+
+            if (response.ok) {
+                showToast('success', 'Project review updated successfully');
+                closeReviewModal();
+                loadProjects(); // Reload projects
+            } else {
+                const error = await response.json();
+                showToast('error', error.error || 'Failed to update review');
+            }
+        } catch (error) {
+            console.error('Error updating review:', error);
+            showToast('error', 'Failed to update review');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtnText.style.display = 'inline';
+            submitBtnSpinner.style.display = 'none';
+        }
+    }
+
+    function viewProjectDetails(projectId) {
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return;
+
+        document.getElementById('projectDetailTitle').textContent = `${project.firstName} ${project.lastName} - Project Details`;
+
+        const content = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <h4 style="color: #1a202c; margin-bottom: 1rem;">Personal Information</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Name:</strong> ${project.firstName} ${project.lastName}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Email:</strong> ${project.email}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Age:</strong> ${project.age || 'Not provided'}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>GitHub:</strong> ${project.githubUsername ? `<a href="https://github.com/${project.githubUsername}" target="_blank">@${project.githubUsername}</a>` : 'Not provided'}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Birthday:</strong> ${project.birthday || 'Not provided'}
+                    </div>
+                </div>
+
+                <div>
+                    <h4 style="color: #1a202c; margin-bottom: 1rem;">Club & Project Info</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Club Name:</strong> ${project.clubName || 'Not provided'}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Leader Email:</strong> ${project.leaderEmail || 'Not provided'}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Hours Worked:</strong> ${project.hours || 0}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Hackatime Project:</strong> ${project.hackatimeProject || 'Not provided'}
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="color: #1a202c; margin: 2rem 0 1rem 0;">Project URLs</h4>
+            <div style="margin-bottom: 1rem;">
+                <strong>Code URL:</strong> ${project.codeUrl ? `<a href="${project.codeUrl}" target="_blank">${project.codeUrl}</a>` : 'Not provided'}
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <strong>Playable URL:</strong> ${project.playableUrl ? `<a href="${project.playableUrl}" target="_blank">${project.playableUrl}</a>` : 'Not provided'}
+            </div>
+
+            ${project.description ? `
+                <h4 style="color: #1a202c; margin: 2rem 0 1rem 0;">Description</h4>
+                <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                    ${project.description}
+                </div>
+            ` : ''}
+
+            ${project.screenshot ? `
+                <h4 style="color: #1a202c; margin: 2rem 0 1rem 0;">Screenshot</h4>
+                <div style="display: flex; justify-content: center; margin: 1rem 0;">
+                    <img src="${project.screenshot}" alt="Project screenshot"
+                         style="max-width: 100%; max-height: 400px; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; object-fit: contain;"
+                         onclick="openImageZoom('${project.screenshot}')">
+                </div>
+            ` : ''}
+
+            <h4 style="color: #1a202c; margin: 2rem 0 1rem 0;">Address</h4>
+            <div style="margin-bottom: 1rem;">
+                <div>${project.addressLine1 || ''}</div>
+                ${project.addressLine2 ? `<div>${project.addressLine2}</div>` : ''}
+                <div>${project.city || ''}, ${project.country || ''} ${project.zipCode || ''}</div>
+            </div>
+
+            <h4 style="color: #1a202c; margin: 2rem 0 1rem 0;">Feedback</h4>
+            <div style="margin-bottom: 1rem;">
+                <strong>How did you hear about this?</strong><br>
+                ${project.howDidYouHear || 'Not provided'}
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <strong>What are we doing well?</strong><br>
+                ${project.whatAreWeDoingWell || 'Not provided'}
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <strong>How can we improve?</strong><br>
+                ${project.howCanWeImprove || 'Not provided'}
+            </div>
+        `;
+
+        document.getElementById('projectDetailContent').innerHTML = content;
+        document.getElementById('projectDetailModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeProjectDetailModal() {
+        document.getElementById('projectDetailModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function openGrantOverrideModal(projectId) {
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return;
+
+        document.getElementById('overrideProjectId').value = projectId;
+        document.getElementById('grantOverrideTitle').textContent = `Grant Override: ${project.firstName} ${project.lastName}`;
+
+        // Display current grant amount
+        const currentAmount = project.grantAmount ? `${Math.round(parseFloat(project.grantAmount) * 100)} tokens ($${parseFloat(project.grantAmount).toFixed(2)} USD)` : 'Not calculated yet';
+        document.getElementById('currentGrantAmount').textContent = currentAmount;
+
+        // Clear override fields
+        document.getElementById('overrideGrantAmount').value = '';
+        document.getElementById('overrideReason').value = '';
+
+        document.getElementById('grantOverrideModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeGrantOverrideModal() {
+        document.getElementById('grantOverrideModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    async function submitGrantOverride() {
+        const projectId = document.getElementById('overrideProjectId').value;
+        const overrideAmount = document.getElementById('overrideGrantAmount').value;
+        const overrideReason = document.getElementById('overrideReason').value;
+
+        if (!overrideAmount || !overrideReason) {
+            showToast('error', 'Please fill in both override amount and reason');
+            return;
+        }
+
+        const submitBtn = document.querySelector('#grantOverrideModal .btn');
+        const submitBtnText = document.getElementById('overrideBtnText');
+        const submitBtnSpinner = document.getElementById('overrideBtnSpinner');
+
+        submitBtn.disabled = true;
+        submitBtnText.style.display = 'none';
+        submitBtnSpinner.style.display = 'inline-block';
+
+        try {
+            const response = await fetch(`/api/projects/grant-override/${projectId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    grantAmount: parseFloat(overrideAmount),
+                    overrideReason: overrideReason
+                })
+            });
+
+            if (response.ok) {
+                showToast('success', 'Grant amount override applied successfully');
+                closeGrantOverrideModal();
+                loadProjects(); // Reload projects
+            } else {
+                const error = await response.json();
+                showToast('error', error.error || 'Failed to apply grant override');
+            }
+        } catch (error) {
+            console.error('Error applying grant override:', error);
+            showToast('error', 'Failed to apply grant override');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtnText.style.display = 'inline';
+            submitBtnSpinner.style.display = 'none';
+        }
+    }
+
+    function openDeleteModal(projectId) {
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return;
+
+        document.getElementById('deleteProjectId').value = projectId;
+
+        // Display project info
+        document.getElementById('deleteProjectInfo').innerHTML = `
+            <strong>${project.firstName} ${project.lastName}</strong><br>
+            <small>${project.email}</small><br>
+            <small>Club: ${project.clubName || 'N/A'}</small>
+        `;
+
+        document.getElementById('deleteModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    async function confirmDelete() {
+        const projectId = document.getElementById('deleteProjectId').value;
+
+        const submitBtn = document.querySelector('#deleteModal .btn-delete');
+        const submitBtnText = document.getElementById('deleteBtnText');
+        const submitBtnSpinner = document.getElementById('deleteBtnSpinner');
+
+        submitBtn.disabled = true;
+        submitBtnText.style.display = 'none';
+        submitBtnSpinner.style.display = 'inline-block';
+
+        try {
+            const response = await fetch(`/api/projects/delete/${projectId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                showToast('success', 'Project submission deleted successfully');
+                closeDeleteModal();
+                loadProjects(); // Reload projects
+            } else {
+                const error = await response.json();
+                showToast('error', error.error || 'Failed to delete project');
+            }
+        } catch (error) {
+            console.error('Error deleting project:', error);
+            showToast('error', 'Failed to delete project');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtnText.style.display = 'inline';
+            submitBtnSpinner.style.display = 'none';
+        }
+    }
+
+    function openImageZoom(imageSrc) {
+        // You can implement image zoom functionality here
+        window.open(imageSrc, '_blank');
+    }
+
+    function showError(message) {
+        const emptyState = document.getElementById('emptyState');
+        emptyState.innerHTML = `
+            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+            <h3>Error Loading Projects</h3>
+            <p>${message}</p>
+        `;
+        emptyState.style.display = 'block';
+    }
+
+    // Close modals when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal')) {
+            if (e.target.id === 'reviewModal') closeReviewModal();
+            if (e.target.id === 'projectDetailModal') closeProjectDetailModal();
+            if (e.target.id === 'grantOverrideModal') closeGrantOverrideModal();
+            if (e.target.id === 'deleteModal') closeDeleteModal();
+        }
+    });
+
+    // Close modals with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const reviewModal = document.getElementById('reviewModal');
+            const detailModal = document.getElementById('projectDetailModal');
+            const grantModal = document.getElementById('grantOverrideModal');
+            const deleteModal = document.getElementById('deleteModal');
+
+            if (reviewModal && reviewModal.style.display === 'block') {
+                closeReviewModal();
+            } else if (detailModal && detailModal.style.display === 'block') {
+                closeProjectDetailModal();
+            } else if (grantModal && grantModal.style.display === 'block') {
+                closeGrantOverrideModal();
+            } else if (deleteModal && deleteModal.style.display === 'block') {
+                closeDeleteModal();
+            }
+        }
+    });
+</script>
+{% endblock %}

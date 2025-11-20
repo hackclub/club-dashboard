@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Debug Callback</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .info {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .label {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .value {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 8px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OAuth Debug Callback</h1>
+
+        {% if error %}
+            <div class="error">
+                <strong>Error:</strong> {{ error }}
+            </div>
+        {% else %}
+            <div class="success">
+                OAuth callback received successfully!
+            </div>
+
+            {% if code %}
+            <div class="info">
+                <div class="label">Authorization Code:</div>
+                <div class="value">{{ code }}</div>
+            </div>
+            {% endif %}
+
+            {% if state %}
+            <div class="info">
+                <div class="label">State:</div>
+                <div class="value">{{ state }}</div>
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 20px;">
+                <p><strong>Next steps:</strong></p>
+                <ol>
+                    <li>Exchange the authorization code for an access token using the <code>/oauth/token</code> endpoint</li>
+                    <li>Use the access token in the Authorization header: <code>Bearer &lt;token&gt;</code></li>
+                </ol>
+            </div>
+        {% endif %}
+
+        <div style="margin-top: 30px;">
+            <a href="{{ url_for('oauth.oauth_debug') }}" style="color: #007bff; text-decoration: none;">← Back to OAuth Debug</a>
+        </div>
+    </div>
+</body>
+</html>

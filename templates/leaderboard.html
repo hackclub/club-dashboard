@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Hack Clubs{% endblock %}
+
+{% block extra_head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+.leaderboard-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.nav-tab {
+    padding: 0.75rem 1.5rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #6b7280;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-tab.active {
+    background: #ec3750;
+    border-color: #ec3750;
+    color: white;
+}
+
+.nav-tab:hover {
+    border-color: #ec3750;
+    color: #ec3750;
+}
+
+.nav-tab.active:hover {
+    color: white;
+}
+
+.leaderboard-row {
+    position: relative;
+}
+
+.admin-exclude-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+}
+
+.leaderboard-row:hover .admin-exclude-btn {
+    opacity: 1;
+}
+
+.admin-exclude-btn:hover {
+    background: #c82333;
+}
+.leaderboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.leaderboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem 1rem;
+}
+
+.leaderboard-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.leaderboard-header p {
+    margin: 0;
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+.leaderboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #ec3750;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.leaderboard-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.table-header {
+    background: #f8f9fa;
+    color: #495057;
+    padding: 1rem 1.5rem;
+    display: grid;
+    grid-template-columns: 80px 1fr 120px 120px;
+    gap: 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.leaderboard-row {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    display: grid;
+    grid-template-columns: 80px 1fr 120px 120px;
+    gap: 1rem;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.leaderboard-row:hover {
+    background: #f8f9fa;
+}
+
+.leaderboard-row:last-child {
+    border-bottom: none;
+}
+
+.rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+
+.rank-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+}
+
+.rank-1 { background: linear-gradient(135deg, #ffd700, #ffed4a); color: #333; }
+.rank-2 { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); }
+.rank-3 { background: linear-gradient(135deg, #cd7f32, #b8860b); }
+.rank-other { background: linear-gradient(135deg, #6c757d, #495057); }
+
+.club-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.club-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.club-location {
+    color: #6c757d;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.token-amount {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #28a745;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.member-count, .position {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #dee2e6;
+}
+
+.error-state {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .leaderboard-container {
+        padding: 1rem;
+    }
+
+    .leaderboard-header h1 {
+        font-size: 2rem;
+    }
+
+    .leaderboard-nav {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .nav-tab {
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .table-header, .leaderboard-row {
+        grid-template-columns: 50px 1fr 60px 70px;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .rank-badge {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+
+    .club-name {
+        font-size: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="leaderboard-container">
+    <div class="leaderboard-header">
+        <h1><i class="fas fa-trophy"></i> Leaderboard</h1>
+        <p>
+            {% if leaderboard_type == "most_members" %}
+                Clubs ranked by total member count
+            {% else %}
+                Total token earnings
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="leaderboard-nav">
+        <a href="{{ url_for('main.leaderboard', leaderboard_type='total') }}"
+           class="nav-tab {{ 'active' if leaderboard_type == 'total' or leaderboard_type == 'total_tokens' else '' }}">
+            <i class="fas fa-coins"></i> Total Tokens
+        </a>
+        <a href="{{ url_for('main.leaderboard', leaderboard_type='most_members') }}"
+           class="nav-tab {{ 'active' if leaderboard_type == 'most_members' else '' }}">
+            <i class="fas fa-users"></i> Most Members
+        </a>
+    </div>
+
+    {% if error %}
+    <div class="error-state">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% if clubs %}
+    <div class="leaderboard-table">
+        <div class="table-header">
+            <div>Rank</div>
+            <div>Club</div>
+            <div>Members</div>
+            <div>
+                {% if leaderboard_type == "most_members" %}
+                    Total Members
+                {% else %}
+                    Total Tokens
+                {% endif %}
+            </div>
+        </div>
+
+        {% for club in clubs %}
+        <div class="leaderboard-row" data-club-id="{{ club.id }}">
+            <div class="rank">
+                <div class="rank-badge rank-{{ '1' if club.rank == 1 else '2' if club.rank == 2 else '3' if club.rank == 3 else 'other' }}">
+                    {% if club.rank <= 3 %}
+                        <i class="fas fa-trophy"></i>
+                    {% else %}
+                        {{ club.rank }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="club-info">
+                <div class="club-name">{{ club.name }}</div>
+            </div>
+
+            <div class="member-count">
+                <i class="fas fa-users"></i>
+                {{ club.member_count }}
+            </div>
+
+            <div class="token-amount">
+                {% if leaderboard_type == "most_members" %}
+                    <i class="fas fa-users"></i>
+                    {{ club.total_members }}
+                {% else %}
+                    <i class="fas fa-coins"></i>
+                    {{ "{:,}".format(club.total_tokens) }}
+                {% endif %}
+            </div>
+
+            {% if current_user and current_user.is_admin %}
+            <button class="admin-exclude-btn" onclick="excludeClub({{ club.id }}, '{{ club.name }}', '{{ leaderboard_type }}')">
+                <i class="fas fa-ban"></i> Exclude
+            </button>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="leaderboard-table">
+        <div class="empty-state">
+            <i class="fas fa-trophy"></i>
+            <h3>No Leaderboard Data Available</h3>
+            <p>Check back soon as clubs start earning tokens!</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function excludeClub(clubId, clubName, leaderboardType) {
+    const leaderboardTypeText = leaderboardType === 'most_members' ? 'most members' : 'total tokens';
+
+    UniversalModal.confirm(
+        `Are you sure you want to exclude <strong>${clubName}</strong> from the <strong>${leaderboardTypeText}</strong> leaderboard?<br><span style="color: #ef4444; font-size: 0.9rem; margin-top: 1rem; display: block;">This action will remove the club from the current leaderboard view.</span>`,
+        async function() {
+            // User confirmed exclusion
+            try {
+                const leaderboardApiType = leaderboardType === 'most_members' ? 'most_members' : 'total_tokens';
+
+                const response = await fetch('/api/admin/leaderboard/exclusions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        club_id: clubId,
+                        leaderboard_type: leaderboardApiType,
+                        reason: `Excluded from ${leaderboardType} leaderboard by admin`
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Remove the row from the leaderboard
+                    const row = document.querySelector(`[data-club-id="${clubId}"]`);
+                    if (row) {
+                        row.style.transition = 'opacity 0.3s ease';
+                        row.style.opacity = '0';
+                        setTimeout(() => row.remove(), 300);
+                    }
+
+                    // Show success message
+                    if (typeof showToast === 'function') {
+                        showToast('success', `${clubName} has been excluded from the leaderboard`);
+                    } else {
+                        alert(`${clubName} has been excluded from the leaderboard`);
+                    }
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast('error', data.error || 'Failed to exclude club');
+                    } else {
+                        alert('Error: ' + (data.error || 'Failed to exclude club'));
+                    }
+                }
+            } catch (error) {
+                console.error('Error excluding club:', error);
+                if (typeof showToast === 'function') {
+                    showToast('error', 'Network error occurred');
+                } else {
+                    alert('Network error occurred');
+                }
+            }
+        },
+        null,
+        'Exclude Club from Leaderboard'
+    );
+}
+            alert('Network error occurred');
+        }
+    }
+}
+</script>
+{% endblock %}

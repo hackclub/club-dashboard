@@ -1,0 +1,964 @@
+{% extends "base.html" %}
+
+{% block title %}Account Settings - Hack Clubs Dash{% endblock %}
+
+{% block extra_head %}
+<style>
+    .account-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .account-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .section-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ec3750;
+        box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: #ec3750;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #d63146;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #4b5563;
+    }
+
+    .club-verification {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .club-verification h4 {
+        margin: 0 0 0.5rem 0;
+        color: #9a3412;
+    }
+
+    .club-verification p {
+        margin: 0;
+        color: #c2410c;
+        font-size: 0.9rem;
+    }
+
+    /* Identity Verification Styles */
+    .verification-status {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .verification-status.verified {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+    }
+
+    .verification-status.pending {
+        background: #fffbeb;
+        border: 1px solid #fef08a;
+        color: #a16207;
+    }
+
+    .verification-status.rejected {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+    }
+
+    .verification-status.unverified {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        color: #075985;
+    }
+
+    .status-icon {
+        font-size: 1.5rem;
+    }
+
+    .status-content h4 {
+        margin: 0 0 0.25rem 0;
+    }
+
+    .status-content p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="account-container">
+    <div class="account-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <div>
+                <h2>Account Information</h2>
+                <p style="margin: 0; color: #64748b;">Manage your personal details</p>
+            </div>
+        </div>
+
+        <form id="accountForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" value="{{ current_user.username }}">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" value="{{ current_user.email }}">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="firstName" value="{{ current_user.first_name or '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lastName" value="{{ current_user.last_name or '' }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Birthday</label>
+                <input type="date" class="form-control" id="birthday" value="{{ current_user.birthday.isoformat() if current_user.birthday else '' }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </form>
+    </div>
+
+    <div class="account-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <h2>Clubs</h2>
+                <p style="margin: 0; color: #64748b;">Verify leadership or join existing clubs</p>
+            </div>
+        </div>
+
+        <div class="club-verification">
+            <h4><i class="fas fa-info-circle"></i> Already a club leader?</h4>
+            <p>If you're already leading a Hack Club, you can verify and link to your existing club instead of creating a new one.</p>
+        </div>
+
+        <a href="{{ url_for('verify_leader') }}" class="btn btn-primary">
+            <i class="fas fa-shield-alt"></i> Verify Club Leadership
+        </a>
+
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
+            <h4 style="margin-bottom: 1rem;"><i class="fas fa-plus-circle"></i> Join a Club</h4>
+            <p style="margin-bottom: 1rem; color: #6b7280; font-size: 0.9rem;">Enter a join code from your club leader to join an existing club.</p>
+
+            <div style="display: flex; gap: 1rem; align-items: end;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label class="form-label">Join Code</label>
+                    <input type="text" class="form-control" id="joinCode" placeholder="Enter club join code">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="joinClubFromSettings()" style="height: fit-content;">
+                    <i class="fas fa-sign-in-alt"></i> Join Club
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="account-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div>
+                <h2>Two-Factor Authentication (2FA)</h2>
+                <p style="margin: 0; color: #64748b;">Add an extra layer of security to your account</p>
+            </div>
+        </div>
+
+        {% if current_user.totp_enabled %}
+        <div class="alert alert-success" style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+            <i class="fas fa-check-circle"></i> Two-factor authentication is <strong>enabled</strong> and protecting your account.
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Status</label>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <span style="color: #22c55e; font-weight: 600;">✓ Active</span>
+                <span style="color: #64748b;">since {{ current_user.totp_enabled_at.strftime('%B %d, %Y') if current_user.totp_enabled_at else 'Unknown' }}</span>
+            </div>
+            <label class="form-label">Backup Codes</label>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem;">
+                You have <strong>{{ current_user.get_backup_codes_count() }}</strong> backup codes remaining.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" onclick="regenerateBackupCodes()">
+                <i class="fas fa-sync"></i> Regenerate Backup Codes
+            </button>
+            <button type="button" class="btn btn-secondary" style="background: #dc2626;" onclick="disable2FA()">
+                <i class="fas fa-times"></i> Disable 2FA
+            </button>
+        </div>
+        {% else %}
+        <div class="alert alert-warning" style="background: #fff7ed; border: 2px solid #fb923c; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+            <i class="fas fa-exclamation-triangle"></i> Two-factor authentication is currently <strong>disabled</strong>. Enable it to better protect your account.
+        </div>
+
+        <p style="color: #64748b; margin-bottom: 1.5rem;">
+            Two-factor authentication adds an extra layer of security by requiring a code from your phone in addition to your password.
+        </p>
+
+        <a href="{{ url_for('auth.setup_2fa') }}" class="btn btn-primary">
+            <i class="fas fa-shield-alt"></i> Enable 2FA
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="account-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <div>
+                <h2>Change Password</h2>
+                <p style="margin: 0; color: #64748b;">Update your account password</p>
+            </div>
+        </div>
+
+        <form id="passwordForm">
+            <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <input type="password" class="form-control" id="currentPassword">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-control" id="newPassword">
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-key"></i> Update Password
+            </button>
+        </form>
+    </div>
+
+    <div class="account-section" id="hackatime">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-code"></i>
+            </div>
+            <div>
+                <h2>Hackatime Integration</h2>
+                <p style="margin: 0; color: #64748b;">Connect your Hackatime account to track coding time</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Hackatime API Key</label>
+            <input type="password" class="form-control" id="hackatimeKey" value="{{ current_user.hackatime_api_key or '' }}" placeholder="Enter your Hackatime API key">
+            <small style="color: #64748b; font-size: 0.875rem;">Get your API key from your Hackatime settings</small>
+        </div>
+
+        <button id="saveHackatime" class="btn btn-primary">
+            <i class="fas fa-clock"></i> Save Hackatime Key
+        </button>
+    </div>
+
+    <div class="account-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div>
+                <h2>Identity Verification</h2>
+                <p style="margin: 0; color: #64748b;">Verify your identity with Hack Club</p>
+            </div>
+        </div>
+
+        <div id="verificationStatus" class="verification-status">
+
+        </div>
+
+        <button id="verifyIdentity" class="btn btn-primary">
+            <i class="fas fa-shield-alt"></i> Verify Identity
+        </button>
+
+        <button id="refreshStatus" class="btn btn-secondary">
+            <i class="fas fa-sync-alt"></i> Refresh Status
+        </button>
+    </div>
+
+    {% if show_permissions %}
+    <div class="account-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div>
+                <h2>Roles & Permissions</h2>
+                <p style="margin: 0; color: #64748b;">Your assigned roles and permission levels</p>
+            </div>
+        </div>
+
+        <div class="roles-container" style="margin-bottom: 2rem;">
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #374151;">
+                <i class="fas fa-tag"></i> Your Roles
+            </h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                {% if user_roles %}
+                    {% for role in user_roles %}
+                    <span class="role-badge" style="
+                        background: linear-gradient(135deg, #ec3750, #d63146);
+                        color: white;
+                        padding: 0.5rem 1rem;
+                        border-radius: 6px;
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    ">
+                        <i class="fas fa-shield-alt"></i> {{ role }}
+                    </span>
+                    {% endfor %}
+                {% else %}
+                    <span style="color: #6b7280;">No special roles assigned</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="permissions-container">
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #374151;">
+                <i class="fas fa-key"></i> Your Permissions
+            </h3>
+
+            {% if permissions_by_category %}
+                {% for category, perms in permissions_by_category.items() %}
+                <div class="permission-category" style="margin-bottom: 1.5rem;">
+                    <h4 style="
+                        font-size: 0.95rem;
+                        font-weight: 600;
+                        color: #ec3750;
+                        margin-bottom: 0.75rem;
+                        text-transform: capitalize;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    ">
+                        {% if category == 'system' %}<i class="fas fa-cog"></i>
+                        {% elif category == 'users' %}<i class="fas fa-users"></i>
+                        {% elif category == 'clubs' %}<i class="fas fa-users-cog"></i>
+                        {% elif category == 'content' %}<i class="fas fa-file-alt"></i>
+                        {% elif category == 'reviews' %}<i class="fas fa-star"></i>
+                        {% elif category == 'orders' %}<i class="fas fa-box"></i>
+                        {% elif category == 'admin' %}<i class="fas fa-user-shield"></i>
+                        {% else %}<i class="fas fa-circle"></i>{% endif %}
+                        {{ category }}
+                    </h4>
+                    <div class="permissions-grid" style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                        gap: 0.75rem;
+                    ">
+                        {% for perm in perms %}
+                        <div class="permission-item" style="
+                            display: flex;
+                            align-items: center;
+                            gap: 0.75rem;
+                            padding: 0.75rem;
+                            background: {{ '#f0fdf4' if perm.has_permission else '#f9fafb' }};
+                            border: 1px solid {{ '#bbf7d0' if perm.has_permission else '#e5e7eb' }};
+                            border-radius: 8px;
+                        ">
+                            <div style="
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: {{ '#16a34a' if perm.has_permission else '#d1d5db' }};
+                                color: white;
+                                font-size: 0.75rem;
+                                flex-shrink: 0;
+                            ">
+                                <i class="fas fa-{{ 'check' if perm.has_permission else 'times' }}"></i>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="
+                                    font-weight: 600;
+                                    font-size: 0.875rem;
+                                    color: {{ '#16a34a' if perm.has_permission else '#6b7280' }};
+                                    font-family: monospace;
+                                ">
+                                    {{ perm.name }}
+                                </div>
+                                <div style="
+                                    font-size: 0.8rem;
+                                    color: #64748b;
+                                    margin-top: 0.25rem;
+                                ">
+                                    {{ perm.description }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #6b7280;">No permissions available</p>
+            {% endif %}
+        </div>
+
+        <div style="
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #075985;
+        ">
+            <i class="fas fa-info-circle"></i>
+            <strong>Note:</strong> These permissions are managed by administrators. Contact your system administrator if you need additional access.
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Account form handler
+    const accountForm = document.getElementById('accountForm');
+    if (accountForm) {
+        accountForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const data = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                birthday: document.getElementById('birthday').value
+            };
+
+            fetch('/api/user/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    if (typeof showToast === 'function') {
+                        showToast('success', data.message, 'Account Updated');
+                    } else {
+                        alert(data.message);
+                    }
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast('error', data.error || 'Failed to update account', 'Error');
+                    } else {
+                        alert(data.error || 'Failed to update account');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (typeof showToast === 'function') {
+                    showToast('error', 'Network error. Please try again.', 'Error');
+                } else {
+                    alert('Network error. Please try again.');
+                }
+            });
+        });
+    }
+
+    // Password form handler
+    const passwordForm = document.getElementById('passwordForm');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const data = {
+                current_password: document.getElementById('currentPassword').value,
+                new_password: document.getElementById('newPassword').value
+            };
+
+            fetch('/api/user/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    if (typeof showToast === 'function') {
+                        showToast('success', data.message, 'Password Updated');
+                    } else {
+                        alert(data.message);
+                    }
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast('error', data.error || 'Failed to update password', 'Error');
+                    } else {
+                        alert(data.error || 'Failed to update password');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (typeof showToast === 'function') {
+                    showToast('error', 'Network error. Please try again.', 'Error');
+                } else {
+                    alert('Network error. Please try again.');
+                }
+            });
+        });
+    }
+
+    // Hackatime key handler
+    const saveHackatime = document.getElementById('saveHackatime');
+    if (saveHackatime) {
+        saveHackatime.addEventListener('click', function() {
+            const data = {
+                hackatime_api_key: document.getElementById('hackatimeKey').value
+            };
+
+            fetch('/api/user/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    if (typeof showToast === 'function') {
+                        showToast('success', data.message, 'Hackatime Updated');
+                    } else {
+                        alert(data.message);
+                    }
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast('error', data.error || 'Failed to update Hackatime key', 'Error');
+                    } else {
+                        alert(data.error || 'Failed to update Hackatime key');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (typeof showToast === 'function') {
+                    showToast('error', 'Network error. Please try again.', 'Error');
+                } else {
+                    alert('Network error. Please try again.');
+                }
+            });
+        });
+    }
+
+    // Identity verification functions
+    function loadVerificationStatus() {
+        fetch('/api/identity/status')
+            .then(response => response.json())
+            .then(data => {
+                displayVerificationStatus(data);
+            })
+            .catch(error => {
+                console.error('Error loading verification status:', error);
+                displayVerificationStatus({ status: 'error', verified: false });
+            });
+    }
+
+    function displayVerificationStatus(data) {
+        const statusDiv = document.getElementById('verificationStatus');
+        if (!statusDiv) return;
+
+        const status = data.status || 'unverified';
+        const verified = data.verified || false;
+
+        let statusClass = '';
+        let icon = '';
+        let title = '';
+        let description = '';
+
+        switch (status) {
+            case 'verified':
+                statusClass = 'verified';
+                icon = 'fas fa-check-circle';
+                title = 'Identity Verified';
+                description = 'Your identity has been successfully verified with Hack Club';
+                break;
+            case 'pending':
+                statusClass = 'pending';
+                icon = 'fas fa-clock';
+                title = 'Verification Pending';
+                description = 'Your identity verification is being reviewed';
+                break;
+            case 'rejected':
+                statusClass = 'rejected';
+                icon = 'fas fa-times-circle';
+                title = 'Verification Rejected';
+                description = data.rejection_reason || 'Your identity verification was rejected';
+                break;
+            case 'error':
+                statusClass = 'unverified';
+                icon = 'fas fa-exclamation-triangle';
+                title = 'Status Error';
+                description = 'Unable to check verification status';
+                break;
+            default:
+                statusClass = 'unverified';
+                icon = 'fas fa-user-clock';
+                title = 'Not Verified';
+                description = 'Click "Verify Identity" to start the verification process';
+                break;
+        }
+
+        statusDiv.className = `verification-status ${statusClass}`;
+        statusDiv.innerHTML = `
+            <div class="status-icon">
+                <i class="${icon}"></i>
+            </div>
+            <div class="status-content">
+                <h4>${title}</h4>
+                <p>${description}</p>
+            </div>
+        `;
+    }
+
+    // Verify identity button handler
+    const verifyIdentityBtn = document.getElementById('verifyIdentity');
+    if (verifyIdentityBtn) {
+        verifyIdentityBtn.addEventListener('click', function() {
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting Verification...';
+
+            fetch('/api/identity/authorize')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.url) {
+                        // Open verification in a popup
+                        const popup = window.open(
+                            data.url,
+                            'identity_verification',
+                            'width=500,height=600,scrollbars=yes,resizable=yes'
+                        );
+
+                        // Check for popup completion
+                        const checkClosed = setInterval(() => {
+                            if (popup.closed) {
+                                clearInterval(checkClosed);
+                                // Refresh status after verification attempt
+                                setTimeout(() => {
+                                    loadVerificationStatus();
+                                }, 1000);
+                            }
+                        }, 1000);
+                    } else {
+                        if (typeof showToast === 'function') {
+                            showToast('error', data.error || 'Failed to start verification', 'Error');
+                        } else {
+                            alert(data.error || 'Failed to start verification');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error starting verification:', error);
+                    if (typeof showToast === 'function') {
+                        showToast('error', 'Network error. Please try again.', 'Error');
+                    } else {
+                        alert('Network error. Please try again.');
+                    }
+                })
+                .finally(() => {
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-shield-alt"></i> Verify Identity';
+                });
+        });
+    }
+
+    // Refresh status button handler
+    const refreshStatusBtn = document.getElementById('refreshStatus');
+    if (refreshStatusBtn) {
+        refreshStatusBtn.addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+
+            loadVerificationStatus();
+
+            setTimeout(() => {
+                this.disabled = false;
+                this.innerHTML = originalText;
+            }, 1000);
+        });
+    }
+
+    // Load initial verification status
+    loadVerificationStatus();
+
+    // Join club from settings function
+    window.joinClubFromSettings = function() {
+        const joinCode = document.getElementById('joinCode').value.trim();
+
+        if (!joinCode) {
+            if (typeof showToast === 'function') {
+                showToast('error', 'Please enter a join code', 'Error');
+            } else {
+                alert('Please enter a join code');
+            }
+            return;
+        }
+
+        window.location.href = `/join-club?code=${encodeURIComponent(joinCode)}`;
+    };
+
+    // 2FA Management Functions
+    window.disable2FA = function() {
+        UniversalModal.show({
+            type: 'warning',
+            title: 'Disable Two-Factor Authentication',
+            message: `
+                <p style="margin-bottom: 1rem;">Are you sure you want to disable two-factor authentication? This will make your account less secure.</p>
+                <div class="form-group" style="text-align: left;">
+                    <label class="form-label">Enter your password to confirm</label>
+                    <input type="password" id="disable2faPassword" class="form-control" placeholder="Password">
+                </div>
+            `,
+            confirmText: 'Disable 2FA',
+            cancelText: 'Cancel',
+            onConfirm: async function() {
+                const password = document.getElementById('disable2faPassword').value;
+                if (!password) {
+                    showNotification('Please enter your password', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('{{ url_for("auth.disable_2fa") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `password=${encodeURIComponent(password)}`
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showNotification('2FA has been disabled successfully.', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showNotification(data.message || 'Failed to disable 2FA', 'error');
+                    }
+                } catch (error) {
+                    showNotification('An error occurred. Please try again.', 'error');
+                }
+            }
+        });
+
+        // Focus password input after modal opens
+        setTimeout(() => {
+            const input = document.getElementById('disable2faPassword');
+            if (input) input.focus();
+        }, 100);
+    };
+
+    window.regenerateBackupCodes = function() {
+        UniversalModal.show({
+            type: 'warning',
+            title: 'Regenerate Backup Codes',
+            message: `
+                <p style="margin-bottom: 1rem;">This will invalidate all existing backup codes and generate new ones.</p>
+                <div class="form-group" style="text-align: left;">
+                    <label class="form-label">Enter your password to confirm</label>
+                    <input type="password" id="regeneratePassword" class="form-control" placeholder="Password">
+                </div>
+            `,
+            confirmText: 'Regenerate Codes',
+            cancelText: 'Cancel',
+            onConfirm: async function() {
+                const password = document.getElementById('regeneratePassword').value;
+                if (!password) {
+                    showNotification('Please enter your password', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('{{ url_for("auth.regenerate_backup_codes") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `password=${encodeURIComponent(password)}`
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showBackupCodes(data.backup_codes);
+                    } else {
+                        showNotification(data.message || 'Failed to regenerate backup codes', 'error');
+                    }
+                } catch (error) {
+                    showNotification('An error occurred. Please try again.', 'error');
+                }
+            }
+        });
+
+        // Focus password input after modal opens
+        setTimeout(() => {
+            const input = document.getElementById('regeneratePassword');
+            if (input) input.focus();
+        }, 100);
+    };
+
+    function showBackupCodes(codes) {
+        const codesGrid = codes.map(code =>
+            `<div style="font-family: monospace; padding: 0.75rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; text-align: center; font-size: 1rem;">${code}</div>`
+        ).join('');
+
+        UniversalModal.show({
+            type: 'success',
+            title: '🔑 Your New Backup Codes',
+            message: `
+                <div style="background: #fff7ed; border: 2px solid #fb923c; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; color: #c2410c; text-align: left;">
+                    <strong>⚠️ Important:</strong> Save these codes in a secure location. Each code can only be used once if you lose access to your authenticator app.
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 1rem 0;">
+                    ${codesGrid}
+                </div>
+            `,
+            confirmText: 'I\'ve Saved My Codes',
+            customFooter: `
+                <button class="modal-btn modal-btn-primary" onclick="downloadBackupCodesModal(${JSON.stringify(codes).replace(/"/g, '&quot;')}); event.stopPropagation();">
+                    <i class="fas fa-download"></i> Download Codes
+                </button>
+                <button class="modal-btn modal-btn-secondary" onclick="UniversalModal.hide()">Close</button>
+            `
+        });
+    }
+
+    function showNotification(message, type = 'info') {
+        if (typeof showToast === 'function') {
+            showToast(type, message, type === 'error' ? 'Error' : 'Success');
+        } else {
+            // Fallback to UniversalModal
+            if (type === 'error') {
+                UniversalModal.error(message);
+            } else {
+                UniversalModal.success(message);
+            }
+        }
+    }
+
+    window.downloadBackupCodesModal = function(codes) {
+        const text = codes.join('\n');
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'hackclub-backup-codes.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+        showNotification('Backup codes downloaded successfully', 'success');
+    };
+});
+</script>
+{% endblock %}

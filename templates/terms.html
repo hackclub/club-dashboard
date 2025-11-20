@@ -1,0 +1,52 @@
+
+{% extends "base.html" %}
+
+{% block title %}Terms of Service - Hack Club Dashboard{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+    <h1 style="color: #1a202c; margin-bottom: 2rem;">Terms of Service</h1>
+
+    <div style="color: #4b5563; line-height: 1.6; font-size: 1rem;">
+        <p style="margin-bottom: 1.5rem;">
+            <strong>Last updated:</strong> June 7, 2025
+        </p>
+
+        <h2 style="color: #1a202c; margin: 2rem 0 1rem 0;">Acceptance of Terms</h2>
+        <p style="margin-bottom: 1rem;">
+            By accessing and using the Hack Club Dashboard, you accept and agree to be bound by the terms and provision of this agreement.
+        </p>
+
+        <h2 style="color: #1a202c; margin: 2rem 0 1rem 0;">Use License</h2>
+        <p style="margin-bottom: 1rem;">
+            Permission is granted to temporarily use the Hack Club Dashboard for personal, non-commercial transitory viewing only.
+        </p>
+
+        <h2 style="color: #1a202c; margin: 2rem 0 1rem 0;">User Conduct</h2>
+        <p style="margin-bottom: 1rem;">
+            You agree not to use the service for any unlawful purpose or to solicit others to perform unlawful acts.
+        </p>
+
+        <h2 style="color: #1a202c; margin: 2rem 0 1rem 0;">Privacy Policy</h2>
+        <p style="margin-bottom: 1rem;">
+            Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the service.
+        </p>
+
+        <h2 style="color: #1a202c; margin: 2rem 0 1rem 0;">Modifications</h2>
+        <p style="margin-bottom: 1rem;">
+            Hack Club may revise these terms of service at any time without notice. By using this service, you are agreeing to be bound by the then current version of these terms.
+        </p>
+
+        <h2 style="color: #1a202c; margin: 2rem 0 1rem 0;">Contact Information</h2>
+        <p style="margin-bottom: 1rem;">
+            If you have any questions about these Terms of Service, please contact us at legal@hackclub.com.
+        </p>
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center;">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,186 @@
+
+<style>
+    /* Raccoon mascot */
+    .raccoon-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 10;
+        display: flex;
+        align-items: flex-end;
+        gap: 15px;
+    }
+
+    .raccoon-image {
+        width: 120px;
+        height: auto;
+        animation: raccoonBounce 3s ease-in-out infinite;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+
+    .speech-bubble {
+        background: white;
+        padding: 12px 16px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        position: relative;
+        max-width: 200px;
+        border: 2px solid #ec3750;
+        animation: bubbleFloat 4s ease-in-out infinite;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+        text-align: center;
+        transform-origin: bottom left;
+    }
+
+    .speech-text {
+        display: inline-block;
+        animation: textWiggle 2s ease-in-out infinite;
+    }
+
+    /* Animations */
+    @keyframes raccoonBounce {
+        0%,
+        100% {
+            transform: translateY(0px) rotate(-2deg);
+        }
+        25% {
+            transform: translateY(-8px) rotate(1deg);
+        }
+        50% {
+            transform: translateY(-5px) rotate(-1deg);
+        }
+        75% {
+            transform: translateY(-12px) rotate(2deg);
+        }
+    }
+
+    @keyframes bubbleFloat {
+        0%,
+        100% {
+            transform: translateY(0px) scale(1);
+        }
+        25% {
+            transform: translateY(-5px) scale(1.02);
+        }
+        50% {
+            transform: translateY(-8px) scale(0.98);
+        }
+        75% {
+            transform: translateY(-3px) scale(1.01);
+        }
+    }
+
+    @keyframes textWiggle {
+        0%,
+        100% {
+            transform: rotate(0deg);
+        }
+        25% {
+            transform: rotate(-1deg);
+        }
+        50% {
+            transform: rotate(1deg);
+        }
+        75% {
+            transform: rotate(-0.5deg);
+        }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .raccoon-container {
+            bottom: 15px;
+            right: 15px;
+            gap: 10px;
+        }
+
+        .raccoon-image {
+            width: 90px;
+        }
+
+        .speech-bubble {
+            max-width: 150px;
+            padding: 10px 12px;
+            font-size: 12px;
+        }
+    }
+
+    /* Hover effects */
+    .raccoon-container:hover .raccoon-image {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+    }
+
+    .raccoon-container:hover .speech-bubble {
+        background: #fffbf0;
+        border-color: #f59e0b;
+        transition: all 0.3s ease;
+    }
+</style>
+
+
+<div class="raccoon-container">
+    <div class="speech-bubble">
+        <span class="speech-text" id="speechText"
+            >I def didn't break it. I promise...</span
+        >
+    </div>
+    <img
+        src="{{ url_for('static', filename='assets/parts.png') }}"
+        alt="Raccoon Mascot"
+        class="raccoon-image"
+    />
+</div>
+
+<script>
+    // Only initialize if not already done
+    if (!window.raccoonInitialized) {
+        window.raccoonInitialized = true;
+
+        const messages = [
+            "I def didn't break it. I promise...",
+            "uhhhhhh i blame ethan",
+            "NO, BLAME ORPHEUS!!!!!!",
+            "I love this quality control",
+            "It was working fine yesterday!",
+            "I was just borrowing some code snippets...",
+            "uhhhhh i'm not slacking off.",
+            "Oops... uh. what happened",
+            "It's not a bug, it's a feature!",
+            "I blame the caffeine shortage",
+            "404? more like: My attention span not found",
+            "Error 403? more like: Access denied to my snack stash",
+            "Error 500? more like: I ate too many cookies",
+            "Rate limited? I'm just speedy like that i guess",
+            "Someone spilled coffee on the servers",
+            "I BLAME ORPHEUS!!!!!!",
+            "I was just testing if everything still works...",
+            "Plot twist: it was working all along! I just decided to make it uh... not work...",
+        ];
+
+        let currentMessage = 0;
+        const speechText = document.getElementById("speechText");
+
+        function changeMessage() {
+            if (speechText) {
+                speechText.style.opacity = "0";
+
+                setTimeout(() => {
+                    currentMessage = (currentMessage + 1) % messages.length;
+                    speechText.textContent = messages[currentMessage];
+                    speechText.style.opacity = "1";
+                }, 500);
+            }
+        }
+
+        // Change message every 4 seconds
+        setInterval(changeMessage, 4000);
+
+        // Smooth opacity transitions
+        if (speechText) {
+            speechText.style.transition = "opacity 0.5s ease";
+        }
+    }
+</script>

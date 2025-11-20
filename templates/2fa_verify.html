@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Two-Factor Authentication - Hack Clubs Dash{% endblock %}
+
+{% block extra_head %}
+<style>
+    .verify-container {
+        max-width: 500px;
+        margin: 4rem auto;
+        padding: 2rem;
+    }
+
+    .verify-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+
+    .verify-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .verify-header h1 {
+        color: #ec3750;
+        margin-bottom: 0.5rem;
+        font-size: 1.8rem;
+    }
+
+    .verify-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        text-align: center;
+        letter-spacing: 0.3rem;
+        transition: border-color 0.2s;
+        font-family: monospace;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ec3750;
+        box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+    .btn-primary {
+        background: #ec3750;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #d63146;
+        transform: translateY(-2px);
+    }
+
+    .btn-link {
+        background: none;
+        color: #ec3750;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+        text-align: center;
+        display: block;
+        margin-top: 1rem;
+    }
+
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+
+    .backup-form {
+        display: none;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f1f5f9;
+    }
+
+    .backup-form.show {
+        display: block;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        text-align: left;
+    }
+
+    .alert-info {
+        background: #eff6ff;
+        border: 2px solid #3b82f6;
+        color: #1e40af;
+    }
+
+    .alert-warning {
+        background: #fff7ed;
+        border: 2px solid #fb923c;
+        color: #c2410c;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verify-container">
+    <div class="verify-card">
+        <div class="verify-header">
+            <div class="verify-icon">🔐</div>
+            <h1>Two-Factor Authentication</h1>
+            <p>Enter the 6-digit code from your authenticator app</p>
+        </div>
+
+        <form method="POST" id="verifyForm">
+            <div class="form-group">
+                <label for="token" class="form-label">Authentication Code</label>
+                <input type="text" id="token" name="token" class="form-control"
+                       placeholder="000000" maxlength="6" pattern="[0-9]{6}" required autofocus>
+                <input type="hidden" name="use_backup" value="false">
+            </div>
+            <button type="submit" class="btn btn-primary">Verify</button>
+            <button type="button" class="btn btn-link" onclick="showBackupForm()">
+                Use a backup code instead
+            </button>
+        </form>
+
+        <div class="backup-form" id="backupForm">
+            <div class="alert alert-warning">
+                <strong>⚠️ Warning:</strong> Backup codes can only be used once. After using a code, it will be permanently invalidated.
+            </div>
+            <form method="POST" id="backupVerifyForm">
+                <div class="form-group">
+                    <label for="backup_token" class="form-label">Backup Code</label>
+                    <input type="text" id="backup_token" name="token" class="form-control"
+                           placeholder="XXXX-XXXX" style="letter-spacing: 0.1rem;" required>
+                    <input type="hidden" name="use_backup" value="true">
+                </div>
+                <button type="submit" class="btn btn-primary">Verify Backup Code</button>
+                <button type="button" class="btn btn-link" onclick="hideBackupForm()">
+                    Use authenticator code instead
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function showBackupForm() {
+    document.getElementById('verifyForm').style.display = 'none';
+    document.getElementById('backupForm').classList.add('show');
+    document.getElementById('backup_token').focus();
+}
+
+function hideBackupForm() {
+    document.getElementById('verifyForm').style.display = 'block';
+    document.getElementById('backupForm').classList.remove('show');
+    document.getElementById('token').focus();
+}
+
+// Auto-submit when 6 digits are entered
+document.getElementById('token').addEventListener('input', (e) => {
+    if (e.target.value.length === 6) {
+        document.getElementById('verifyForm').submit();
+    }
+});
+</script>
+{% endblock %}

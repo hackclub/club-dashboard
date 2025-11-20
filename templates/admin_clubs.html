@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Clubs - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <div class="admin-header" style="background: linear-gradient(135deg, #ec3750 0%, #ff6b7a 100%); color: white; padding: 2rem; border-radius: 20px; margin-bottom: 2rem;">
+        <h1 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 0.5rem;">Club Management</h1>
+        <p style="opacity: 0.9; margin: 0;">Manage all clubs in the system</p>
+    </div>
+
+    <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <form method="GET" action="{{ url_for('admin.clubs') }}">
+            <div style="display: flex; gap: 1rem;">
+                <input type="text" name="search" value="{{ search }}" placeholder="Search clubs..." style="flex: 1; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px;">
+                <button type="submit" style="background: #ec3750; color: white; padding: 0.75rem 2rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Search</button>
+            </div>
+        </form>
+    </div>
+
+    {% if clubs %}
+    <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #e2e8f0;">
+                    <th style="padding: 1rem; text-align: left;">ID</th>
+                    <th style="padding: 1rem; text-align: left;">Name</th>
+                    <th style="padding: 1rem; text-align: left;">Location</th>
+                    <th style="padding: 1rem; text-align: left;">Tokens</th>
+                    <th style="padding: 1rem; text-align: left;">Created</th>
+                    <th style="padding: 1rem; text-align: left;">Status</th>
+                    <th style="padding: 1rem; text-align: left;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for club in clubs %}
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 1rem;">{{ club.id }}</td>
+                    <td style="padding: 1rem; font-weight: 600;">{{ club.name }}</td>
+                    <td style="padding: 1rem;">{{ club.location or 'N/A' }}</td>
+                    <td style="padding: 1rem;">{{ club.tokens }}</td>
+                    <td style="padding: 1rem;">{{ club.created_at.strftime('%Y-%m-%d') if club.created_at else 'N/A' }}</td>
+                    <td style="padding: 1rem;">
+                        {% if club.is_suspended %}
+                        <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem; font-weight: 600;">Suspended</span>
+                        {% else %}
+                        <span style="background: #d1fae5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem; font-weight: 600;">Active</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">
+                        <div class="dropdown" style="position: relative; display: inline-block;">
+                            <button onclick="toggleDropdown({{ club.id }})" style="background: #3b82f6; color: white; padding: 0.5rem 1rem; border-radius: 6px; border: none; cursor: pointer; font-size: 0.875rem;">
+                                Actions <i class="fas fa-chevron-down" style="font-size: 0.75rem; margin-left: 0.25rem;"></i>
+                            </button>
+                            <div id="dropdown-{{ club.id }}" class="dropdown-content" style="display: none; position: absolute; background: white; min-width: 180px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 6px; z-index: 100; margin-top: 0.25rem;">
+                                <a href="{{ url_for('admin.club_detail', club_id=club.id) }}" style="display: block; padding: 0.75rem 1rem; text-decoration: none; color: #1e293b; border-bottom: 1px solid #f1f5f9;">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                                <a href="{{ url_for('main.club_dashboard', club_id=club.id) }}" style="display: block; padding: 0.75rem 1rem; text-decoration: none; color: #1e293b; border-bottom: 1px solid #f1f5f9;">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                                <a href="#" onclick="openTeamNotesModal({{ club.id }}, '{{ club.name }}'); return false;" style="display: block; padding: 0.75rem 1rem; text-decoration: none; color: #1e293b;">
+                                    <i class="fas fa-sticky-note"></i> View Team Notes
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 0.5rem;">
+            {% if pagination.has_prev %}
+            <a href="{{ url_for('admin.clubs', page=pagination.prev_num, search=search) }}" style="background: #ec3750; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none;">Previous</a>
+            {% endif %}
+            <span style="padding: 0.5rem 1rem; color: #64748b;">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+            {% if pagination.has_next %}
+            <a href="{{ url_for('admin.clubs', page=pagination.next_num, search=search) }}" style="background: #ec3750; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none;">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div style="background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <i class="fas fa-users" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+        <h3 style="color: #64748b;">No clubs found</h3>
+        <p style="color: #94a3b8;">{% if search %}Try a different search term{% else %}No clubs in the system yet{% endif %}</p>
+    </div>
+    {% endif %}
+
+    <!-- Team Notes Modal -->
+    <div id="teamNotesModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 2rem; border-radius: 10px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="margin: 0;">Team Notes for <span id="modalClubName"></span></h2>
+                <button onclick="closeTeamNotesModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <textarea id="teamNotesText" rows="10" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-family: inherit;"
+                    {% if current_user and not (current_user.has_permission('clubs.edit_team_notes') or current_user.is_admin) %}disabled{% endif %}
+                    placeholder="Add internal notes about this club here..."></textarea>
+                <small style="color: #64748b; display: block; margin-top: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> Use this space for planning, meeting notes, important reminders, or any internal club information.
+                </small>
+            </div>
+            <div id="teamNotesStatus" style="margin-bottom: 1rem;"></div>
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                {% if current_user and (current_user.has_permission('clubs.edit_team_notes') or current_user.is_admin) %}
+                <button onclick="saveTeamNotesFromList()" style="background: #8b5cf6; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer;">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                {% endif %}
+                <button onclick="closeTeamNotesModal()" style="background: #6b7280; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentClubId = null;
+
+        function toggleDropdown(clubId) {
+            const dropdown = document.getElementById('dropdown-' + clubId);
+            const allDropdowns = document.querySelectorAll('.dropdown-content');
+            
+            // Close all other dropdowns
+            allDropdowns.forEach(dd => {
+                if (dd.id !== 'dropdown-' + clubId) {
+                    dd.style.display = 'none';
+                }
+            });
+            
+            // Toggle current dropdown
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-content').forEach(dd => {
+                    dd.style.display = 'none';
+                });
+            }
+        });
+
+        function openTeamNotesModal(clubId, clubName) {
+            currentClubId = clubId;
+            document.getElementById('modalClubName').textContent = clubName;
+            document.getElementById('teamNotesModal').style.display = 'flex';
+            
+            // Load team notes
+            fetch('/api/clubs/' + clubId + '/team-notes')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('teamNotesText').value = data.team_notes || '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading team notes:', error);
+                    showStatus('Error loading team notes', 'error');
+                });
+        }
+
+        function closeTeamNotesModal() {
+            document.getElementById('teamNotesModal').style.display = 'none';
+            currentClubId = null;
+        }
+
+        function saveTeamNotesFromList() {
+            if (!currentClubId) return;
+            
+            const teamNotes = document.getElementById('teamNotesText').value;
+            
+            fetch('/api/clubs/' + currentClubId + '/team-notes', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ team_notes: teamNotes })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus(data.message || 'Team notes saved successfully!', 'success');
+                } else {
+                    showStatus(data.error || 'Error saving team notes', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving team notes:', error);
+                showStatus('Error saving team notes', 'error');
+            });
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('teamNotesStatus');
+            statusDiv.innerHTML = `<div style="padding: 0.75rem; border-radius: 5px; background: ${type === 'success' ? '#d1fae5' : '#fee2e2'}; color: ${type === 'success' ? '#059669' : '#dc2626'};">${message}</div>`;
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 3000);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('teamNotesModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTeamNotesModal();
+            }
+        });
+    </script>
+</div>
+{% endblock %}

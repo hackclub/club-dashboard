@@ -1,0 +1,1243 @@
+{% extends "base.html" %}
+
+{% block title %}Order Review - Admin{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dash.css') }}">
+<style>
+    .review-container {
+        min-height: 100vh;
+        background: #f5f7fa;
+        padding: 2rem 0;
+    }
+
+    .review-header {
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .review-header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .review-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    }
+
+    .review-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0;
+    }
+
+    .review-subtitle {
+        color: #718096;
+        font-size: 0.9rem;
+        margin: 0.25rem 0 0 0;
+    }
+
+    .review-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .review-controls {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .filter-label {
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .filter-select {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+        color: #4a5568;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
+    .orders-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .order-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .order-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-color: #8b5cf6;
+    }
+
+    .order-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fafbfc;
+    }
+
+    .order-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .order-id {
+        font-weight: 700;
+        color: #1a202c;
+        font-size: 1.1rem;
+    }
+
+    .order-club {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .order-date {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    .order-total {
+        font-weight: 700;
+        color: #059669;
+        font-size: 1.1rem;
+    }
+
+    .order-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #92400e;
+    }
+
+    .status-shipped {
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: #065f46;
+    }
+
+    .status-flagged {
+        background: linear-gradient(135deg, #f87171, #ef4444);
+        color: #7f1d1d;
+    }
+
+    .status-rejected {
+        background: linear-gradient(135deg, #9ca3af, #6b7280);
+        color: #374151;
+    }
+
+
+    .order-content {
+        padding: 1.5rem;
+    }
+
+    .order-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .section-content {
+        color: #6b7280;
+        line-height: 1.5;
+    }
+
+    .order-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .products-section {
+        grid-column: span 2;
+    }
+
+    .products-list {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .product-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .product-item:last-child {
+        border-bottom: none;
+    }
+
+    .product-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .product-image i {
+        color: #9ca3af;
+        font-size: 1.5rem;
+    }
+
+    .product-details {
+        flex: 1;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 0.25rem;
+    }
+
+    .product-link {
+        color: #8b5cf6;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.2s ease;
+    }
+
+    .product-link:hover {
+        color: #7c3aed;
+        text-decoration: underline;
+    }
+
+    .address-block {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1rem;
+        line-height: 1.6;
+    }
+
+    .review-section {
+        background: #fef7ff;
+        border: 1px solid #e879f9;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .review-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .status-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .status-option {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .status-option:hover {
+        border-color: #8b5cf6;
+        background: #faf5ff;
+    }
+
+    .status-option.selected {
+        border-color: #8b5cf6;
+        background: #8b5cf6;
+        color: white;
+    }
+
+    .reason-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        resize: vertical;
+        min-height: 80px;
+        font-family: inherit;
+    }
+
+    .reason-input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
+    .review-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-review {
+        flex: 1;
+        background: #8b5cf6;
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-review:hover {
+        background: #7c3aed;
+        transform: translateY(-1px);
+    }
+
+    .btn-review:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+        border: 2px dotted #f59e0b;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-delete:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+    }
+
+    .btn-delete:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-refund {
+        background: #f59e0b;
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-refund:hover {
+        background: #d97706;
+        transform: translateY(-1px);
+    }
+
+    .btn-refund:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+
+    /* Modal Styles */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 120px;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow: hidden;
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-50px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .modal-header.success {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .modal-header.error {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+    }
+
+    .modal-header.warning {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        color: #374151;
+        line-height: 1.6;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        background: #f9fafb;
+    }
+
+    .btn-modal {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-success {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+    }
+
+    .btn-error {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-error:hover {
+        background: #dc2626;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #4b5563;
+    }
+
+    .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        flex-direction: column;
+        gap: 1rem;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f3f4f6;
+        border-radius: 50%;
+        border-top-color: #8b5cf6;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    .loading-text {
+        color: #6b7280;
+        font-size: 1rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        color: #6b7280;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #d1d5db;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+
+    @media (max-width: 768px) {
+        .order-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .products-section {
+            grid-column: span 1;
+        }
+
+        .order-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .order-info {
+            justify-content: space-between;
+        }
+
+        .status-selector {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="review-container">
+    <div class="review-header">
+        <div class="review-header-content">
+            <div class="review-icon">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <div>
+                <h1 class="review-title">Order Review</h1>
+                <p class="review-subtitle">Review and manage shop orders</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="review-content">
+        <div class="review-controls">
+            <div class="filter-group">
+                <span class="filter-label">Filter by status:</span>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Orders</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Flagged">Flagged</option>
+                    <option value="Rejected Shipment">Rejected</option>
+                </select>
+                <span class="filter-label">Sort by:</span>
+                <select class="filter-select" id="sortFilter">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="amount_high">Highest Amount</option>
+                    <option value="amount_low">Lowest Amount</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="loadingContainer" class="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading orders...</div>
+        </div>
+
+        <div id="ordersContainer" class="orders-grid" style="display: none;">
+
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fas fa-clipboard-list"></i>
+            <h3>No orders found</h3>
+            <p>No orders match your current filters.</p>
+        </div>
+    </div>
+</div>
+
+
+<script>
+let allOrders = [];
+let filteredOrders = [];
+let shopItems = {}; // Cache for shop items
+const IS_ADMIN = {{ 'true' if current_user.is_admin else 'false' }};
+const CAN_APPROVE_ORDERS = {{ 'true' if current_user.has_permission('orders.approve') else 'false' }};
+
+// Modal helper functions - now using UniversalModal
+function showModal(modalId) {
+    // Deprecated - use UniversalModal instead
+}
+
+function closeModal(modalId) {
+    // Deprecated - use UniversalModal.hide() instead
+}
+
+function showSuccessModal(message) {
+    UniversalModal.success(message);
+}
+
+function showErrorModal(message) {
+    UniversalModal.error(message);
+}
+
+function showConfirmModal(message, onConfirm) {
+    UniversalModal.confirm(message, onConfirm, null, 'Confirm Action');
+}
+
+// Close modals when clicking outside
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
+
+// Load orders on page load
+document.addEventListener('DOMContentLoaded', async function() {
+    setupEventListeners();
+    await loadShopItems(); // Load shop items FIRST
+    await loadOrders(); // Then load and render orders
+});
+
+function setupEventListeners() {
+    // Status filter
+    document.getElementById('statusFilter').addEventListener('change', function() {
+        filterOrders();
+    });
+
+    // Sort filter
+    document.getElementById('sortFilter').addEventListener('change', function() {
+        filterOrders();
+    });
+}
+
+// Load orders from API
+async function loadOrders() {
+    try {
+        const response = await fetch('/api/admin/orders');
+
+        if (response.ok) {
+            const data = await response.json();
+            allOrders = data.orders || [];
+            filteredOrders = [...allOrders];
+
+            document.getElementById('loadingContainer').style.display = 'none';
+
+            if (allOrders.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+            } else {
+                document.getElementById('ordersContainer').style.display = 'block';
+                filterOrders();
+            }
+        } else {
+            throw new Error('Failed to load orders');
+        }
+    } catch (error) {
+        console.error('❌ Error loading orders:', error);
+        document.getElementById('loadingContainer').innerHTML = `
+            <div class="loading-text" style="color: #ef4444;">
+                <i class="fas fa-exclamation-triangle"></i>
+                Failed to load orders
+            </div>
+        `;
+    }
+}
+
+// Load shop items for product details
+async function loadShopItems() {
+    try {
+        const response = await fetch('/api/admin/shop-items');
+        if (response.ok) {
+            const data = await response.json();
+            shopItems = data.items || {};
+            return shopItems;
+        } else {
+            console.warn('❌ Failed to load shop items for product details');
+            return {};
+        }
+    } catch (error) {
+        console.error('❌ Error loading shop items:', error);
+        return {};
+    }
+}
+
+function filterOrders() {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const sortFilter = document.getElementById('sortFilter').value;
+
+    // Filter by status
+    filteredOrders = allOrders.filter(order => {
+        if (statusFilter && order.shipment_status !== statusFilter) return false;
+        return true;
+    });
+
+    // Sort orders
+    filteredOrders.sort((a, b) => {
+        switch (sortFilter) {
+            case 'newest':
+                return new Date(b.created_time) - new Date(a.created_time);
+            case 'oldest':
+                return new Date(a.created_time) - new Date(b.created_time);
+            case 'amount_high':
+                return (parseFloat(b.total_estimated_cost) || 0) - (parseFloat(a.total_estimated_cost) || 0);
+            case 'amount_low':
+                return (parseFloat(a.total_estimated_cost) || 0) - (parseFloat(b.total_estimated_cost) || 0);
+            default:
+                return new Date(b.created_time) - new Date(a.created_time);
+        }
+    });
+
+    renderOrders();
+}
+
+function renderOrders() {
+    const container = document.getElementById('ordersContainer');
+
+    if (filteredOrders.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-filter"></i>
+                <h3>No orders match your filters</h3>
+                <p>Try adjusting your filters to see more results.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = filteredOrders.map(order => {
+        const statusClass = getStatusClass(order.shipment_status);
+        const formattedDate = formatDate(order.created_time);
+        const orderIdShort = order.id.substring(0, 8);
+        const products = parseProducts(order.products);
+
+        return `
+            <div class="order-card" data-order-id="${order.id}">
+                <div class="order-header">
+                    <div class="order-info">
+                        <div>
+                            <div class="order-id">Order #${orderIdShort}</div>
+                            <div class="order-club">${order.club_name}</div>
+                            <div class="order-date">${formattedDate}</div>
+                        </div>
+                        <div class="order-total">$${parseFloat(order.total_estimated_cost || 0).toFixed(2)}</div>
+                    </div>
+                    <div class="order-status ${statusClass}">
+                        ${order.shipment_status || 'Pending'}
+                    </div>
+                </div>
+                <div class="order-content">
+                    <div class="order-grid">
+                        <div class="order-section products-section">
+                            <div class="section-title">Ordered Items</div>
+                            <div class="section-content">
+                                <div class="products-list">
+                                    ${products.map(product => {
+                                        const shopItem = findShopItem(product.name);
+                                        const hasImage = shopItem && shopItem.picture;
+                                        const hasUrl = shopItem && shopItem.url;
+
+
+                                        return `
+                                        <div class="product-item">
+                                            <div class="product-image">
+                                                ${hasImage ?
+                                                    `<img src="${shopItem.picture}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                                     <i class="fas fa-box" style="display: none;"></i>` :
+                                                    `<i class="fas fa-box"></i>`
+                                                }
+                                            </div>
+                                            <div class="product-details">
+                                                <div class="product-name">${product.name} x${product.quantity}${shopItem && shopItem.name !== product.name ? ` (${shopItem.name})` : ''}</div>
+                                                ${hasUrl ?
+                                                    `<a href="${shopItem.url}" target="_blank" class="product-link">
+                                                        <i class="fas fa-external-link-alt"></i> Purchase Link
+                                                    </a>` :
+                                                    `<span class="product-link" style="color: #9ca3af; cursor: default;">
+                                                        <i class="fas fa-info-circle"></i> No purchase link${shopItem ? ' available' : ' - item not found'}
+                                                    </span>`
+                                                }
+                                            </div>
+                                        </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-section">
+                            <div class="section-title">Club Info</div>
+                            <div class="section-content">
+                                <strong>Leader:</strong> ${order.leader_first_name} ${order.leader_last_name}<br>
+                                <strong>Email:</strong> ${order.leader_email}<br>
+                                <strong>Members:</strong> ${order.club_member_amount}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-section">
+                        <div class="section-title">Delivery Address</div>
+                        <div class="section-content">
+                            <div class="address-block">
+                                ${order.delivery_address_line_1}<br>
+                                ${order.delivery_address_line_2 ? order.delivery_address_line_2 + '<br>' : ''}
+                                ${order.delivery_city}, ${order.delivery_state} ${order.delivery_zip}<br>
+                                ${order.delivery_country}
+                            </div>
+                        </div>
+                    </div>
+
+                    ${order.usage_reason ? `
+                        <div class="order-section">
+                            <div class="section-title">Usage Reason</div>
+                            <div class="section-content">${order.usage_reason}</div>
+                        </div>
+                    ` : ''}
+
+                    ${order.special_notes ? `
+                        <div class="order-section">
+                            <div class="section-title">Special Notes</div>
+                            <div class="section-content">${order.special_notes}</div>
+                        </div>
+                    ` : ''}
+
+                    ${order.order_sources && order.order_sources.length > 0 ? `
+                        <div class="order-section">
+                            <div class="section-title">Order Sources</div>
+                            <div class="section-content">${order.order_sources.join(', ')}</div>
+                        </div>
+                    ` : ''}
+
+                    ${order.reviewer_reason ? `
+                        <div class="order-section">
+                            <div class="section-title">Previous Review</div>
+                            <div class="section-content">${order.reviewer_reason}</div>
+                        </div>
+                    ` : ''}
+
+                    ${CAN_APPROVE_ORDERS || IS_ADMIN ? `
+                    <div class="review-section">
+                        <div class="section-title">Review Order</div>
+                        <div class="review-form">
+                            ${CAN_APPROVE_ORDERS ? `
+                            <div class="status-selector" data-order-id="${order.id}">
+                                <div class="status-option ${order.shipment_status === 'Pending' ? 'selected' : ''}" data-status="Pending">Pending</div>
+                                <div class="status-option ${order.shipment_status === 'Shipped' ? 'selected' : ''}" data-status="Shipped">Shipped</div>
+                                <div class="status-option ${order.shipment_status === 'Flagged' ? 'selected' : ''}" data-status="Flagged">Flagged</div>
+                                <div class="status-option ${order.shipment_status === 'Rejected Shipment' ? 'selected' : ''}" data-status="Rejected Shipment">Rejected</div>
+                            </div>
+                            <textarea class="reason-input" id="reason-${order.id}" placeholder="Reviewer reason (optional)...">${order.reviewer_reason || ''}</textarea>
+                            ` : ''}
+                            <div class="review-actions">
+                                ${CAN_APPROVE_ORDERS ? `<button class="btn-review" onclick="submitReview('${order.id}')">Update Status</button>` : ''}
+                                ${IS_ADMIN ? `<button class="btn-delete" onclick="deleteOrder('${order.id}')">Delete Order</button>` : ''}
+                                ${IS_ADMIN && (order.shipment_status === 'Shipped' || order.shipment_status === 'Pending') ? `
+                                    <button class="btn-refund" onclick="refundOrder('${order.id}')">Refund & Reject</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Add event listeners for status options
+    document.querySelectorAll('.status-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const orderId = this.closest('.status-selector').dataset.orderId;
+            const statusSelector = document.querySelector(`[data-order-id="${orderId}"]`);
+            statusSelector.querySelectorAll('.status-option').forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+}
+
+function parseProducts(productsString) {
+    if (!productsString) return [];
+
+    // Parse "pcb x1, esp32 x4" format
+    return productsString.split(',').map(item => {
+        const trimmed = item.trim();
+        const match = trimmed.match(/^(.+?)\s+x(\d+)$/);
+        if (match) {
+            return {
+                name: match[1].trim(),
+                quantity: parseInt(match[2])
+            };
+        }
+        return { name: trimmed, quantity: 1 };
+    });
+}
+
+function findShopItem(productName) {
+    if (!productName) return null;
+
+    const cleanedName = productName.toLowerCase().trim();
+
+    // First try exact match
+    if (shopItems[cleanedName]) {
+        return shopItems[cleanedName];
+    }
+
+    // Try normalizing the product name (remove brackets, special chars)
+    const normalizedName = cleanedName.replace(/[\[\]()]/g, '').replace(/\s+/g, ' ').trim();
+    if (shopItems[normalizedName]) {
+        return shopItems[normalizedName];
+    }
+
+    // Try matching individual words from the product name
+    const productWords = cleanedName.split(/\s+/).filter(word => word.length > 2);
+    for (const word of productWords) {
+        if (shopItems[word]) {
+            return shopItems[word];
+        }
+    }
+
+    // Try fuzzy matching with full product names (not individual word keys)
+    let bestMatch = null;
+    let bestScore = 0;
+
+    for (const [key, item] of Object.entries(shopItems)) {
+        // Skip single word keys for this phase
+        if (!key.includes(' ')) continue;
+
+        const itemName = item.name.toLowerCase();
+
+        // Calculate similarity score
+        let score = 0;
+
+        // Check if product name contains item name or vice versa
+        if (cleanedName.includes(itemName) || itemName.includes(cleanedName)) {
+            score += 10;
+        }
+
+        // Check word overlap
+        const itemWords = itemName.split(/\s+/);
+        const matchingWords = productWords.filter(pw =>
+            itemWords.some(iw => iw.includes(pw) || pw.includes(iw))
+        );
+
+        score += matchingWords.length * 2;
+
+        // Bonus for similar length
+        if (Math.abs(cleanedName.length - itemName.length) < 10) {
+            score += 1;
+        }
+
+        if (score > bestScore && score >= 3) {
+            bestScore = score;
+            bestMatch = item;
+        }
+    }
+
+    if (bestMatch) {
+        return bestMatch;
+    }
+
+    console.warn(`✗ No shop item found for product: "${productName}"`);
+    return null;
+}
+
+function getStatusClass(status) {
+    switch(status?.toLowerCase()) {
+        case 'shipped': return 'status-shipped';
+        case 'flagged': return 'status-flagged';
+        case 'rejected shipment': return 'status-rejected';
+        default: return 'status-pending';
+    }
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Unknown date';
+
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (e) {
+        return 'Invalid date';
+    }
+}
+
+async function submitReview(orderId) {
+    const statusSelector = document.querySelector(`[data-order-id="${orderId}"] .status-option.selected`);
+    const reasonInput = document.getElementById(`reason-${orderId}`);
+    const submitButton = document.querySelector(`[data-order-id="${orderId}"] .btn-review`);
+
+    if (!statusSelector) {
+        showErrorModal('Please select a status');
+        return;
+    }
+
+    const status = statusSelector.dataset.status;
+    const reason = reasonInput.value.trim();
+
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+    try {
+        const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: status,
+                reviewer_reason: reason
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Update the order in local data
+            const orderIndex = allOrders.findIndex(o => o.id === orderId);
+            if (orderIndex !== -1) {
+                allOrders[orderIndex].shipment_status = status;
+                allOrders[orderIndex].reviewer_reason = reason;
+            }
+
+            // Refresh the display
+            filterOrders();
+
+            showSuccessModal('Order status updated successfully!');
+        } else {
+            throw new Error(result.error || 'Failed to update order status');
+        }
+    } catch (error) {
+        console.error('Error updating order:', error);
+        showErrorModal(`Error: ${error.message}`);
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Update Status';
+    }
+}
+
+async function deleteOrder(orderId) {
+    showConfirmModal(
+        'Are you sure you want to delete this order? This action cannot be undone.',
+        () => performDeleteOrder(orderId)
+    );
+}
+
+async function performDeleteOrder(orderId) {
+
+    const deleteButton = document.querySelector(`[data-order-id="${orderId}"] .btn-delete`);
+    const originalText = deleteButton ? deleteButton.innerHTML : 'Delete Order';
+
+    if (deleteButton) {
+        deleteButton.disabled = true;
+        deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+    }
+
+    try {
+        const response = await fetch(`/api/admin/orders/${orderId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Remove the order from local data
+            const orderIndex = allOrders.findIndex(o => o.id === orderId);
+            if (orderIndex !== -1) {
+                allOrders.splice(orderIndex, 1);
+            }
+
+            // Refresh the display
+            filterOrders();
+
+            showSuccessModal('Order deleted successfully!');
+        } else {
+            throw new Error(result.error || 'Failed to delete order');
+        }
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        showErrorModal(`Error: ${error.message}`);
+
+        // Reset button state on error
+        if (deleteButton) {
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = originalText;
+        }
+    }
+}
+
+async function refundOrder(orderId) {
+    const refundButton = document.querySelector(`[onclick="refundOrder('${orderId}')"]`);
+    const originalText = refundButton.innerHTML;
+
+    try {
+        refundButton.disabled = true;
+        refundButton.innerHTML = '🔄 Refunding...';
+
+        const response = await fetch(`/api/admin/orders/${orderId}/refund`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Update the order status in local data
+            const order = allOrders.find(o => o.id === orderId);
+            if (order) {
+                order.shipment_status = 'Rejected Shipment';
+                order.reviewer_reason = result.message;
+            }
+
+            // Refresh the display
+            filterOrders();
+
+            showSuccessModal(result.message || 'Order refunded and rejected');
+        } else {
+            throw new Error(result.error || 'Failed to refund order');
+        }
+    } catch (error) {
+        console.error('Error refunding order:', error);
+        showErrorModal(`Error: ${error.message}`);
+
+        // Reset button state on error
+        if (refundButton) {
+            refundButton.disabled = false;
+            refundButton.innerHTML = originalText;
+        }
+    }
+}
+
+
+</script>
+{% endblock %}

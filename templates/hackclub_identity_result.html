@@ -1,0 +1,150 @@
+
+{% extends "base.html" %}
+
+{% block title %}Identity Verification - Hack Club Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+    .result-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        position: relative;
+    }
+
+    .result-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{{ url_for("static", filename="assets/Dinos.jpg") }}') center/cover;
+        filter: blur(3px);
+        z-index: 0;
+    }
+
+    .result-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1;
+    }
+
+    .result-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        padding: 3rem;
+        width: 100%;
+        max-width: 500px;
+        border: 1px solid #e1e8ed;
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+    .result-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .success { background: #10b981; }
+    .pending { background: #f59e0b; }
+    .error, .rejected { background: #ef4444; }
+
+    .result-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1a202c;
+    }
+
+    .result-message {
+        color: #718096;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .btn-close {
+        background: #ec3750;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-close:hover {
+        background: #d63146;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="result-container">
+    <div class="result-card">
+        <div class="result-icon {{ status }}">
+            {% if status == 'success' %}
+                <i class="fas fa-check"></i>
+            {% elif status == 'pending' %}
+                <i class="fas fa-clock"></i>
+            {% else %}
+                <i class="fas fa-times"></i>
+            {% endif %}
+        </div>
+
+        <h1 class="result-title">
+            {% if status == 'success' %}
+                Identity Verified!
+            {% elif status == 'pending' %}
+                Verification Pending
+            {% elif status == 'rejected' %}
+                Verification Rejected
+            {% else %}
+                Verification Failed
+            {% endif %}
+        </h1>
+
+        <p class="result-message">{{ message }}</p>
+
+        <button onclick="closeWindow()" class="btn-close">
+            {% if opener %}Close{% else %}Continue{% endif %}
+        </button>
+    </div>
+</div>
+
+<script>
+function closeWindow() {
+    if (window.opener) {
+        window.close();
+    } else {
+        window.location.href = '/dashboard';
+    }
+}
+
+// Auto-close successful verifications after 3 seconds
+{% if status == 'success' %}
+setTimeout(() => {
+    closeWindow();
+}, 3000);
+{% endif %}
+</script>
+{% endblock %}

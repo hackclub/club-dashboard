@@ -1,0 +1,11 @@
+{% extends "errors/base_error.html" %}
+
+{% block error_icon %}
+<i class="fas fa-hourglass-end"></i>
+{% endblock %}
+
+{% block error_title %}Gateway Timeout{% endblock %}
+
+{% block error_message %}
+The server took too long to respond. Please try again in a few moments.
+{% endblock %}

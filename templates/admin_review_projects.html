@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Review Projects - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <h1>Pending Project Submissions</h1>
+
+    <div style="background: white; padding: 2rem; border-radius: 10px; margin-top: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        {% if projects %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f1f5f9; border-bottom: 2px solid #e2e8f0;">
+                    <th style="padding: 1rem; text-align: left;">ID</th>
+                    <th style="padding: 1rem; text-align: left;">Club</th>
+                    <th style="padding: 1rem; text-align: left;">Project Name</th>
+                    <th style="padding: 1rem; text-align: left;">Submitted</th>
+                    <th style="padding: 1rem; text-align: left;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 1rem;">{{ project.id }}</td>
+                    <td style="padding: 1rem;">{{ project.club.name if project.club else 'N/A' }}</td>
+                    <td style="padding: 1rem;"><strong>{{ project.project_name }}</strong></td>
+                    <td style="padding: 1rem;">{{ project.submitted_at.strftime('%Y-%m-%d %H:%M') if project.submitted_at else 'N/A' }}</td>
+                    <td style="padding: 1rem;">
+                        <a href="#" style="color: #3b82f6; margin-right: 1rem;">View</a>
+                        <a href="#" style="color: #10b981; margin-right: 1rem;">Approve</a>
+                        <a href="#" style="color: #ef4444;">Reject</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No pending project submissions.</p>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('admin.dashboard') }}" style="color: #3b82f6;">← Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

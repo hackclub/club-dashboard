@@ -1,0 +1,11 @@
+{% extends "errors/base_error.html" %}
+
+{% block error_icon %}
+<i class="fas fa-tachometer-alt"></i>
+{% endblock %}
+
+{% block error_title %}Too Many Requests{% endblock %}
+
+{% block error_message %}
+You've made too many requests. Please slow down and try again in a few moments.
+{% endblock %}

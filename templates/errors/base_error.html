@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}{{ error_code }} - {{ error_title }}{% endblock %}
+
+{% block content %}
+<style>
+    .error-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+    }
+
+    .error-card {
+        background: var(--surface);
+        border-radius: 16px;
+        box-shadow: var(--shadow-hover);
+        max-width: 600px;
+        width: 100%;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .error-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 3rem 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .error-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .error-code {
+        font-size: 6rem;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .error-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .error-body {
+        padding: 2.5rem 2rem;
+    }
+
+    .error-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 1rem;
+    }
+
+    .error-message {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .error-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .error-btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .error-btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(236, 55, 80, 0.3);
+    }
+
+    .error-btn-secondary {
+        background: transparent;
+        color: var(--text);
+        border: 2px solid var(--border);
+    }
+
+    .error-btn-secondary:hover {
+        background: var(--background);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .error-footer {
+        padding: 1.5rem 2rem;
+        background: var(--background);
+        border-top: 1px solid var(--border);
+    }
+
+    .error-help-text {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    .error-help-text a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .error-help-text a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .error-code {
+            font-size: 4rem;
+        }
+
+        .error-icon {
+            font-size: 3rem;
+        }
+
+        .error-title {
+            font-size: 1.5rem;
+        }
+
+        .error-message {
+            font-size: 1rem;
+        }
+
+        .error-actions {
+            flex-direction: column;
+        }
+
+        .error-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="error-container">
+    <div class="error-card">
+        <div class="error-header">
+            <div class="error-icon">
+                {% block error_icon %}
+                <i class="fas fa-exclamation-triangle"></i>
+                {% endblock %}
+            </div>
+            <h1 class="error-code">{{ error_code }}</h1>
+        </div>
+
+        <div class="error-body">
+            <h2 class="error-title">{% block error_title %}{{ error_title }}{% endblock %}</h2>
+            <p class="error-message">
+                {% block error_message %}
+                {{ error_message }}
+                {% endblock %}
+            </p>
+
+            <div class="error-actions">
+                {% block error_actions %}
+                <a href="{{ url_for('main.index') }}" class="error-btn error-btn-primary">
+                    <i class="fas fa-home"></i> Go Home
+                </a>
+                <button onclick="history.back()" class="error-btn error-btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Go Back
+                </button>
+                {% endblock %}
+            </div>
+        </div>
+
+        <div class="error-footer">
+            <p class="error-help-text">
+                {% block error_help %}
+                Need help? <a href="{{ url_for('main.contact') }}">Contact Support</a>
+                {% endblock %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

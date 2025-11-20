@@ -1,0 +1,568 @@
+{% extends "base.html" %} {% block title %}Dashboard - Hack Club{% endblock %}
+{% block extra_styles %}
+<style>
+    .dashboard-container {
+        min-height: 100vh;
+        background: #f5f7fa;
+        padding: 2rem 0;
+    }
+
+    .dashboard-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .dashboard-header {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .dashboard-title {
+        font-size: clamp(2rem, 6vw, 3rem);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .dashboard-title i {
+        color: #ec3750;
+    }
+
+    .dashboard-subtitle {
+        font-size: 1.1rem;
+        color: #6b7280;
+        margin-bottom: 0;
+    }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #fef7f7;
+        color: #ec3750;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: 1px solid rgba(236, 55, 80, 0.2);
+    }
+
+    .clubs-section {
+        margin-bottom: 2rem;
+    }
+
+    .clubs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .club-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .club-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: #ec3750;
+    }
+
+    .club-card-header {
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, #fef7f7, #fff);
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .club-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 1.5rem;
+        color: white;
+        box-shadow: 0 8px 20px rgba(236, 55, 80, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .club-card:hover .club-avatar {
+        transform: scale(1.05);
+        box-shadow: 0 12px 25px rgba(236, 55, 80, 0.4);
+    }
+
+    .club-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 0.5rem;
+    }
+
+    .club-role {
+        background: #ec3750;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .club-card-body {
+        padding: 1.5rem;
+    }
+
+    .club-description {
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .club-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        color: #6b7280;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .club-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .club-meta-item i {
+        color: #ec3750;
+        font-size: 0.75rem;
+    }
+
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #ec3750;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        color: #6b7280;
+        padding: 4rem 2rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #d1d5db;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #374151;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+
+    .btn-hero {
+        background: #ec3750;
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 150px;
+        justify-content: center;
+    }
+
+    .btn-hero:hover {
+        background: #d63146;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(236, 55, 80, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-secondary-hero {
+        background: white;
+        color: #ec3750;
+        border: 2px solid #ec3750;
+    }
+
+    .btn-secondary-hero:hover {
+        background: #ec3750;
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-content {
+            padding: 0 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+        }
+
+        .clubs-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-hero {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .quick-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .quick-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %} {% block content %}
+<div
+    data-fillout-id="pXZ4qwhTgEus"
+    data-fillout-embed-type="slider"
+    data-fillout-button-text="Give Feedback"
+    data-fillout-button-color="#EB144C"
+    data-fillout-button-float="bottom-left"
+    data-fillout-slider-direction="right"
+    data-fillout-inherit-parameters
+    data-fillout-domain="forms.hackclub.com"
+    data-fillout-popup-size="medium"
+></div>
+<script src="https://server.fillout.com/embed/v1/"></script>
+
+<div class="dashboard-container">
+    <div class="dashboard-content">
+        <div class="dashboard-header">
+            <div class="welcome-badge">
+                <i class="fas fa-rocket"></i>
+                <span>Welcome to your dashboard!</span>
+            </div>
+
+            <h1 class="dashboard-title">
+                <i class="fas fa-flag"></i>
+                Hey there, {{ current_user.username if current_user and
+                current_user.id else 'User' }}!
+            </h1>
+
+            <p class="dashboard-subtitle">
+                Ready to build something amazing? Choose a club to get started!
+            </p>
+        </div>
+
+        {% set all_club_ids = [] %}
+        {% if led_clubs or memberships %}
+        <div class="clubs-section">
+            <div class="clubs-grid">
+
+                {% for club in led_clubs %}
+                {% set _ = all_club_ids.append(club.id) %}
+                <div
+                    class="club-card"
+                    onclick="window.location.href='{{ url_for('club_dashboard', club_id=club.id) }}'"
+                >
+                    <div class="club-card-header">
+                        <div class="club-avatar">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h3 class="club-name">{{ club.name }}</h3>
+                        <span class="club-role">Club Leader</span>
+                    </div>
+                    <div class="club-card-body">
+                        <p class="club-description">
+                            {{ club.description or 'Leading the way in
+                            innovation and collaboration!' }}
+                        </p>
+                        <div class="club-meta">
+                            <div class="club-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ club.location or 'Remote' }}</span>
+                            </div>
+                            <div class="club-meta-item">
+                                <i class="fas fa-users"></i>
+                                <span
+                                    >{{ club.members|length + 1 }} members</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+
+                {% for membership in memberships %}
+                {% if membership.club.id not in all_club_ids %}
+                <div
+                    class="club-card"
+                    onclick="window.location.href='{{ url_for('club_dashboard', club_id=membership.club.id) }}'"
+                >
+                    <div class="club-card-header">
+                        <div class="club-avatar">
+                            {% if membership.role == 'co-leader' %}
+                            <i class="fas fa-star"></i>
+                            {% else %}
+                            <i class="fas fa-users"></i>
+                            {% endif %}
+                        </div>
+                        <h3 class="club-name">{{ membership.club.name }}</h3>
+                        <span class="club-role"
+                            >{{ membership.role.title() }}</span
+                        >
+                    </div>
+                    <div class="club-card-body">
+                        <p class="club-description">
+                            {{ membership.club.description or 'Part of an
+                            amazing coding community!' }}
+                        </p>
+                        <div class="club-meta">
+                            <div class="club-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span
+                                    >{{ membership.club.location or 'Remote'
+                                    }}</span
+                                >
+                            </div>
+                            <div class="club-meta-item">
+                                <i class="fas fa-users"></i>
+                                <span
+                                    >{{ membership.club.members|length + 1 }}
+                                    members</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            {% set member_clubs = memberships|rejectattr('club.id', 'in', all_club_ids)|list %}
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-number">{{ led_clubs|length }}</div>
+                    <div class="stat-label">Clubs Leading</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ member_clubs|length }}</div>
+                    <div class="stat-label">Clubs Joined</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">
+                        {{ (led_clubs|length + member_clubs|length) }}
+                    </div>
+                    <div class="stat-label">Total Clubs</div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-flag"></i>
+            <h3>No clubs yet</h3>
+            <p>Join an existing club or link your own to get started!</p>
+
+            <div class="cta-buttons">
+                <a
+                    href="#"
+                    class="btn-hero btn-secondary-hero"
+                    onclick="joinClubPrompt(); return false;"
+                >
+                    Join Club
+                </a>
+                <a href="{{ url_for('verify_leader') }}" class="btn-hero">
+                    <i class="fas fa-shield-check"></i>
+                    Link a Club
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<div id="joinClubModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Join a Club</h2>
+            <button class="modal-close" onclick="closeJoinModal()">
+                &times;
+            </button>
+        </div>
+        <div class="modal-body">
+            <p
+                style="
+                    margin-bottom: 1.5rem;
+                    color: #6b7280;
+                    text-align: center;
+                "
+            >
+                Enter the join code from your club leader
+            </p>
+            <div style="margin-bottom: 1.5rem">
+                <input
+                    type="text"
+                    id="joinCodeInput"
+                    placeholder="Enter join code"
+                    style="
+                        width: 100%;
+                        padding: 0.75rem;
+                        border: 2px solid #e2e8f0;
+                        border-radius: 8px;
+                        font-size: 1rem;
+                        text-align: center;
+                        letter-spacing: 1px;
+                        font-weight: 600;
+                    "
+                />
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeJoinModal()" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button onclick="submitJoinCode()" class="btn btn-primary">
+                Join Club
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function joinClubPrompt() {
+        const modal = document.getElementById("joinClubModal");
+        if (modal) {
+            modal.style.display = "block";
+            document.body.style.overflow = "hidden";
+            document.getElementById("joinCodeInput").focus();
+        }
+    }
+
+    function closeJoinModal() {
+        const modal = document.getElementById("joinClubModal");
+        if (modal) {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+            document.getElementById("joinCodeInput").value = "";
+        }
+    }
+
+    function submitJoinCode() {
+        const joinCode = document.getElementById("joinCodeInput").value.trim();
+        if (joinCode) {
+            window.location.href = `/join-club?code=${encodeURIComponent(joinCode)}`;
+        }
+    }
+
+    // Handle Enter key in join code input
+    document.addEventListener("DOMContentLoaded", function () {
+        const joinCodeInput = document.getElementById("joinCodeInput");
+        if (joinCodeInput) {
+            joinCodeInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    submitJoinCode();
+                }
+            });
+        }
+    });
+
+    // Close modal when clicking backdrop
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("modal")) {
+            if (e.target.id === "joinClubModal") closeJoinModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+            const joinModal = document.getElementById("joinClubModal");
+            if (joinModal && joinModal.style.display === "block") {
+                closeJoinModal();
+            }
+        }
+    });
+</script>
+{% endblock %}

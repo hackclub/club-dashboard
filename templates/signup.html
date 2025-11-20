@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Hack Clubs Dash{% endblock %}
+
+{% block extra_head %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        position: relative;
+    }
+
+    .auth-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{{ url_for("static", filename="assets/Dinos.jpg") }}') center/cover;
+        filter: blur(3px);
+        z-index: 0;
+    }
+
+    .auth-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1;
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        padding: 3rem;
+        width: 100%;
+        max-width: 450px;
+        border: 1px solid #e1e8ed;
+        position: relative;
+        z-index: 2;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-header h1 {
+        color: #1a202c;
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .auth-header p {
+        color: #718096;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 0.875rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background: white;
+        color: #2d3748;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ec3750;
+        box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-control::placeholder {
+        color: #a0aec0;
+    }
+
+    .btn-auth {
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-auth:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(236, 55, 80, 0.3);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .auth-footer a {
+        color: #ec3750;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .auth-logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f7fafc;
+        border-radius: 8px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+
+    .checkbox-group:hover {
+        border-color: #ec3750;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #ec3750;
+    }
+
+    .checkbox-group label {
+        margin: 0;
+        color: #2d3748;
+        font-weight: 500;
+        cursor: pointer;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .leader-badge {
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <h1>Create Hack Club Account</h1>
+            <p>Create your account and start building</p>
+        </div>
+
+        <form method="POST" class="auth-form">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" name="username" placeholder="Choose a username" required minlength="3" maxlength="30">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" class="form-control" name="first_name" placeholder="Enter your first name" required maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" class="form-control" name="last_name" placeholder="Enter your last name" required maxlength="50">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Birthday</label>
+                <input type="date" class="form-control" name="birthday" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Create a password" required minlength="6">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" name="is_leader" id="isLeader">
+                <label for="isLeader">
+                    I'm a registered club leader and want to link my club
+                    <span class="leader-badge">Leader</span>
+                </label>
+            </div>
+
+            <div id="leader-info" style="display: none; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; font-size: 0.875rem; color: #856404;">
+                <i class="fas fa-info-circle"></i> <strong>Leader Verification Required:</strong> Your account will be created first, then you'll need to verify your leadership status with your registered email and club name before your club is created.
+            </div>
+
+            <button type="submit" class="btn-auth">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const isLeaderCheckbox = document.getElementById('isLeader');
+    const leaderInfo = document.getElementById('leader-info');
+
+    if (isLeaderCheckbox && leaderInfo) {
+        isLeaderCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                leaderInfo.style.display = 'block';
+            } else {
+                leaderInfo.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

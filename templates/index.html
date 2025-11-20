@@ -1,0 +1,1418 @@
+{% extends "base.html" %} {% block title %}Hack Club Dashboard - Manage Your
+Club{% endblock %} {% block extra_styles %}
+<style>
+    :root {
+        --primary-gradient: linear-gradient(
+            135deg,
+            #ec3750 0%,
+            #ff6b7a 50%,
+            #ff8c82 100%
+        );
+        --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --glass-bg: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+        --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.15);
+        --text-light: rgba(255, 255, 255, 0.9);
+        --text-dim: rgba(255, 255, 255, 0.7);
+    }
+
+    @keyframes float {
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes pulse {
+        0%,
+        100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .hero-section {
+        background: linear-gradient(135deg, #ec3750 0%, #ff6b7a 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        padding: 4rem 2rem;
+    }
+
+    .hero-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(
+                circle at 20% 20%,
+                rgba(255, 255, 255, 0.05) 0%,
+                transparent 50%
+            ),
+            radial-gradient(
+                circle at 80% 80%,
+                rgba(255, 255, 255, 0.05) 0%,
+                transparent 50%
+            );
+    }
+
+    .floating-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+    .shape {
+        position: absolute;
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .shape:nth-child(1) {
+        width: 140px;
+        height: 140px;
+        top: 15%;
+        left: 8%;
+        animation-delay: 0s;
+    }
+
+    .shape:nth-child(2) {
+        width: 100px;
+        height: 100px;
+        top: 25%;
+        right: 12%;
+        animation-delay: 2s;
+    }
+
+    .shape:nth-child(3) {
+        width: 170px;
+        height: 170px;
+        bottom: 25%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+
+    .shape:nth-child(4) {
+        width: 120px;
+        height: 120px;
+        bottom: 15%;
+        right: 8%;
+        animation-delay: 1s;
+    }
+
+    .shape:nth-child(5) {
+        width: 80px;
+        height: 80px;
+        top: 55%;
+        left: 2%;
+        animation-delay: 3s;
+    }
+
+    .shape:nth-child(6) {
+        width: 110px;
+        height: 110px;
+        top: 65%;
+        right: 2%;
+        animation-delay: 5s;
+    }
+
+    .floating-sticker {
+        position: absolute;
+        z-index: 1;
+        opacity: 0.4;
+        transition: all 0.3s ease;
+        animation: float 8s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    .floating-sticker:hover {
+        opacity: 0.7;
+        transform: scale(1.05) rotate(5deg);
+    }
+
+    .sticker-1 {
+        top: 25%;
+        left: 15%;
+        width: 130px;
+        animation-delay: 0s;
+        transform: rotate(-15deg);
+    }
+
+    .sticker-2 {
+        top: 8%;
+        right: 25%;
+        width: 135px;
+        animation-delay: 2s;
+        transform: rotate(20deg);
+    }
+
+    .sticker-3 {
+        bottom: 25%;
+        left: 20%;
+        width: 140px;
+        animation-delay: 1s;
+        transform: rotate(-10deg);
+    }
+
+    .sticker-4 {
+        bottom: 8%;
+        right: 45%;
+        width: 125px;
+        animation-delay: 3s;
+        transform: rotate(15deg);
+    }
+
+    .sticker-5 {
+        top: 55%;
+        left: 12%;
+        width: 120px;
+        animation-delay: 4s;
+        transform: rotate(-25deg);
+    }
+
+    .sticker-6 {
+        top: 75%;
+        right: 20%;
+        width: 135px;
+        animation-delay: 1.5s;
+        transform: rotate(10deg);
+    }
+
+    .section-sticker {
+        position: absolute;
+        opacity: 0.3;
+        transition: all 0.3s ease;
+        animation: float 10s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    .features-section {
+        position: relative;
+    }
+
+    .features-sticker-1 {
+        top: 5%;
+        left: 15%;
+        width: 85px;
+        animation-delay: 0s;
+        transform: rotate(-20deg);
+    }
+
+    .features-sticker-2 {
+        top: 8%;
+        right: 15%;
+        width: 90px;
+        animation-delay: 3s;
+        transform: rotate(25deg);
+    }
+
+    .features-sticker-3 {
+        bottom: 8%;
+        left: 25%;
+        width: 80px;
+        animation-delay: 1.5s;
+        transform: rotate(-15deg);
+    }
+
+    .stats-sticker {
+        top: 5%;
+        right: 25%;
+        width: 95px;
+        animation-delay: 2s;
+        transform: rotate(15deg);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 10;
+        max-width: 1000px;
+        width: 100%;
+        padding: 2rem;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        animation: pulse 3s ease-in-out infinite;
+    }
+
+    .hero-title {
+        font-size: clamp(2.8rem, 8vw, 5.5rem);
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        color: white;
+        line-height: 1.1;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.1rem, 3vw, 1.6rem);
+        margin-bottom: 2.5rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
+        line-height: 1.6;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2.5rem;
+    }
+
+    .btn-hero {
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 220px;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+        border: 2px solid transparent;
+    }
+
+    .btn-hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+        );
+        transition: left 0.5s;
+    }
+
+    .btn-hero:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary-hero {
+        background: var(--glass-bg);
+        color: white;
+        border-color: var(--glass-border);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .btn-primary-hero:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: var(--shadow-strong);
+        border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-secondary-hero {
+        background: rgba(255, 255, 255, 0.95);
+        color: #ec3750;
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .btn-secondary-hero:hover {
+        background: white;
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: var(--shadow-strong);
+        color: #d63146;
+    }
+
+    .features-section {
+        padding: 8rem 0;
+        background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+        position: relative;
+    }
+
+    .features-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .features-header {
+        text-align: center;
+        margin-bottom: 6rem;
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .features-header.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .features-header .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, #ec3750, #ff6b7a);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(236, 55, 80, 0.3);
+    }
+
+    .features-header h2 {
+        font-size: clamp(2.5rem, 6vw, 4rem);
+        color: #1a202c;
+        margin-bottom: 1.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #1a202c 0%, #4a5568 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .features-header p {
+        font-size: 1.25rem;
+        color: #64748b;
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: 2.5rem;
+        margin-top: 4rem;
+    }
+
+    .feature-card {
+        background: white;
+        padding: 3rem;
+        border-radius: 24px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid #f1f5f9;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        border-color: #ec3750;
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card:nth-child(odd) {
+        opacity: 0;
+        transform: translateX(-100px);
+        transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+
+    .feature-card:nth-child(even) {
+        opacity: 0;
+        transform: translateX(100px);
+        transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+
+    .feature-card:nth-child(odd).visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .feature-card:nth-child(even).visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .feature-card.visible:nth-child(1) {
+        transition-delay: 0.1s;
+    }
+    .feature-card.visible:nth-child(2) {
+        transition-delay: 0.2s;
+    }
+    .feature-card.visible:nth-child(3) {
+        transition-delay: 0.3s;
+    }
+    .feature-card.visible:nth-child(4) {
+        transition-delay: 0.4s;
+    }
+    .feature-card.visible:nth-child(5) {
+        transition-delay: 0.5s;
+    }
+    .feature-card.visible:nth-child(6) {
+        transition-delay: 0.6s;
+    }
+
+    .feature-icon {
+        width: 100px;
+        height: 100px;
+        background: var(--primary-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 2.5rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(236, 55, 80, 0.3);
+        transition: all 0.4s ease;
+        position: relative;
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 15px 40px rgba(236, 55, 80, 0.4);
+    }
+
+    .feature-icon::after {
+        content: "";
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        right: -20px;
+        bottom: -20px;
+        border-radius: 50%;
+        border: 2px solid rgba(236, 55, 80, 0.2);
+        animation: pulse 3s ease-in-out infinite;
+    }
+
+    .feature-card h3 {
+        font-size: 1.5rem;
+        color: #1a202c;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .feature-card p {
+        color: #64748b;
+        line-height: 1.7;
+        font-size: 1rem;
+    }
+
+    .stats-section {
+        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        padding: 6rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.5;
+    }
+
+    .stats-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 3rem;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stat-item {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        transition: all 0.4s ease;
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    .stat-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 1s ease-out, transform 1s ease-out, all 0.4s ease;
+    }
+
+    .stat-item.visible:nth-child(1) {
+        transition-delay: 0.1s;
+    }
+    .stat-item.visible:nth-child(2) {
+        transition-delay: 0.2s;
+    }
+    .stat-item.visible:nth-child(3) {
+        transition-delay: 0.3s;
+    }
+    .stat-item.visible:nth-child(4) {
+        transition-delay: 0.4s;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-10px);
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-item h3 {
+        font-size: 3.5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .stat-item p {
+        color: var(--text-light);
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 3rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-hero {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .features-header h2 {
+            font-size: 2.5rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-item {
+            padding: 2rem 1rem;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero-content {
+            padding: 2rem 1rem;
+        }
+
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .hack-club-flag {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        height: auto;
+        transition: all 0.3s ease;
+        transform: translateX(-2px);
+    }
+
+    .hack-club-flag:hover {
+        transform: translateX(0px) scale(1.2);
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-gradient);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #d63146;
+    }
+
+    /* Floating Polaroid Photos */
+    .floating-polaroid {
+        position: absolute;
+        background: rgba(248, 248, 248, 0.8);
+        padding: 15px 15px 45px 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        animation: floatPolaroid 12s ease-in-out infinite;
+        z-index: 2;
+        cursor: pointer;
+        transform-origin: center;
+        transform: rotate(var(--rotation));
+        border: 1px solid rgba(224, 224, 224, 0.5);
+        backdrop-filter: blur(10px);
+    }
+
+    .floating-polaroid:hover {
+        transform: scale(1.1) rotate(0deg) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        z-index: 50;
+        background: rgba(248, 248, 248, 0.9);
+    }
+
+    .polaroid-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        display: block;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .polaroid-caption {
+        font-family: "Permanent Marker", cursive, sans-serif;
+        font-size: 14px;
+        color: #333;
+        text-align: center;
+        margin-top: 12px;
+        font-weight: 400;
+        transform: rotate(-1deg);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    @keyframes floatPolaroid {
+        0%,
+        100% {
+            transform: translateY(0px) rotate(var(--rotation));
+        }
+        33% {
+            transform: translateY(-12px) rotate(calc(var(--rotation) + 1deg));
+        }
+        66% {
+            transform: translateY(12px) rotate(calc(var(--rotation) - 1deg));
+        }
+    }
+
+    /* Individual polaroid positioning - spread along the sides */
+    .polaroid-1 {
+        top: 15%;
+        left: 5%;
+        --rotation: -8deg;
+        animation-delay: 0s;
+    }
+
+    .polaroid-2 {
+        top: 35%;
+        left: 3%;
+        --rotation: 12deg;
+        animation-delay: 2s;
+    }
+
+    .polaroid-3 {
+        top: 20%;
+        right: 6%;
+        --rotation: -15deg;
+        animation-delay: 4s;
+    }
+
+    .polaroid-4 {
+        top: 45%;
+        right: 4%;
+        --rotation: 10deg;
+        animation-delay: 1s;
+    }
+
+    .polaroid-5 {
+        bottom: 15%;
+        right: 8%;
+        --rotation: -5deg;
+        animation-delay: 3s;
+    }
+
+    /* Section polaroids */
+    .section-polaroid {
+        position: absolute;
+        background: rgba(245, 245, 245, 0.7);
+        padding: 10px 10px 25px 10px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        border-radius: 10px;
+        border: 1px solid rgba(221, 221, 221, 0.4);
+        animation: floatPolaroid 15s ease-in-out infinite;
+        z-index: 1;
+        opacity: 0.9;
+        transform: rotate(var(--rotation));
+        backdrop-filter: blur(8px);
+    }
+
+    .section-polaroid .polaroid-image {
+        width: 80px;
+        height: 80px;
+        border: 2px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        border-radius: 6px;
+    }
+
+    .section-polaroid .polaroid-caption {
+        font-size: 11px;
+        margin-top: 8px;
+        color: #444;
+        font-family: "Permanent Marker", cursive, sans-serif;
+        transform: rotate(-0.5deg);
+    }
+
+    .features-polaroid-1 {
+        top: 8%;
+        left: 5%;
+        --rotation: -12deg;
+        animation-delay: 0.5s;
+    }
+
+    .features-polaroid-2 {
+        top: 12%;
+        left: 12%;
+        --rotation: 15deg;
+        animation-delay: 2.5s;
+    }
+
+    .stats-polaroid {
+        top: 15%;
+        right: 12%;
+        --rotation: 8deg;
+        animation-delay: 1.5s;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+        .floating-polaroid {
+            padding: 12px 12px 35px 12px;
+        }
+
+        .polaroid-image {
+            width: 100px;
+            height: 100px;
+        }
+
+        .polaroid-caption {
+            font-size: 12px;
+        }
+
+        .section-polaroid {
+            padding: 8px 8px 20px 8px;
+        }
+
+        .section-polaroid .polaroid-image {
+            width: 70px;
+            height: 70px;
+        }
+
+        .section-polaroid .polaroid-caption {
+            font-size: 10px;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .floating-polaroid {
+            padding: 10px 10px 30px 10px;
+        }
+
+        .polaroid-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+        }
+
+        .polaroid-caption {
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        /* Reposition for medium screens - maintain side spread */
+        .polaroid-1 {
+            top: 18%;
+            left: 4%;
+        }
+
+        .polaroid-2 {
+            top: 38%;
+            left: 2%;
+        }
+
+        .polaroid-3 {
+            top: 22%;
+            right: 5%;
+        }
+
+        .polaroid-4 {
+            top: 48%;
+            right: 3%;
+        }
+
+        .polaroid-5 {
+            bottom: 18%;
+            right: 6%;
+        }
+
+        .section-polaroid .polaroid-image {
+            width: 60px;
+            height: 60px;
+        }
+
+        .features-polaroid-1 {
+            top: 10%;
+            left: 5%;
+        }
+
+        .features-polaroid-2 {
+            top: 14%;
+            left: 10%;
+        }
+
+        .stats-polaroid {
+            top: 20%;
+            right: 10%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .floating-polaroid {
+            padding: 8px 8px 25px 8px;
+            border-radius: 8px;
+        }
+
+        .polaroid-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+        }
+
+        .polaroid-caption {
+            font-size: 9px;
+            margin-top: 6px;
+        }
+
+        /* Mobile positioning - spread along sides */
+        .polaroid-1 {
+            top: 20%;
+            left: 2%;
+        }
+
+        .polaroid-2 {
+            top: 45%;
+            left: 1%;
+        }
+
+        .polaroid-3 {
+            bottom: 20%;
+            right: 2%;
+        }
+
+        .polaroid-4 {
+            display: none; /* Hide on mobile */
+        }
+
+        .polaroid-5 {
+            display: none; /* Hide on mobile */
+        }
+
+        .section-polaroid {
+            padding: 6px 6px 18px 6px;
+            border-radius: 6px;
+        }
+
+        .section-polaroid .polaroid-image {
+            width: 45px;
+            height: 45px;
+            border-radius: 3px;
+        }
+
+        .section-polaroid .polaroid-caption {
+            font-size: 8px;
+            margin-top: 4px;
+        }
+
+        .features-polaroid-1 {
+            top: 8%;
+            left: 3%;
+        }
+
+        .features-polaroid-2 {
+            display: none; /* Hide second features polaroid on mobile */
+        }
+
+        .stats-polaroid {
+            top: 15%;
+            right: 5%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .floating-polaroid {
+            padding: 6px 6px 20px 6px;
+        }
+
+        .polaroid-image {
+            width: 50px;
+            height: 50px;
+        }
+
+        .polaroid-caption {
+            font-size: 8px;
+            margin-top: 4px;
+        }
+
+        /* Very small screens - edge positioning only */
+        .polaroid-1 {
+            top: 2%;
+            left: 1%;
+        }
+
+        .polaroid-2 {
+            top: 1%;
+            right: 2%;
+        }
+
+        .polaroid-3 {
+            bottom: 5%;
+            left: 2%;
+        }
+
+        .section-polaroid .polaroid-image {
+            width: 35px;
+            height: 35px;
+        }
+
+        .section-polaroid .polaroid-caption {
+            font-size: 7px;
+        }
+
+        .features-polaroid-1 {
+            top: 5%;
+            left: 2%;
+        }
+
+        .stats-polaroid {
+            top: 10%;
+            right: 3%;
+        }
+    }
+</style>
+{% endblock %} {% block content %}
+<a href="https://hackclub.com" target="_blank" class="hack-club-flag">
+    <br />
+    <br />
+    <br />
+    <br />
+    <img
+        style="width: 150px"
+        src="{{ url_for('static', filename='assets/flag-orpheus-left.png') }}"
+        alt="Hack Club"
+    />
+</a>
+
+<div class="hero-section">
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+
+    <div class="floating-polaroid polaroid-1">
+        <img
+            src="{{ url_for('static', filename='assets/social/bridgewater.png') }}"
+            alt="Club Photo"
+            class="polaroid-image"
+        />
+        <div class="polaroid-caption">Group photo!!!</div>
+    </div>
+
+    <div class="floating-polaroid polaroid-2">
+        <img
+            src="{{ url_for('static', filename='assets/social/juice.jpg') }}"
+            alt="Club Photo"
+            class="polaroid-image"
+        />
+        <div class="polaroid-caption">We went to Juice!</div>
+    </div>
+
+    <div class="floating-polaroid polaroid-3">
+        <img
+            src="{{ url_for('static', filename='assets/social/pizza.jpg') }}"
+            alt="Club Photo"
+            class="polaroid-image"
+        />
+        <div class="polaroid-caption">pizza + code = ❤️</div>
+    </div>
+
+    <div class="floating-polaroid polaroid-4">
+        <img
+            src="{{ url_for('static', filename='assets/social/anvay.jpg') }}"
+            alt="Club Photo"
+            class="polaroid-image"
+        />
+        <div class="polaroid-caption">first day!</div>
+    </div>
+
+    <div class="floating-polaroid polaroid-5">
+        <img
+            src="{{ url_for('static', filename='assets/social/vcp.png') }}"
+            alt="Club Photo"
+            class="polaroid-image"
+        />
+        <div class="polaroid-caption">picnic!</div>
+    </div>
+
+
+    <img
+        src="{{ url_for('static', filename='assets/orpheus-having-boba.png') }}"
+        alt="Orpheus Boba"
+        class="floating-sticker sticker-1"
+    />
+    <img
+        src="{{ url_for('static', filename='assets/orpheus-skateboarding-PCB.png') }}"
+        alt="Orpheus Skateboard"
+        class="floating-sticker sticker-2"
+    />
+    <img
+        src="{{ url_for('static', filename='assets/orphmoji_peefest.png') }}"
+        alt="Orphmoji Happy"
+        class="floating-sticker sticker-3"
+    />
+    <img
+        src="{{ url_for('static', filename='assets/orphmoji_scared.png') }}"
+        alt="Orphmoji Scared"
+        class="floating-sticker sticker-4"
+    />
+    <img
+        src="{{ url_for('static', filename='assets/Rummage.png') }}"
+        alt="Rummage"
+        class="floating-sticker sticker-5"
+    />
+    <img
+        src="{{ url_for('static', filename='assets/hackers,_assemble!.png') }}"
+        alt="Hackers Assemble"
+        class="floating-sticker sticker-6"
+    />
+
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fas fa-rocket"></i>
+            <span>1000+ Hack Clubs worldwide!!</span>
+        </div>
+
+        <h1 class="hero-title">
+            <i class="fas fa-flag"></i> Hack Club Dashboard
+        </h1>
+
+        <p class="hero-subtitle">
+            The place where Hack Club leaders manage their clubs, log projects,
+            buy hardware, find lessons and make the best clubs possible!
+        </p>
+
+        <div class="cta-buttons">
+            {% if user_registration_enabled %}
+            <a href="{{ url_for('signup') }}" class="btn-hero btn-primary-hero">
+                <i class="fas fa-rocket"></i>
+                Link my club
+            </a>
+            {% endif %}
+            <a
+                href="https://apply.hackclub.com/"
+                class="btn-hero btn-primary-hero"
+            >
+                <i class="fas fa-plus"></i>
+                Start a club
+            </a>
+            <a
+                href="{{ url_for('login') }}"
+                class="btn-hero btn-secondary-hero"
+            >
+                <i class="fas fa-sign-in-alt"></i>
+                Sign In
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="features-section">
+
+    <div class="section-polaroid features-polaroid-1">
+        <img
+            src="{{ url_for('static', filename='assets/social/lab.jpg') }}"
+            alt="Club coding session"
+            class="polaroid-image"
+        />
+        <div class="polaroid-caption">workshop day</div>
+    </div>
+
+    <div class="section-polaroid features-polaroid-2">
+        <img
+            src="{{ url_for('static', filename='assets/social/egypt.jpg') }}"
+            alt="Demo presentation"
+            class="polaroid-image"
+        />
+        <div class="polaroid-caption">photo op!</div>
+    </div>
+
+
+    <img
+        src="{{ url_for('static', filename='assets/parts.png') }}"
+        alt="Mo Parts Mo Problems"
+        class="section-sticker features-sticker-1"
+    />
+    <img
+        src="{{ url_for('static', filename='assets/find.png') }}"
+        alt="Find Out"
+        class="section-sticker features-sticker-2"
+    />
+    <img
+        src="{{ url_for('static', filename='assets/orpheus-having-boba.png') }}"
+        alt="Orpheus Boba"
+        class="section-sticker features-sticker-3"
+    />
+
+    <div class="features-container">
+        <div class="features-header">
+            <div class="badge">
+                <i class="fas fa-star"></i>
+                <span>Everything You Need</span>
+            </div>
+            <h2>Built for Modern Hack Clubs</h2>
+            <p>
+                Built by Hack Clubbers, for Hack Clubbers. Everything you need
+                to run an awesome club is right here—no more juggling
+                spreadsheets and sticky notes!
+            </p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Keep Track of Your Members</h3>
+                <p>
+                    See who's in your club, what they're working on, and how
+                    they're doing. No more losing track of people or wondering
+                    who's actually showing up to meetings.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Plan Your Hackathons & Meetings</h3>
+                <p>
+                    Schedule workshops, hackathons, and club meetings without
+                    the headache. Send reminders so people actually show up, and
+                    keep track of who came. It's way easier than group chats and
+                    sticky notes.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>See What Everyone's Building</h3>
+                <p>
+                    Keep tabs on all the cool stuff your members are working on.
+                    Give them feedback, cheer them on when they hit milestones,
+                    and watch your club's projects come to life.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <h3>Get Grants</h3>
+                <p>
+                    Apply for Hack Club grants right from your dashboard. Turn
+                    your club meetings into pizza parties and fund your wildest
+                    project ideas with way less paperwork and money.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3>Show Off Your Wins</h3>
+                <p>
+                    Build a gallery of all the awesome stuff your club has done.
+                    Let your members flex their projects and inspire the next
+                    wave of hackers who join your club.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Numbers That Actually Matter</h3>
+                <p>
+                    See how your club is growing, who's staying engaged, and
+                    what projects are getting finished. No boring spreadsheets—
+                    just clean charts that help you make your club even better.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="stats-section">
+
+    <div class="section-polaroid stats-polaroid">
+        <img
+            src="{{ url_for('static', filename='assets/social/sahiti.jpg') }}"
+            alt="Club achievements"
+            class="polaroid-image"
+        />
+        <div class="polaroid-caption">growing strong!</div>
+    </div>
+
+    <img
+        src="{{ url_for('static', filename='assets/hackers,_assemble!.png') }}"
+        alt="Hackers Assemble"
+        class="section-sticker stats-sticker"
+    />
+
+    <div class="stats-container">
+        <div class="stat-item">
+            <h3>1,000+</h3>
+            <p>Active Clubs</p>
+        </div>
+        <div class="stat-item">
+            <h3>50,000+</h3>
+            <p>Student Hackers</p>
+        </div>
+        <div class="stat-item">
+            <h3>100,000+</h3>
+            <p>Projects Built</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

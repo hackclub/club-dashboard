@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <h1>System Statistics</h1>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+        <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h3>Users</h3>
+            <p style="font-size: 2rem; font-weight: bold; color: #3b82f6;">{{ stats.total_users }}</p>
+        </div>
+
+        <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h3>Clubs</h3>
+            <p style="font-size: 2rem; font-weight: bold; color: #10b981;">{{ stats.total_clubs }}</p>
+        </div>
+
+        <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h3>Posts</h3>
+            <p style="font-size: 2rem; font-weight: bold; color: #ec3750;">{{ stats.total_posts }}</p>
+        </div>
+
+        <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h3>Assignments</h3>
+            <p style="font-size: 2rem; font-weight: bold; color: #f59e0b;">{{ stats.total_assignments }}</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('admin.dashboard') }}" style="color: #3b82f6;">← Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

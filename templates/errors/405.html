@@ -1,0 +1,11 @@
+{% extends "errors/base_error.html" %}
+
+{% block error_icon %}
+<i class="fas fa-times-circle"></i>
+{% endblock %}
+
+{% block error_title %}Method Not Allowed{% endblock %}
+
+{% block error_message %}
+The request method is not supported for this resource. Please check the API documentation.
+{% endblock %}

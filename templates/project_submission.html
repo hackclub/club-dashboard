@@ -1,0 +1,1515 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Submission - {{ club.name }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ec3750;
+            --primary-dark: #d63146;
+            --primary-gradient: linear-gradient(135deg, #ec3750 0%, #ff6b7a 50%, #ff8c82 100%);
+            --secondary-gradient: linear-gradient(135deg, #ec3750 0%, #d63146 100%);
+            --accent-gradient: linear-gradient(135deg, #ff8c82 0%, #ff6b7a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --text-light: rgba(255, 255, 255, 0.9);
+            --text-dim: rgba(255, 255, 255, 0.7);
+            --text-dark: #1f2937;
+            --border-radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('{{ url_for("static", filename="assets/Dinos.jpg") }}') center/cover;
+            filter: blur(3px);
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            padding: 2.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            text-align: center;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .header h1 {
+            color: var(--text-dark);
+            font-size: clamp(2rem, 6vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .club-info {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(236, 55, 80, 0.3);
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            padding: 2.5rem 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-section h3 i {
+            background: var(--primary-gradient);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(236, 55, 80, 0.3);
+            color: white;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-grid.single {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: #ff8c82;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #ec3750;
+            box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-control:disabled {
+            background: #f7fafc;
+            color: #4a5568;
+            cursor: not-allowed;
+        }
+
+        .form-control::placeholder {
+            color: rgba(31, 41, 55, 0.6);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        select.form-control {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
+        }
+
+        .hackatime-dropdown {
+            margin-bottom: 1.5rem;
+        }
+
+        .dropdown-container {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-toggle:hover {
+            border-color: #ec3750;
+        }
+
+        .dropdown-toggle.active {
+            border-color: #ec3750;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .dropdown-toggle.required {
+            border-color: #fca5a5;
+        }
+
+        .dropdown-toggle.required:hover {
+            border-color: #ec3750;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #ec3750;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(236, 55, 80, 0.05);
+            color: var(--primary);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item h5 {
+            margin: 0 0 0.25rem 0;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .dropdown-item p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: rgba(31, 41, 55, 0.6);
+        }
+
+        .dropdown-chevron {
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-toggle.active .dropdown-chevron {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-search {
+            position: relative;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            transition: border-color 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(236, 55, 80, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .dropdown-items {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: rgba(236, 55, 80, 0.05);
+        }
+
+        .file-upload.dragover {
+            border-color: var(--primary);
+            background: rgba(236, 55, 80, 0.1);
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 2px solid transparent;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ec3750, #d63146);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(236, 55, 80, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #d63146, #c02d42);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236, 55, 80, 0.4);
+            color: white;
+        }
+
+        .btn-lg {
+            padding: 1.25rem 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #059669;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 600;
+            position: relative;
+            z-index: 10;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Hackatime Setup Notice */
+        .hackatime-setup-notice {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .notice-icon {
+            font-size: 2.5rem;
+            color: #f59e0b;
+            flex-shrink: 0;
+        }
+
+        .notice-content h3 {
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .notice-content p {
+            color: #b45309;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .setup-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .setup-button:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Fraud Prevention Agreement Styles */
+        .fraud-prevention-agreement {
+            margin-bottom: 2rem;
+        }
+
+        .agreement-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .agreement-header h3 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .agreement-header h3 i {
+            color: #f59e0b;
+            font-size: 1.25em;
+        }
+
+        .agreement-header p {
+            color: #718096;
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        .agreement-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .agreement-rules {
+            background: linear-gradient(135deg, rgba(255, 59, 48, 0.05) 0%, rgba(255, 149, 0, 0.05) 100%);
+            border: 2px solid rgba(255, 59, 48, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .agreement-rules h4 {
+            color: #dc2626;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .agreement-rules h4 i {
+            color: #f59e0b;
+        }
+
+        .rule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+        }
+
+        .rule-item i {
+            color: var(--primary);
+            font-size: 1.25rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .rule-item strong {
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .agreement-checkbox-container {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%);
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+        }
+
+        .agreement-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .agreement-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkmark {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            flex-shrink: 0;
+            position: relative;
+            transition: all 0.2s ease;
+            margin-top: 2px;
+        }
+
+        .agreement-checkbox:hover .checkmark {
+            border-color: var(--primary);
+        }
+
+        .agreement-checkbox input[type="checkbox"]:checked + .checkmark {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .agreement-checkbox input[type="checkbox"]:checked + .checkmark::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-text {
+            color: var(--text-dark);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .checkbox-text strong {
+            font-weight: 700;
+        }
+
+        .agreement-buttons {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn:disabled:hover {
+            transform: none !important;
+            box-shadow: 0 4px 15px rgba(236, 55, 80, 0.3) !important;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .rule-item {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: center;
+                text-align: center;
+            }
+
+            .rule-item i {
+                margin-top: 0;
+            }
+
+            .agreement-checkbox {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .checkmark {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('club_dashboard', club_id=club.id) }}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Club Dashboard
+        </a>
+
+        <div class="header">
+            <h1><i class="fas fa-code"></i> Project Submission</h1>
+            <p>Submit your project for review and potential grants</p>
+            <div class="club-info">
+                <strong>{{ club.name }}</strong> - {{ club.location or 'Remote' }}
+            </div>
+        </div>
+
+        {% if not has_hackatime %}
+        <div class="form-container">
+            <div class="hackatime-setup-notice">
+                <div class="notice-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="notice-content">
+                    <h3>Hackatime Setup Required</h3>
+                    <p>You need to connect your Hackatime account before you can submit projects. Hackatime is used to track your coding hours and validate project submissions.</p>
+                    <a href="{{ url_for('setup_hackatime') }}" class="setup-button">
+                        <i class="fas fa-cog"></i>
+                        Setup Hackatime in Account Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="form-container">
+
+            <div class="fraud-prevention-agreement" id="fraudAgreement">
+                <div class="agreement-header">
+                    <h3><i class="fas fa-shield-alt"></i> Project Submission Agreement</h3>
+                    <p>Please read and agree to the following terms before submitting your project:</p>
+                </div>
+
+                <div class="agreement-content">
+                    <div class="agreement-rules">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Anti-Fraud Requirements</h4>
+                        <div class="rule-list">
+                            <div class="rule-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <strong>No Fake Hours:</strong> You must only report actual hours worked on this project. Hours are verified through Hackatime tracking and manipulation will result in immediate account suspension.
+                                </div>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-ban"></i>
+                                <div>
+                                    <strong>No Double Submissions:</strong> You cannot submit the same project for multiple YSWS programs, contests, or grants. Each submission must be unique and original.
+                                </div>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-user-check"></i>
+                                <div>
+                                    <strong>Own Work Only:</strong> You must only submit projects you personally created. Submitting someone else's work or claiming credit for work you didn't do is strictly prohibited.
+                                </div>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-id-card"></i>
+                                <div>
+                                    <strong>Real Information:</strong> All personal details (name, email, address, etc.) must be accurate and truthful. False information will result in automatic disqualification.
+                                </div>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-gavel"></i>
+                                <div>
+                                    <strong>Consequences:</strong> Violation of any of these rules will result in immediate account suspension, disqualification from all programs, and potential permanent ban from Hack Club services.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agreement-checkbox-container">
+                        <label class="agreement-checkbox">
+                            <input type="checkbox" id="agreementCheckbox" required>
+                            <span class="checkmark"></span>
+                            <div class="checkbox-text">
+                                <strong>I understand and agree to all terms above.</strong> I certify that all information provided is truthful and accurate, and that this project represents my own original work with verified time tracking.
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="agreement-buttons">
+                        <button type="button" id="proceedButton" class="btn btn-primary btn-lg" disabled>
+                            <i class="fas fa-check"></i>
+                            I Agree - Proceed to Form
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <form id="projectForm" style="display: none;">
+
+                <div class="form-section" id="memberSection" style="display: none;">
+                    <h3><i class="fas fa-users"></i> Select Member</h3>
+                    <div class="form-group">
+                        <label for="memberId" class="form-label required">Submit for:</label>
+                        <select id="memberId" name="memberId" class="form-control" required>
+                            <option value="">Select a member...</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="form-section">
+                    <h3><i class="fas fa-project-diagram"></i> Project Information</h3>
+
+                    <div class="form-group">
+                        <label class="form-label required">Select Hackatime Project</label>
+                        <div class="hackatime-dropdown">
+                            <div class="dropdown-container">
+                                <div class="dropdown-toggle" id="hackatimeDropdown">
+                                    <span id="dropdownText">Choose a Hackatime project...</span>
+                                    <i class="fas fa-chevron-down dropdown-chevron"></i>
+                                </div>
+                                <div class="dropdown-menu" id="hackatimeMenu">
+                                    <div class="dropdown-search">
+                                        <input type="text" id="projectSearch" placeholder="Search projects..." class="search-input">
+                                        <i class="fas fa-search search-icon"></i>
+                                    </div>
+                                    <div class="dropdown-items" id="dropdownItems">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="projectName" class="form-label required">Project Name</label>
+                            <input type="text" id="projectName" name="projectName" class="form-control" required disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="hours" class="form-label required">Hours Worked</label>
+                            <input type="number" id="hours" name="hours" class="form-control" min="0" step="0.5" required disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description" class="form-label required">Project Description</label>
+                        <textarea id="description" name="description" class="form-control" rows="4" placeholder="Describe your project, what it does, and what you learned..." required></textarea>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="codeUrl" class="form-label required">GitHub URL</label>
+                            <input type="url" id="codeUrl" name="codeUrl" class="form-control" placeholder="https://github.com/username/project" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="playableUrl" class="form-label">Live Demo URL</label>
+                            <input type="url" id="playableUrl" name="playableUrl" class="form-control" placeholder="https://yourproject.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="githubUsername" class="form-label">GitHub Username</label>
+                        <input type="text" id="githubUsername" name="githubUsername" class="form-control" placeholder="your-github-username">
+                    </div>
+                </div>
+
+
+                <div class="form-section">
+                    <h3><i class="fas fa-user"></i> Personal Information</h3>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="firstName" class="form-label required">First Name</label>
+                            <input type="text" id="firstName" name="firstName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName" class="form-label required">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="email" class="form-label required">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="birthday" class="form-label">Birthday</label>
+                            <input type="date" id="birthday" name="birthday" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age" class="form-label">Age</label>
+                        <input type="number" id="age" name="age" class="form-control" min="1" max="150">
+                    </div>
+                </div>
+
+
+                <div class="form-section">
+                    <h3><i class="fas fa-map-marker-alt"></i> Address Information</h3>
+
+                    <div class="form-group">
+                        <label for="address1" class="form-label">Address Line 1</label>
+                        <input type="text" id="address1" name="address1" class="form-control" placeholder="Street address">
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" id="city" name="city" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="state" class="form-label">State / Province</label>
+                            <input type="text" id="state" name="state" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="zipCode" class="form-label">ZIP / Postal Code</label>
+                            <input type="text" id="zipCode" name="zipCode" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" id="country" name="country" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-section">
+                    <h3><i class="fas fa-comments"></i> Feedback</h3>
+
+                    <div class="form-group">
+                        <label for="doingWell" class="form-label required">What are we doing well?</label>
+                        <textarea id="doingWell" name="doingWell" class="form-control" rows="3" placeholder="Tell us what you like about Hack Club..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="canImprove" class="form-label required">How can we improve?</label>
+                        <textarea id="canImprove" name="canImprove" class="form-control" rows="3" placeholder="Share your suggestions for improvement..." required></textarea>
+                    </div>
+                </div>
+
+                <div id="errorAlert" class="alert alert-error" style="display: none;"></div>
+                <div id="successAlert" class="alert alert-success" style="display: none;"></div>
+
+                <div id="adminOverride" style="display: none; margin: 1rem 0; padding: 1rem; border: 2px dotted #ff8c37; border-radius: 6px; background: rgba(255, 140, 55, 0.1); text-align: center;">
+                    <p style="margin: 0 0 1rem 0; color: #e67e22; font-weight: 600;">
+                        <i class="fas fa-crown"></i> Admin Override Available
+                    </p>
+                    <button type="button" id="adminOverrideBtn" class="btn btn-secondary" style="background: #ff8c37; border-color: #ff8c37; color: white;">
+                        <i class="fas fa-shield-alt"></i> Override Member Requirement
+                    </button>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Project
+                    </button>
+                </div>
+
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Submitting your project...</p>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        const clubId = {{ club.id }};
+        const currentUserId = {{ current_user.id }};
+        const isLeader = {{ 'true' if is_leader else 'false' }};
+        let selectedProject = null;
+        let clubMembers = [];
+        let adminOverrideActive = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAgreement();
+            initializeForm();
+            loadClubMembers();
+            loadUserInfo();
+            loadHackatimeProjects();
+
+            // Admin override button functionality
+            document.getElementById('adminOverrideBtn').addEventListener('click', function() {
+                adminOverrideActive = true;
+                document.getElementById('adminOverride').style.display = 'none';
+                document.getElementById('errorAlert').style.display = 'none';
+
+                // Re-submit the form with admin override
+                document.getElementById('projectForm').dispatchEvent(new Event('submit'));
+            });
+        });
+
+        function initializeAgreement() {
+            const agreementCheckbox = document.getElementById('agreementCheckbox');
+            const proceedButton = document.getElementById('proceedButton');
+            const fraudAgreement = document.getElementById('fraudAgreement');
+            const projectForm = document.getElementById('projectForm');
+
+            // Check if elements exist before adding event listeners
+            if (!agreementCheckbox || !proceedButton) {
+                return; // Elements don't exist, skip initialization
+            }
+
+            // Enable/disable proceed button based on checkbox
+            agreementCheckbox.addEventListener('change', function() {
+                proceedButton.disabled = !this.checked;
+
+                if (this.checked) {
+                    proceedButton.classList.remove('disabled');
+                } else {
+                    proceedButton.classList.add('disabled');
+                }
+            });
+
+            // Handle proceed button click
+            proceedButton.addEventListener('click', function() {
+                if (!agreementCheckbox.checked) {
+                    alert('You must agree to the terms before proceeding.');
+                    return;
+                }
+
+                // Hide agreement and show form
+                if (fraudAgreement) fraudAgreement.style.display = 'none';
+                if (projectForm) {
+                    projectForm.style.display = 'block';
+                    projectForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
+
+        function initializeForm() {
+            // Show member selection for leaders
+            if (isLeader) {
+                document.getElementById('memberSection').style.display = 'block';
+            } else {
+                // For regular members, auto-select themselves
+                document.getElementById('memberId').value = currentUserId;
+                loadUserInfo(currentUserId);
+            }
+
+            // Hackatime dropdown functionality
+            document.getElementById('hackatimeDropdown').addEventListener('click', toggleDropdown);
+
+            // Search functionality
+            document.getElementById('projectSearch').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredProjects = allProjects.filter(project =>
+                    project.name.toLowerCase().includes(searchTerm)
+                );
+                renderProjects(filteredProjects);
+            });
+
+            // Prevent dropdown from closing when clicking search input
+            document.getElementById('projectSearch').addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                const dropdown = document.getElementById('hackatimeDropdown');
+                const menu = document.getElementById('hackatimeMenu');
+                if (!dropdown.contains(e.target) && !menu.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+
+            // Auto-calculate age from birthday
+            document.getElementById('birthday').addEventListener('change', function() {
+                const birthday = new Date(this.value);
+                const today = new Date();
+                let age = today.getFullYear() - birthday.getFullYear();
+                const monthDiff = today.getMonth() - birthday.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthday.getDate())) {
+                    age--;
+                }
+                if (age >= 0 && age <= 150) {
+                    document.getElementById('age').value = age;
+                }
+            });
+
+            // Form submission
+            document.getElementById('projectForm').addEventListener('submit', handleSubmit);
+
+            // Member selection change
+            document.getElementById('memberId').addEventListener('change', function() {
+                const selectedUserId = this.value;
+                if (selectedUserId) {
+                    loadUserInfo(selectedUserId);
+                    loadHackatimeProjects(selectedUserId);
+                }
+            });
+        }
+
+        async function loadClubMembers() {
+            if (!isLeader) return;
+
+            try {
+                const response = await fetch(`/api/clubs/${clubId}/members`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    clubMembers = data.members;
+                    const select = document.getElementById('memberId');
+                    select.innerHTML = '<option value="">Select a member...</option>';
+
+                    data.members.forEach(member => {
+                        const option = document.createElement('option');
+                        option.value = member.id;
+                        option.textContent = `${member.username} (${member.role})`;
+                        // Default to current user if they are in the list
+                        if (member.id === currentUserId) {
+                            option.selected = true;
+                            loadUserInfo(currentUserId);
+                            loadHackatimeProjects(currentUserId);
+                        }
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading club members:', error);
+            }
+        }
+
+        async function loadUserInfo(userId = currentUserId) {
+            console.log(`loadUserInfo: Starting for userId ${userId}`);
+
+            try {
+                const url = `/api/user/${userId}`;
+                console.log(`loadUserInfo: Fetching from ${url}`);
+
+                const response = await fetch(url);
+                console.log(`loadUserInfo: Response status ${response.status} ${response.statusText}`);
+
+                const data = await response.json();
+                console.log(`loadUserInfo: Response data:`, data);
+
+                if (response.ok) {
+                    const user = data;
+                    console.log(`loadUserInfo: Successfully loaded user info for ${user.username || 'unknown'}`);
+
+                    document.getElementById('firstName').value = user.first_name || '';
+                    document.getElementById('lastName').value = user.last_name || '';
+                    document.getElementById('email').value = user.email || '';
+                    if (user.birthday) {
+                        document.getElementById('birthday').value = user.birthday;
+                        // Trigger age calculation
+                        document.getElementById('birthday').dispatchEvent(new Event('change'));
+                    }
+                } else {
+                    console.error(`loadUserInfo: Server error ${response.status}: ${data.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('loadUserInfo: Network/fetch error:', error);
+                console.error('loadUserInfo: Error stack:', error.stack);
+            }
+        }
+
+        let allProjects = []; // Store all projects for filtering
+
+        async function loadHackatimeProjects(userId = currentUserId) {
+            console.log(`loadHackatimeProjects: Starting for userId ${userId}`);
+
+            const dropdownText = document.getElementById('dropdownText');
+            const dropdownItems = document.getElementById('dropdownItems');
+
+            dropdownText.textContent = 'Loading projects...';
+            dropdownItems.innerHTML = '';
+
+            try {
+                const url = `/api/hackatime/projects/${userId}`;
+                console.log(`loadHackatimeProjects: Fetching from ${url}`);
+
+                const response = await fetch(url);
+                console.log(`loadHackatimeProjects: Response status ${response.status} ${response.statusText}`);
+
+                const data = await response.json();
+                console.log(`loadHackatimeProjects: Response data:`, data);
+
+                if (response.ok) {
+                    if (data.projects && data.projects.length > 0) {
+                        console.log(`loadHackatimeProjects: Successfully loaded ${data.projects.length} projects`);
+                        dropdownText.textContent = 'Choose a Hackatime project...';
+                        allProjects = data.projects; // Store all projects
+
+                        // Log project details
+                        data.projects.forEach((project, index) => {
+                            console.log(`loadHackatimeProjects: Project ${index + 1}: "${project.name}" with ${project.total_seconds} seconds (${project.formatted_time})`);
+                        });
+
+                        renderProjects(allProjects);
+                    } else {
+                        console.warn('loadHackatimeProjects: No projects in response or empty projects array');
+                        console.log('loadHackatimeProjects: Full response data:', JSON.stringify(data, null, 2));
+
+                        dropdownText.textContent = 'No projects found';
+                        const item = document.createElement('div');
+                        item.className = 'dropdown-item';
+                        item.innerHTML = `
+                            <h5>No Hackatime projects found</h5>
+                            <p>You can still submit manually</p>
+                        `;
+                        dropdownItems.appendChild(item);
+                    }
+                } else {
+                    console.error(`loadHackatimeProjects: Server error ${response.status}: ${data.error || 'Unknown error'}`);
+
+                    dropdownText.textContent = 'Error loading projects';
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item';
+                    item.innerHTML = `
+                        <h5>Server Error (${response.status})</h5>
+                        <p>${data.error || 'Unknown server error'}</p>
+                    `;
+                    dropdownItems.appendChild(item);
+                }
+            } catch (error) {
+                console.error('loadHackatimeProjects: Network/fetch error:', error);
+                console.error('loadHackatimeProjects: Error stack:', error.stack);
+
+                dropdownText.textContent = 'Error loading projects';
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.innerHTML = `
+                    <h5>Network Error</h5>
+                    <p>Unable to connect to server: ${error.message}</p>
+                `;
+                dropdownItems.appendChild(item);
+            }
+        }
+
+        function renderProjects(projects) {
+            const dropdownItems = document.getElementById('dropdownItems');
+            dropdownItems.innerHTML = '';
+
+            projects.forEach(project => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.innerHTML = `
+                    <h5>${project.name}</h5>
+                    <p><strong>Time:</strong> ${project.formatted_time}</p>
+                `;
+
+                item.addEventListener('click', function() {
+                    selectedProject = project;
+                    document.getElementById('dropdownText').textContent = project.name;
+
+                    // Auto-fill and disable project name and hours
+                    const projectNameField = document.getElementById('projectName');
+                    const hoursField = document.getElementById('hours');
+
+                    projectNameField.value = project.name;
+                    projectNameField.disabled = true;
+                    hoursField.value = Math.round((project.total_seconds / 3600) * 10) / 10;
+                    hoursField.disabled = true;
+
+                    // Remove required indicator
+                    document.getElementById('hackatimeDropdown').classList.remove('required');
+
+                    // Clear search
+                    document.getElementById('projectSearch').value = '';
+
+                    // Close dropdown
+                    closeDropdown();
+                });
+
+                dropdownItems.appendChild(item);
+            });
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('hackatimeDropdown');
+            const menu = document.getElementById('hackatimeMenu');
+            const searchInput = document.getElementById('projectSearch');
+
+            dropdown.classList.toggle('active');
+            menu.classList.toggle('show');
+
+            // Focus search input when dropdown opens
+            if (menu.classList.contains('show')) {
+                setTimeout(() => {
+                    searchInput.focus();
+                }, 100);
+            } else {
+                // Clear search when closing
+                searchInput.value = '';
+                if (allProjects.length > 0) {
+                    renderProjects(allProjects);
+                }
+            }
+        }
+
+        function closeDropdown() {
+            const dropdown = document.getElementById('hackatimeDropdown');
+            const menu = document.getElementById('hackatimeMenu');
+            const searchInput = document.getElementById('projectSearch');
+
+            dropdown.classList.remove('active');
+            menu.classList.remove('show');
+
+            // Clear search when closing
+            searchInput.value = '';
+            if (allProjects.length > 0) {
+                renderProjects(allProjects);
+            }
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const loading = document.getElementById('loading');
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+
+            // Hide alerts
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+
+            // Validate that a Hackatime project is selected
+            if (!selectedProject) {
+                errorAlert.textContent = 'Please select a Hackatime project before submitting.';
+                errorAlert.style.display = 'block';
+                document.getElementById('hackatimeDropdown').classList.add('required');
+                errorAlert.scrollIntoView({ behavior: 'smooth' });
+                return;
+            } else {
+                document.getElementById('hackatimeDropdown').classList.remove('required');
+            }
+
+            // Show loading
+            loading.style.display = 'block';
+
+            // Get form data manually to include disabled fields
+            const submitData = {
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                project_name: document.getElementById('projectName').value,
+                project_description: document.getElementById('description').value,
+                github_url: document.getElementById('codeUrl').value,
+                live_url: document.getElementById('playableUrl').value || '',
+                github_username: document.getElementById('githubUsername').value || '',
+                age: document.getElementById('age').value || '',
+                birthday: document.getElementById('birthday').value || '',
+                address_1: document.getElementById('address1').value || '',
+                city: document.getElementById('city').value || '',
+                state: document.getElementById('state').value || '',
+                zip: document.getElementById('zipCode').value || '',
+                country: document.getElementById('country').value || '',
+                doing_well: document.getElementById('doingWell').value || '',
+                improve: document.getElementById('canImprove').value || '',
+                project_hours: document.getElementById('hours').value,
+                club_name: '{{ club.name }}',
+                leader_email: '{{ club.leader.email }}'
+            };
+
+            // Add selected member ID if leader is submitting
+            if (isLeader) {
+                submitData.member_id = document.getElementById('memberId').value;
+            } else {
+                submitData.member_id = currentUserId;
+            }
+
+            // Add admin override flag if active
+            if (adminOverrideActive) {
+                submitData.admin_override = true;
+            }
+
+            // Add Hackatime project info and validate hours match
+            if (selectedProject) {
+                submitData.hackatime_project = selectedProject.name;
+
+                // SECURITY CHECK: Verify hours match Hackatime data
+                const expectedHours = Math.round((selectedProject.total_seconds / 3600) * 10) / 10;
+                const submittedHours = parseFloat(submitData.project_hours);
+
+                if (Math.abs(expectedHours - submittedHours) > 0.1) {
+                    // User tried to manipulate hours - suspend them
+                    submitData.suspend_user = true;
+                    submitData.suspension_reason = `Hours manipulation detected: Expected ${expectedHours} from Hackatime, but got ${submittedHours}`;
+                }
+            }
+
+            try {
+                const response = await fetch(`/api/clubs/${clubId}/project-submission`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(submitData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    successAlert.textContent = result.message || 'Project submitted successfully!';
+                    successAlert.style.display = 'block';
+
+                    // Reset form
+                    document.getElementById('projectForm').reset();
+                    selectedProject = null;
+                    document.getElementById('dropdownText').textContent = 'Choose a Hackatime project...';
+
+                    // Reset project name and hours fields to disabled state
+                    document.getElementById('projectName').disabled = true;
+                    document.getElementById('hours').disabled = true;
+
+                    // Scroll to success message
+                    successAlert.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    if (result.suspended) {
+                        // User was suspended for security violation
+                        errorAlert.innerHTML = `
+                            <strong>ACCOUNT SUSPENDED</strong><br>
+                            ${result.error}<br>
+                            <small>If you believe this is an error, please contact support.</small>
+                        `;
+                        errorAlert.style.background = 'rgba(239, 68, 68, 0.2)';
+                        errorAlert.style.borderColor = '#ef4444';
+                        errorAlert.style.color = '#dc2626';
+
+                        // Disable the form
+                        document.getElementById('projectForm').style.opacity = '0.5';
+                        document.getElementById('projectForm').style.pointerEvents = 'none';
+                    } else if (result.is_admin && result.member_count && result.member_count < 3) {
+                        // Show admin override option for member count error
+                        errorAlert.textContent = result.error || 'Failed to submit project';
+                        document.getElementById('adminOverride').style.display = 'block';
+                    } else {
+                        errorAlert.textContent = result.error || 'Failed to submit project';
+                    }
+                    errorAlert.style.display = 'block';
+                    errorAlert.scrollIntoView({ behavior: 'smooth' });
+                }
+            } catch (error) {
+                console.error('Error submitting project:', error);
+                errorAlert.textContent = 'Network error. Please try again.';
+                errorAlert.style.display = 'block';
+                errorAlert.scrollIntoView({ behavior: 'smooth' });
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

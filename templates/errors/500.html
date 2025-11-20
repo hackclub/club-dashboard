@@ -1,0 +1,11 @@
+{% extends "errors/base_error.html" %}
+
+{% block error_icon %}
+<i class="fas fa-exclamation-triangle"></i>
+{% endblock %}
+
+{% block error_title %}Internal Server Error{% endblock %}
+
+{% block error_message %}
+Something went wrong on our end. We've been notified and are working to fix it. Please try again later.
+{% endblock %}

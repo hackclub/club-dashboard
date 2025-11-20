@@ -1,0 +1,1420 @@
+{% extends "base.html" %}
+
+{% block title %}API Debug Console - Hack Clubs Dash{% endblock %}
+
+{% block extra_head %}
+<style>
+    .debug-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .debug-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .debug-header {
+        color: #1a202c;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ec3750;
+        box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-right: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-primary {
+        background: #ec3750;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #d63146;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-test {
+        background: #059669;
+        color: white;
+    }
+
+    .btn-test:hover {
+        background: #047857;
+    }
+
+    .code-block {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.875rem;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+
+    .response-display {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        display: none;
+    }
+
+    .error-display {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        color: #dc2626;
+        display: none;
+    }
+
+    .test-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .test-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .test-card h4 {
+        margin: 0 0 1rem 0;
+        color: #374151;
+    }
+
+    .test-card p {
+        margin: 0 0 1rem 0;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .url-display {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-family: monospace;
+        word-break: break-all;
+    }
+
+    .status-indicator {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-error {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .oauth-flow {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin: 2rem 0;
+    }
+
+    .oauth-flow h3 {
+        margin: 0 0 1rem 0;
+    }
+
+    .flow-steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .flow-step {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .flow-step-number {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.5rem;
+        font-weight: bold;
+    }
+
+    /* New styles for Token Types & Usage Guide */
+    .auth-overview {
+        background: #f0f9ff;
+        border: 1px solid #0ea5e9;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .auth-overview-header {
+        margin-bottom: 1.5rem;
+        color: #0c4a6e;
+    }
+
+    .auth-overview-header h3 {
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .auth-overview-header p {
+        font-size: 0.9rem;
+        color: #6b7280;
+    }
+
+    .token-comparison {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .token-card {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .oauth-card {
+        border-left: 4px solid #10b981;
+    }
+
+    .admin-card {
+        border-left: 4px solid #dc2626;
+    }
+
+    .token-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .token-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        margin-right: 0.75rem;
+    }
+
+    .oauth-icon {
+        background-color: #10b981;
+    }
+
+    .admin-icon {
+        background-color: #dc2626;
+    }
+
+    .token-title {
+        flex: 1;
+    }
+
+    .token-title h4 {
+        margin: 0;
+        color: #374151;
+    }
+
+    .token-subtitle {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .token-features {
+        margin-bottom: 1rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-item i {
+        margin-right: 0.5rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .token-endpoints,
+    .token-usecase {
+        font-size: 0.85rem;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .decision-guide {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .decision-guide h4 {
+        color: #92400e;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .decision-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .decision-option {
+        padding: 1rem;
+        border-radius: 6px;
+    }
+
+    .oauth-option {
+        border: 1px solid #a7f3d0;
+        background-color: #f0fdf4;
+    }
+
+    .admin-option {
+        border: 1px solid #fecaca;
+        background-color: #fee2e2;
+    }
+
+    .decision-option h5 {
+        margin-bottom: 0.5rem;
+        color: #1e40af;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .decision-option ul {
+        margin: 0.5rem 0 0 0;
+        color: #374151;
+        list-style-type: disc;
+        padding-left: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="debug-container">
+    <h1><i class="fas fa-bug"></i> API Debug Console</h1>
+    <p>Test and debug both OAuth and Admin API functionality for the Hack Club Dashboard API</p>
+
+
+    <div class="debug-section">
+        <h2 class="debug-header"><i class="fas fa-cog"></i> OAuth Application Setup</h2>
+        <form id="oauthConfigForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">Client ID</label>
+                    <input type="text" class="form-control" id="clientId" placeholder="Your OAuth application client ID">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Client Secret</label>
+                    <input type="password" class="form-control" id="clientSecret" placeholder="Your OAuth application client secret">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Redirect URI</label>
+                <input type="url" class="form-control" id="redirectUri" placeholder="https://your-app.com/oauth/callback" value="https://{{ request.host }}/oauth/debug/callback">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Requested Scopes (space-separated)</label>
+                <input type="text" class="form-control" id="scopes" value="clubs:read users:read projects:read assignments:read meetings:read" placeholder="clubs:read users:read projects:read assignments:read meetings:read">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="saveConfig()">
+                <i class="fas fa-save"></i> Save Configuration
+            </button>
+        </form>
+    </div>
+
+
+    <div class="oauth-flow">
+        <h3><i class="fas fa-flow-chart"></i> OAuth 2.0 Authorization Code Flow</h3>
+        <div class="flow-steps">
+            <div class="flow-step">
+                <div class="flow-step-number">1</div>
+                <strong>Authorization Request</strong>
+                <p>Redirect user to authorization server</p>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-number">2</div>
+                <strong>User Consent</strong>
+                <p>User approves access to their account</p>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-number">3</div>
+                <strong>Authorization Code</strong>
+                <p>Server returns authorization code</p>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-number">4</div>
+                <strong>Identity Verification (Required)</strong>
+                <p>Verify identity with Hack Club - includes address information</p>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-number">5</div>
+                <strong>Token Exchange</strong>
+                <p>Exchange code for access token</p>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-number">6</div>
+                <strong>API Access</strong>
+                <p>Use token to access protected resources</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="debug-section">
+        <h2 class="debug-header"><i class="fas fa-link"></i> Authorization URL Generator</h2>
+        <button type="button" class="btn btn-test" onclick="generateAuthUrl()">
+            <i class="fas fa-external-link-alt"></i> Generate Authorization URL
+        </button>
+        <div id="authUrlDisplay" class="url-display" style="display: none;">
+            <strong>Authorization URL:</strong><br>
+            <span id="authUrl"></span>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="startOAuthFlow()" style="display: none;" id="startFlowBtn">
+            <i class="fas fa-play"></i> Start OAuth Flow
+        </button>
+    </div>
+
+
+    <div class="debug-section">
+        <h2 class="debug-header"><i class="fas fa-shield-alt"></i> Token Types & Usage Guide</h2>
+
+        <div class="auth-overview">
+            <div class="auth-type">
+                <h4><i class="fas fa-id-card"></i> Hack Club Identity Integration</h4>
+                <p><strong>Purpose:</strong> Verify user identity with official Hack Club records and collect address information</p>
+                <p><strong>Flow:</strong> During OAuth consent, users are required to verify their identity through Hack Club's identity service</p>
+                <p><strong>Benefits:</strong> Ensures users are authentic Hack Club members with verified identities and provides access to address information</p>
+                <p><strong>Status Values:</strong></p>
+                <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                    <li><code>verified</code> - Identity successfully verified, address information available</li>
+                    <li><code>pending</code> - Verification under review</li>
+                    <li><code>rejected</code> - Verification rejected</li>
+                    <li><code>unverified</code> - No verification attempted</li>
+                </ul>
+                <p><strong>Address Information:</strong> When identity verification is completed, address details (street, city, state, postal code, country) become available through the <code>/oauth/user</code> endpoint</p>
+                <p><strong>Integration:</strong> Works seamlessly with OAuth flow when "Verify Identity" checkbox is selected. Address scope is automatically included.</p>
+            </div>
+            <div class="auth-overview-header">
+                <h3><i class="fas fa-key"></i> Understanding Authentication Types</h3>
+                <p>Choose the right authentication method for your use case</p>
+            </div>
+
+            <div class="token-comparison">
+                <div class="token-card oauth-card">
+                    <div class="token-card-header">
+                        <div class="token-icon oauth-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="token-title">
+                            <h4>OAuth Access Tokens</h4>
+                            <span class="token-subtitle">For user-facing applications</span>
+                        </div>
+                    </div>
+                    <div class="token-features">
+                        <div class="feature-item">
+                            <i class="fas fa-user"></i>
+                            <span>User-specific data access</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-lock"></i>
+                            <span>Limited to user's own data</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-handshake"></i>
+                            <span>Requires user consent</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Expires after 1 hour (refreshable)</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-tags"></i>
+                            <span>Scoped permissions (clubs:read, users:read, etc.)</span>
+                        </div>
+                    </div>
+                    <div class="token-endpoints">
+                        <strong>Endpoints:</strong> /oauth/user, /oauth/user/clubs, /oauth/user/projects
+                    </div>
+                    <div class="token-usecase">
+                        <strong>Use case:</strong> Personal apps, user dashboards
+                    </div>
+                </div>
+
+                <div class="token-card admin-card">
+                    <div class="token-card-header">
+                        <div class="token-icon admin-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="token-title">
+                            <h4>Admin API Keys</h4>
+                            <span class="token-subtitle">For platform administration</span>
+                        </div>
+                    </div>
+                    <div class="token-features">
+                        <div class="feature-item">
+                            <i class="fas fa-globe"></i>
+                            <span>Platform-wide access</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-database"></i>
+                            <span>Access to all clubs, users, analytics</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-search"></i>
+                            <span>Search/lookup functionality</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-infinity"></i>
+                            <span>No expiration (until revoked)</span>
+                        </div>
+                    </div>
+                    <div class="token-endpoints">
+                        <strong>Endpoints:</strong> /api/v1/clubs, /api/v1/users, /api/v1/analytics
+                    </div>
+                    <div class="token-usecase">
+                        <strong>Use case:</strong> Admin tools, monitoring, search
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="decision-guide">
+            <h4><i class="fas fa-lightbulb"></i> Quick Decision Guide</h4>
+            <div class="decision-grid">
+                <div class="decision-option oauth-option">
+                    <h5><i class="fas fa-user-friends"></i> Use OAuth when:</h5>
+                    <ul>
+                        <li>Building user-facing apps</li>
+                        <li>Users access their own data</li>
+                        <li>Need user consent/login</li>
+                    </ul>
+                </div>
+                <div class="decision-option admin-option">
+                    <h5><i class="fas fa-tools"></i> Use Admin API when:</h5>
+                    <ul>
+                        <li>Need to search users/clubs</li>
+                        <li>Building admin dashboards</li>
+                        <li>Need platform-wide data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="debug-section">
+        <h2 class="debug-header"><i class="fas fa-key"></i> Admin API Key Testing</h2>
+        <div class="form-group">
+            <label class="form-label">Admin API Key (for testing platform-wide endpoints)</label>
+            <input type="text" class="form-control" id="adminApiKey" placeholder="Paste your admin API key here">
+            <small style="color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
+                Admin API keys provide access to platform-wide data like all clubs, users, and analytics
+            </small>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h4><i class="fas fa-users"></i> Get All Clubs</h4>
+                <p>Test /api/v1/clubs endpoint with pagination</p>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <input type="number" class="form-control" id="clubsPage" placeholder="Page" value="1" style="width: 80px;">
+                    <input type="number" class="form-control" id="clubsPerPage" placeholder="Per page" value="20" style="width: 100px;">
+                    <input type="text" class="form-control" id="clubsSearch" placeholder="Search term" style="flex: 1;">
+                </div>
+                <button type="button" class="btn btn-test" onclick="testAdminClubsEndpoint()">Test Get Clubs</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-chart-bar"></i> Get Analytics</h4>
+                <p>Test /api/v1/analytics/overview endpoint (admin scope required)</p>
+                <button type="button" class="btn btn-test" onclick="testAdminAnalyticsEndpoint()">Test Analytics</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-user"></i> Get Specific User</h4>
+                <p>Test /api/v1/users/{id} endpoint</p>
+                <input type="number" class="form-control" id="specificUserId" placeholder="User ID" style="margin-bottom: 1rem;">
+                <button type="button" class="btn btn-test" onclick="testAdminUserEndpoint()">Test Get User</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-building"></i> Get Specific Club</h4>
+                <p>Test /api/v1/clubs/{id} endpoint with fallback to Airtable</p>
+                <input type="number" class="form-control" id="specificClubId" placeholder="Club ID" style="margin-bottom: 1rem;">
+                <button type="button" class="btn btn-test" onclick="testAdminClubEndpoint()">Test Get Club</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-users-cog"></i> Get Club Members</h4>
+                <p>Test /api/v1/clubs/{id}/members endpoint</p>
+                <input type="number" class="form-control" id="clubMembersId" placeholder="Club ID" style="margin-bottom: 1rem;">
+                <button type="button" class="btn btn-test" onclick="testAdminClubMembersEndpoint()">Test Club Members</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-project-diagram"></i> Get Club Projects</h4>
+                <p>Test /api/v1/clubs/{id}/projects endpoint</p>
+                <input type="number" class="form-control" id="clubProjectsId" placeholder="Club ID" style="margin-bottom: 1rem;">
+                <button type="button" class="btn btn-test" onclick="testAdminClubProjectsEndpoint()">Test Club Projects</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-search"></i> Search Clubs by Name</h4>
+                <p>Test /api/v1/clubs/search endpoint to find club IDs</p>
+                <input type="text" class="form-control" id="clubSearchQuery" placeholder="Search term (e.g., 'tech', 'high school')" style="margin-bottom: 1rem;">
+                <button type="button" class="btn btn-test" onclick="testAdminClubSearchEndpoint()">Search Clubs</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-user-search"></i> Search Users by Name</h4>
+                <p>Test /api/v1/users/search endpoint to find user IDs</p>
+                <input type="text" class="form-control" id="userSearchQuery" placeholder="Search term (e.g., 'alex', 'john@email.com')" style="margin-bottom: 1rem;">
+                <button type="button" class="btn btn-test" onclick="testAdminUserSearchEndpoint()">Search Users</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="debug-section">
+        <h2 class="debug-header"><i class="fas fa-flask"></i> OAuth Token Testing</h2>
+        <div class="form-group">
+            <label class="form-label">OAuth Access Token (for testing user-scoped endpoints)</label>
+            <input type="text" class="form-control" id="accessToken" placeholder="Paste your OAuth access token here">
+            <small style="color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
+                Note: OAuth tokens can only access user-specific data, not platform-wide admin endpoints
+            </small>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h4><i class="fas fa-shield-alt"></i> OAuth Token Exchange</h4>
+                <p>Test exchanging authorization code for access token</p>
+                <input type="text" class="form-control" id="authCode" placeholder="Authorization code" style="margin-bottom: 1rem;">
+                <button type="button" class="btn btn-test" onclick="testTokenExchange()">Test Token Exchange</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-user"></i> Get User Info</h4>
+                <p>Test /oauth/user endpoint with access token</p>
+                <button type="button" class="btn btn-test" onclick="testUserEndpoint()">Test User Endpoint</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-users"></i> Get User's Clubs</h4>
+                <p>Test accessing user's club data (OAuth scope: clubs:read)</p>
+                <button type="button" class="btn btn-test" onclick="testUserClubsEndpoint()">Test User Clubs</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-project-diagram"></i> Get User's Projects</h4>
+                <p>Test accessing user's project data (OAuth scope: projects:read)</p>
+                <button type="button" class="btn btn-test" onclick="testUserProjectsEndpoint()">Test User Projects</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-tasks"></i> Get User's Assignments</h4>
+                <p>Test accessing user's assignment data (OAuth scope: assignments:read)</p>
+                <button type="button" class="btn btn-test" onclick="testUserAssignmentsEndpoint()">Test User Assignments</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-calendar"></i> Get User's Meetings</h4>
+                <p>Test accessing user's meeting data (OAuth scope: meetings:read)</p>
+                <button type="button" class="btn btn-test" onclick="testUserMeetingsEndpoint()">Test User Meetings</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-id-card"></i> Hack Club Identity Verification</h4>
+                <p>Test the Hack Club Identity verification flow integration</p>
+                <button type="button" class="btn btn-test" onclick="testIdentityVerification()">Test Identity Verification</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-shield-alt"></i> Check Identity Status</h4>
+                <p>Check current user's identity verification status</p>
+                <button type="button" class="btn btn-test" onclick="testIdentityStatus()">Check Identity Status</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-shield-check"></i> Start Identity Verification</h4>
+                <p>Test Hack Club Identity verification flow</p>
+                <button type="button" class="btn btn-test" onclick="testIdentityVerification()">Start Verification</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-user-shield"></i> Check Identity Status</h4>
+                <p>Test checking identity verification status</p>
+                <button type="button" class="btn btn-test" onclick="testIdentityStatus()">Check Status</button>
+            </div>
+
+            <div class="test-card">
+                <h4><i class="fas fa-map-marker-alt"></i> Test Address Information</h4>
+                <p>Test retrieving address information from verified identity (requires completed identity verification)</p>
+                <button type="button" class="btn btn-test" onclick="testAddressInformation()">Test Address Info</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="debug-section">
+        <h2 class="debug-header"><i class="fas fa-terminal"></i> Response Output</h2>
+        <div id="responseDisplay" class="response-display">
+            <strong>Success Response:</strong>
+            <div id="responseContent" class="code-block"></div>
+        </div>
+        <div id="errorDisplay" class="error-display">
+            <strong>Error Response:</strong>
+            <div id="errorContent" class="code-block"></div>
+        </div>
+    </div>
+
+
+    <div class="debug-section">
+        <h2 class="debug-header"><i class="fas fa-info-circle"></i> Current Configuration</h2>
+        <div class="code-block" id="configDisplay">
+No configuration saved yet.
+        </div>
+    </div>
+</div>
+
+<script>
+let oauthConfig = {};
+
+function saveConfig() {
+    oauthConfig = {
+        clientId: document.getElementById('clientId').value,
+        clientSecret: document.getElementById('clientSecret').value,
+        redirectUri: document.getElementById('redirectUri').value,
+        scopes: document.getElementById('scopes').value
+    };
+
+    localStorage.setItem('oauthDebugConfig', JSON.stringify(oauthConfig));
+    updateConfigDisplay();
+    alert('Configuration saved!');
+}
+
+function loadConfig() {
+    const saved = localStorage.getItem('oauthDebugConfig');
+    if (saved) {
+        oauthConfig = JSON.parse(saved);
+        document.getElementById('clientId').value = oauthConfig.clientId || '';
+        document.getElementById('clientSecret').value = oauthConfig.clientSecret || '';
+        document.getElementById('redirectUri').value = oauthConfig.redirectUri || '';
+        document.getElementById('scopes').value = oauthConfig.scopes || '';
+        updateConfigDisplay();
+    }
+}
+
+function updateConfigDisplay() {
+    const display = document.getElementById('configDisplay');
+    if (Object.keys(oauthConfig).length > 0) {
+        const maskedConfig = {
+            ...oauthConfig,
+            clientSecret: oauthConfig.clientSecret ? '***' + oauthConfig.clientSecret.slice(-4) : ''
+        };
+        display.textContent = JSON.stringify(maskedConfig, null, 2);
+    }
+}
+
+function generateAuthUrl() {
+    if (!oauthConfig.clientId || !oauthConfig.redirectUri) {
+        alert('Please save OAuth configuration first');
+        return;
+    }
+
+    const state = Math.random().toString(36).substring(2);
+    localStorage.setItem('oauthState', state);
+
+    const params = new URLSearchParams({
+        client_id: oauthConfig.clientId,
+        redirect_uri: oauthConfig.redirectUri,
+        response_type: 'code',
+        scope: oauthConfig.scopes || '',
+        state: state
+    });
+
+    const authUrl = `/oauth/authorize?${params.toString()}`;
+    document.getElementById('authUrl').textContent = window.location.origin + authUrl;
+    document.getElementById('authUrlDisplay').style.display = 'block';
+    document.getElementById('startFlowBtn').style.display = 'inline-block';
+}
+
+function startOAuthFlow() {
+    const authUrl = document.getElementById('authUrl').textContent;
+    window.open(authUrl, '_blank');
+}
+
+function testTokenExchange() {
+    const authCode = document.getElementById('authCode').value;
+    if (!authCode) {
+        alert('Please enter an authorization code');
+        return;
+    }
+
+    if (!oauthConfig.clientId || !oauthConfig.clientSecret) {
+        alert('Please save OAuth configuration first');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('grant_type', 'authorization_code');
+    formData.append('client_id', oauthConfig.clientId);
+    formData.append('client_secret', oauthConfig.clientSecret);
+    formData.append('code', authCode);
+    formData.append('redirect_uri', oauthConfig.redirectUri);
+
+    fetch('/oauth/token', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.access_token) {
+            document.getElementById('accessToken').value = data.access_token;
+            showResponse(data);
+            alert('Token exchange successful! Access token has been filled in automatically.');
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testUserEndpoint() {
+    const token = document.getElementById('accessToken').value;
+    if (!token) {
+        alert('Please enter an access token');
+        return;
+    }
+
+    fetch('/oauth/user', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.user) {
+            // Enhance the response to highlight identity verification and address info
+            const enhancedData = {
+                message: 'User information retrieved successfully',
+                user: data.user,
+                identity_verification: {
+                    status: data.user.identity_verification_status || 'unverified',
+                    verified: data.user.identity_verified || false,
+                    rejection_reason: data.user.identity_rejection_reason || null
+                },
+                address_information: data.user.address || null,
+                endpoint: '/oauth/user',
+                note: data.user.address ? 'Address information is available because user completed Hack Club Identity verification' : 'No address information (user has not completed identity verification or verification was not requested during OAuth flow)'
+            };
+            showResponse(enhancedData);
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testUserClubsEndpoint() {
+    const token = document.getElementById('accessToken').value;
+    if (!token) {
+        alert('Please enter an access token');
+        return;
+    }
+
+    fetch('/oauth/user/clubs', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.clubs) {
+            showResponse({
+                message: 'User clubs retrieved successfully',
+                clubs: data.clubs,
+                total_clubs: data.total_clubs,
+                clubs_led: data.clubs_led,
+                clubs_joined: data.clubs_joined,
+                endpoint: '/oauth/user/clubs'            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testUserProjectsEndpoint() {
+    const token = document.getElementById('accessToken').value;
+    if (!token) {
+        alert('Please enter an access token');
+        return;
+    }
+
+    fetch('/oauth/user/projects', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.projects) {
+            showResponse({
+                message: 'User projects retrieved successfully',
+                projects: data.projects,
+                total_projects: data.total_projects,
+                endpoint: '/oauth/user/projects'
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testUserAssignmentsEndpoint() {
+    const token = document.getElementById('accessToken').value;
+    if (!token) {
+        alert('Please enter an access token');
+        return;
+    }
+
+    fetch('/oauth/user/assignments', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.assignments) {
+            showResponse({
+                message: 'User assignments retrieved successfully',
+                assignments: data.assignments,
+                total_assignments: data.total_assignments,
+                endpoint: '/oauth/user/assignments'
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testUserMeetingsEndpoint() {
+    const token = document.getElementById('accessToken').value;
+    if (!token) {
+        alert('Please enter an access token');
+        return;
+    }
+
+    fetch('/oauth/user/meetings', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.meetings) {
+            showResponse({
+                message: 'User meetings retrieved successfully',
+                meetings: data.meetings,
+                total_meetings: data.total_meetings,
+                endpoint: '/oauth/user/meetings'
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testIdentityVerification() {
+    fetch('/api/identity/authorize')
+    .then(response => response.json())
+    .then(data => {
+        if (data.url) {
+            showResponse({
+                message: 'Identity verification URL generated',
+                authorization_url: data.url,
+                endpoint: '/api/identity/authorize',
+                tip: 'Open this URL to start the identity verification process'
+            });
+
+            // Optionally open in new window
+            if (confirm('Open identity verification in new window?')) {
+                window.open(data.url, 'identity-verification', 'width=500,height=600,scrollbars=yes,resizable=yes');
+            }
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testIdentityStatus() {
+    fetch('/api/identity/status')
+    .then(response => response.json())
+    .then(data => {
+        showResponse({
+            message: 'Identity status retrieved successfully',
+            identity_status: data,
+            endpoint: '/api/identity/status',
+            note: 'This endpoint shows verification status but not address info. Use /oauth/user with an OAuth token to see address information.'
+        });
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testAddressInformation() {
+    const token = document.getElementById('accessToken').value;
+    if (!token) {
+        alert('Please enter an OAuth access token to test address information retrieval');
+        return;
+    }
+
+    fetch('/oauth/user', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.user) {
+            const addressData = {
+                message: 'Address information test completed',
+                user_identity_status: {
+                    verified: data.user.identity_verified,
+                    status: data.user.identity_verification_status,
+                    rejection_reason: data.user.identity_rejection_reason
+                },
+                address_information: data.user.address,
+                endpoint: '/oauth/user',
+                explanation: {
+                    address_available: !!data.user.address,
+                    reason: data.user.address
+                        ? 'Address information is available because user completed Hack Club Identity verification with address scope'
+                        : 'No address information available. This could be because: 1) User has not completed identity verification, 2) Identity verification was not requested during OAuth flow, or 3) Address scope was not included in the OAuth request'
+                },
+                next_steps: data.user.address
+                    ? 'Address information is successfully retrieved and can be used by your application'
+                    : 'To get address information: 1) Include "Verify Identity" checkbox during OAuth consent, 2) Complete Hack Club Identity verification process, 3) Ensure your OAuth app requests address scope'
+            };
+            showResponse(addressData);
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+// Admin API Key Testing Functions
+function testAdminClubsEndpoint() {
+    const apiKey = document.getElementById('adminApiKey').value;
+    if (!apiKey) {
+        alert('Please enter an admin API key');
+        return;
+    }
+
+    const page = document.getElementById('clubsPage').value || 1;
+    const perPage = document.getElementById('clubsPerPage').value || 20;
+    const search = document.getElementById('clubsSearch').value;
+
+    let url = `/api/v1/clubs?page=${page}&per_page=${perPage}`;
+    if (search) {
+        url += `&search=${encodeURIComponent(search)}`;
+    }
+
+    fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.clubs) {
+            showResponse({
+                message: 'Clubs retrieved successfully',
+                clubs: data.clubs,
+                pagination: data.pagination,
+                endpoint: url
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testAdminAnalyticsEndpoint() {
+    const apiKey = document.getElementById('adminApiKey').value;
+    if (!apiKey) {
+        alert('Please enter an admin API key');
+        return;
+    }
+
+    fetch('/api/v1/analytics/overview', {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.analytics) {
+            showResponse({
+                message: 'Analytics retrieved successfully',
+                analytics: data.analytics,
+                endpoint: '/api/v1/analytics/overview'
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testAdminUserEndpoint() {
+    const apiKey = document.getElementById('adminApiKey').value;
+    const userId = document.getElementById('specificUserId').value;
+
+    if (!apiKey) {
+        alert('Please enter an admin API key');
+        return;
+    }
+
+    if (!userId) {
+        alert('Please enter a user ID');
+        return;
+    }
+
+    fetch(`/api/v1/users/${userId}`, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.user) {
+            showResponse({
+                message: 'User retrieved successfully',
+                user: data.user,
+                endpoint: `/api/v1/users/${userId}`
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testAdminClubEndpoint() {
+    const apiKey = document.getElementById('adminApiKey').value;
+    const clubId = document.getElementById('specificClubId').value;
+
+    if (!apiKey) {
+        alert('Please enter an admin API key');
+        return;
+    }
+
+    if (!clubId) {
+        alert('Please enter a club ID');
+        return;
+    }
+
+    fetch(`/api/v1/clubs/${clubId}`, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.club) {
+            showResponse({
+                message: 'Club retrieved successfully',
+                club: data.club,
+                endpoint: `/api/v1/clubs/${clubId}`
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testAdminClubMembersEndpoint() {
+    const apiKey = document.getElementById('adminApiKey').value;
+    const clubId = document.getElementById('clubMembersId').value;
+
+    if (!apiKey) {
+        alert('Please enter an admin API key');
+        return;
+    }
+
+    if (!clubId) {
+        alert('Please enter a club ID');
+        return;
+    }
+
+    fetch(`/api/v1/clubs/${clubId}/members`, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.members) {
+            showResponse({
+                message: 'Club members retrieved successfully',
+                members: data.members,
+                endpoint: `/api/v1/clubs/${clubId}/members`
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testAdminClubProjectsEndpoint() {
+    const apiKey = document.getElementById('adminApiKey').value;
+    const clubId = document.getElementById('clubProjectsId').value;
+
+    if (!apiKey) {
+        alert('Please enter an admin API key');
+        return;
+    }
+
+    if (!clubId) {
+        alert('Please enter a club ID');
+        return;
+    }
+
+    fetch(`/api/v1/clubs/${clubId}/projects`, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.projects) {
+            showResponse({
+                message: 'Club projects retrieved successfully',
+                projects: data.projects,
+                endpoint: `/api/v1/clubs/${clubId}/projects`
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testAdminClubSearchEndpoint() {
+    const apiKey = document.getElementById('adminApiKey').value;
+    const query = document.getElementById('clubSearchQuery').value;
+
+    if (!apiKey) {
+        alert('Please enter an admin API key');
+        return;
+    }
+
+    if (!query) {
+        alert('Please enter a search term');
+        return;
+    }
+
+    const url = `/api/v1/clubs/search?q=${encodeURIComponent(query)}&limit=20`;
+
+    fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.clubs) {
+            showResponse({
+                message: 'Club search completed successfully',
+                clubs: data.clubs,
+                total_results: data.total_results,
+                search_query: data.search_query,
+                endpoint: url,
+                tip: 'Use the club IDs from this search result in other endpoints'
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function testAdminUserSearchEndpoint() {
+    const apiKey = document.getElementById('adminApiKey').value;
+    const query = document.getElementById('userSearchQuery').value;
+
+    if (!apiKey) {
+        alert('Please enter an admin API key');
+        return;
+    }
+
+    if (!query) {
+        alert('Please enter a search term');
+        return;
+    }
+
+    const url = `/api/v1/users/search?q=${encodeURIComponent(query)}&limit=20`;
+
+    fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.users) {
+            showResponse({
+                message: 'User search completed successfully',
+                users: data.users,
+                total_results: data.total_results,
+                search_query: data.search_query,
+                endpoint: url,
+                tip: 'Use the user IDs from this search result in other endpoints'
+            });
+        } else {
+            showError(data);
+        }
+    })
+    .catch(error => showError({ error: 'Network error', details: error.message }));
+}
+
+function showResponse(data) {
+    document.getElementById('responseContent').textContent = JSON.stringify(data, null, 2);
+    document.getElementById('responseDisplay').style.display = 'block';
+    document.getElementById('errorDisplay').style.display = 'none';
+}
+
+function showError(error) {
+    document.getElementById('errorContent').textContent = JSON.stringify(error, null, 2);
+    document.getElementById('errorDisplay').style.display = 'block';
+    document.getElementById('responseDisplay').style.display = 'none';
+}
+
+// Check for OAuth callback on page load
+window.addEventListener('load', function() {
+    loadConfig();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+    const error = urlParams.get('error');
+
+    if (error) {
+        showError({ oauth_error: error, description: urlParams.get('error_description') });
+    } else if (code && state) {
+        const savedState = localStorage.getItem('oauthState');
+        if (state === savedState) {
+            document.getElementById('authCode').value = code;
+            alert('Authorization code received! You can now test token exchange.');
+        } else {
+            showError({ error: 'State mismatch', received_state: state, expected_state: savedState });
+        }
+    }
+});
+</script>
+{% endblock %}

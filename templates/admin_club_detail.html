@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Club Details - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <h1>Club Details: {{ club.name }}</h1>
+
+    <div style="background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2>Club Information</h2>
+        <p><strong>ID:</strong> {{ club.id }}</p>
+        <p><strong>Name:</strong> {{ club.name }}</p>
+        <p><strong>Description:</strong> {{ club.description or 'N/A' }}</p>
+        <p><strong>Location:</strong> {{ club.location or 'N/A' }}</p>
+        <p><strong>Tokens:</strong> {{ club.tokens }}</p>
+        <p><strong>Balance:</strong> ${{ club.balance }}</p>
+        <p><strong>Created:</strong> {{ club.created_at.strftime('%Y-%m-%d %H:%M') if club.created_at else 'N/A' }}</p>
+        {% if leader %}
+        <p><strong>Leader:</strong> <a href="{{ url_for('admin.user_detail', user_id=leader.id) }}">{{ leader.username }}</a></p>
+        {% endif %}
+    </div>
+
+    <div style="background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2>Members ({{ members|length }})</h2>
+        {% if members %}
+        <ul>
+            {% for membership in members %}
+            <li>
+                <a href="{{ url_for('admin.user_detail', user_id=membership.user.id) }}">{{ membership.user.username }}</a>
+                - {{ membership.role or 'Member' }}
+                {% if membership.is_leader %}<span style="color: #10b981;">(Leader)</span>{% endif %}
+                {% if membership.is_co_leader %}<span style="color: #3b82f6;">(Co-leader)</span>{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No members</p>
+        {% endif %}
+    </div>
+
+    {% if current_user and (current_user.has_permission('clubs.view_team_notes') or current_user.is_admin) %}
+    <div style="background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2>Team Notes</h2>
+        <p style="color: #64748b; margin-bottom: 1rem;">Internal notes for administrators and club leaders</p>
+        <textarea id="teamNotesText" rows="8" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-family: inherit; margin-bottom: 1rem;"
+            {% if current_user and not (current_user.has_permission('clubs.edit_team_notes') or current_user.is_admin) %}disabled{% endif %}
+            placeholder="Add internal notes about this club here...">{{ club.team_notes or '' }}</textarea>
+        {% if current_user and (current_user.has_permission('clubs.edit_team_notes') or current_user.is_admin) %}
+        <button onclick="saveTeamNotes()" style="background: #8b5cf6; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer;">
+            <i class="fas fa-save"></i> Save Team Notes
+        </button>
+        {% endif %}
+        <div id="teamNotesStatus" style="margin-top: 1rem;"></div>
+    </div>
+    {% endif %}
+
+    <script>
+        function saveTeamNotes() {
+            const teamNotes = document.getElementById('teamNotesText').value;
+            
+            fetch('/api/clubs/{{ club.id }}/team-notes', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ team_notes: teamNotes })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus(data.message || 'Team notes saved successfully!', 'success');
+                } else {
+                    showStatus(data.error || 'Error saving team notes', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving team notes:', error);
+                showStatus('Error saving team notes', 'error');
+            });
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('teamNotesStatus');
+            statusDiv.innerHTML = `<div style="padding: 0.75rem; border-radius: 5px; background: ${type === 'success' ? '#d1fae5' : '#fee2e2'}; color: ${type === 'success' ? '#059669' : '#dc2626'};">${message}</div>`;
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 3000);
+        }
+    </script>
+
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('admin.clubs') }}" style="color: #3b82f6;">← Back to Clubs List</a>
+    </div>
+</div>
+{% endblock %}

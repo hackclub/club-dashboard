@@ -1,0 +1,769 @@
+
+{% extends "base.html" %}
+
+{% block title %}Verify Club Leader - Hack Clubs Dash{% endblock %}
+
+{% block extra_head %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        position: relative;
+    }
+
+    .auth-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{{ url_for("static", filename="assets/Dinos.jpg") }}') center/cover;
+        filter: blur(3px);
+        z-index: 0;
+    }
+
+    .auth-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1;
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        padding: 3rem;
+        width: 100%;
+        max-width: 500px;
+        border: 1px solid #e1e8ed;
+        position: relative;
+        z-index: 2;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-header h1 {
+        color: #1a202c;
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .auth-header p {
+        color: #718096;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 0.875rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background: white;
+        color: #2d3748;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ec3750;
+        box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-control::placeholder {
+        color: #a0aec0;
+    }
+
+    .btn-auth {
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-auth:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(236, 55, 80, 0.3);
+    }
+
+    .btn-auth:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .auth-footer a {
+        color: #ec3750;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .auth-logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .verification-info {
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        color: #4a5568;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    .verification-info h3 {
+        margin: 0 0 0.5rem 0;
+        color: #2d3748;
+        font-size: 1rem;
+    }
+
+    .error-message {
+        background: #fed7d7;
+        border: 1px solid #feb2b2;
+        color: #c53030;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .success-message {
+        background: #c6f6d5;
+        border: 1px solid #9ae6b4;
+        color: #2f855a;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .club-list {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        background: #f8fafc;
+    }
+
+    .club-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+
+    .club-item:hover {
+        border-color: #ec3750;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(236, 55, 80, 0.1);
+    }
+
+    .club-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .club-info h4 {
+        margin: 0 0 0.25rem 0;
+        color: #1a202c;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .club-info p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+    .btn-link-club {
+        background: #ec3750;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .btn-link-club:hover {
+        background: #d63146;
+        transform: translateY(-1px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .resend-btn {
+        background: none;
+        border: none;
+        color: #ec3750;
+        cursor: pointer;
+        text-decoration: underline;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+    .resend-btn:hover {
+        color: #d63146;
+    }
+
+    .apply-btn {
+        background: #f59e0b;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .apply-btn:hover {
+        background: #d97706;
+        transform: translateY(-1px);
+        color: white;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1>Verify Club Leadership</h1>
+            <p>Link your account to your Hack Club</p>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="success-message" class="success-message" style="display: none;"></div>
+
+
+        <div id="no-club-section" class="verification-info" style="background: #fef3c7; border-color: #fbbf24; margin-bottom: 2rem;">
+            <h3 style="color: #92400e;"><i class="fas fa-info-circle"></i> Don't have a club yet?</h3>
+            <p style="color: #92400e; margin-bottom: 1rem;">
+                If you haven't started a Hack Club yet, you can apply to start one at your school!
+            </p>
+            <a href="https://apply.hackclub.com/" target="_blank" rel="noopener noreferrer"
+               style="background: #f59e0b; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
+                <i class="fas fa-external-link-alt"></i> Apply to Start a Club
+            </a>
+        </div>
+
+
+        <div id="email-step">
+            <div class="verification-info">
+                <h3><i class="fas fa-envelope"></i> Step 1: Verify Your Email</h3>
+                <p>Enter your email address that's registered as a leader in the Hack Club directory.</p>
+            </div>
+
+            <form id="email-form" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label">Your Email Address</label>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your registered email" required pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}">
+                    <small style="color: #64748b; font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        This should match the email in your Hack Club leader registration
+                    </small>
+                </div>
+
+                <button type="submit" class="btn-auth" id="send-code-btn">
+                    <i class="fas fa-paper-plane"></i> Send Verification Code
+                </button>
+            </form>
+        </div>
+
+
+        <div id="code-step" style="display: none;">
+            <div class="verification-info">
+                <h3><i class="fas fa-lock"></i> Step 2: Enter Verification Code</h3>
+                <p>We've sent a 5-digit verification code to your email. Please enter it below.</p>
+            </div>
+
+            <form id="code-form" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label">Verification Code</label>
+                    <input type="text" class="form-control" id="verification_code" placeholder="Enter 5-digit code" required maxlength="5" pattern="[0-9]{5}">
+                    <small style="color: #64748b; font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        Check your email for the verification code
+                    </small>
+                </div>
+
+                <button type="submit" class="btn-auth" id="verify-code-btn">
+                    <i class="fas fa-check-circle"></i> Verify Code
+                </button>
+
+                <button type="button" class="resend-btn" id="resend-btn">
+                    Didn't receive the code? Resend
+                </button>
+            </form>
+        </div>
+
+
+        <div id="club-step" style="display: none;">
+            <div class="verification-info">
+                <h3><i class="fas fa-users"></i> Step 3: Select Your Club</h3>
+                <p>We found the following clubs associated with your email. Click "Link Club" to connect your account.</p>
+            </div>
+
+            <div id="club-list" class="club-list">
+
+            </div>
+        </div>
+
+        <div class="auth-footer">
+            {% if current_user.is_authenticated %}
+                <p>Changed your mind? <a href="{{ url_for('dashboard') }}">Back to dashboard</a></p>
+            {% else %}
+                <p>Not a club leader? <a href="{{ url_for('signup') }}">Go back to regular signup</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const emailForm = document.getElementById('email-form');
+    const codeForm = document.getElementById('code-form');
+    const resendBtn = document.getElementById('resend-btn');
+
+    let currentEmail = '';
+
+    // Step 1: Send verification code
+    emailForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+        const sendCodeBtn = document.getElementById('send-code-btn');
+        const emailInput = document.getElementById('email');
+
+        // Hide previous messages
+        if (errorDiv) errorDiv.style.display = 'none';
+        if (successDiv) successDiv.style.display = 'none';
+
+        // Disable button
+        sendCodeBtn.disabled = true;
+        sendCodeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+        const emailValue = emailInput.value.trim();
+
+        // Validate email format
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(emailValue)) {
+            if (errorDiv) {
+                errorDiv.textContent = 'Please enter a valid email address';
+                errorDiv.style.display = 'block';
+            }
+            sendCodeBtn.disabled = false;
+            sendCodeBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Verification Code';
+            return;
+        }
+
+        currentEmail = emailValue;
+
+        try {
+            const response = await fetch('/verify-leader', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    step: 'send_verification',
+                    email: emailValue
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                if (successDiv) {
+                    successDiv.textContent = result.message;
+                    successDiv.style.display = 'block';
+                }
+
+                // Move to code verification step
+                document.getElementById('email-step').style.display = 'none';
+                document.getElementById('code-step').style.display = 'block';
+            } else {
+                if (errorDiv) {
+                    errorDiv.textContent = result.error || 'Failed to send verification code';
+                    errorDiv.style.display = 'block';
+                }
+            }
+        } catch (error) {
+            console.error('Send code error:', error);
+            if (errorDiv) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        sendCodeBtn.disabled = false;
+        sendCodeBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Verification Code';
+    });
+
+    // Step 2: Verify code
+    codeForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+        const verifyCodeBtn = document.getElementById('verify-code-btn');
+        const codeInput = document.getElementById('verification_code');
+
+        // Hide previous messages
+        if (errorDiv) errorDiv.style.display = 'none';
+        if (successDiv) successDiv.style.display = 'none';
+
+        // Disable button
+        verifyCodeBtn.disabled = true;
+        verifyCodeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+
+        const code = codeInput.value.trim();
+
+        if (!/^\d{5}$/.test(code)) {
+            if (errorDiv) {
+                errorDiv.textContent = 'Please enter a valid 5-digit code';
+                errorDiv.style.display = 'block';
+            }
+            verifyCodeBtn.disabled = false;
+            verifyCodeBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verify Code';
+            return;
+        }
+
+        try {
+            const response = await fetch('/verify-leader', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    step: 'verify_email',
+                    email: currentEmail,
+                    verification_code: code
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                if (successDiv) {
+                    successDiv.textContent = result.message;
+                    successDiv.style.display = 'block';
+                }
+
+                // Move to club selection step
+                document.getElementById('code-step').style.display = 'none';
+                document.getElementById('club-step').style.display = 'block';
+
+                // Load available clubs
+                setTimeout(async () => {
+                    await loadAvailableClubs();
+                }, 100);
+            } else {
+                if (errorDiv) {
+                    errorDiv.textContent = result.error || 'Code verification failed';
+                    errorDiv.style.display = 'block';
+                }
+            }
+        } catch (error) {
+            console.error('Code verification error:', error);
+            if (errorDiv) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        verifyCodeBtn.disabled = false;
+        verifyCodeBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verify Code';
+    });
+
+    // Resend code
+    resendBtn.addEventListener('click', async function() {
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+
+        resendBtn.disabled = true;
+        resendBtn.textContent = 'Sending...';
+
+        try {
+            const response = await fetch('/verify-leader', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    step: 'send_verification',
+                    email: currentEmail
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                if (successDiv) {
+                    successDiv.textContent = 'New verification code sent to your email';
+                    successDiv.style.display = 'block';
+                }
+                if (errorDiv) errorDiv.style.display = 'none';
+            } else {
+                if (errorDiv) {
+                    errorDiv.textContent = result.error || 'Failed to resend code';
+                    errorDiv.style.display = 'block';
+                }
+            }
+        } catch (error) {
+            if (errorDiv) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Didn\'t receive the code? Resend';
+    });
+
+    // Load available clubs
+    async function loadAvailableClubs() {
+        const errorDiv = document.getElementById('error-message');
+        const clubList = document.getElementById('club-list');
+
+        try {
+
+            // Show loading state
+            clubList.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #ec3750; margin-bottom: 1rem;"></i>
+                    <p style="color: #64748b;">Loading your clubs...</p>
+                </div>
+            `;
+
+            const response = await fetch('/verify-leader', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    step: 'get_clubs',
+                    email: currentEmail
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                if (result.clubs && result.clubs.length > 0) {
+                    clubList.innerHTML = '';
+
+                    result.clubs.forEach(club => {
+                        const clubItem = document.createElement('div');
+                        clubItem.className = 'club-item';
+                        
+                        if (club.suspended) {
+                            // Suspended club - show with disabled state
+                            clubItem.style.opacity = '0.6';
+                            clubItem.style.cursor = 'not-allowed';
+                            clubItem.innerHTML = `
+                                <div class="club-info">
+                                    <h4>${club.name} <span style="color: #ef4444; font-size: 0.75rem; font-weight: 600; background: #fee2e2; padding: 0.25rem 0.5rem; border-radius: 4px; margin-left: 0.5rem;">SUSPENDED</span></h4>
+                                    <p><i class="fas fa-map-marker-alt"></i> ${club.location || 'Location not specified'}</p>
+                                    <p style="color: #ef4444; font-size: 0.75rem; margin-top: 0.5rem;"><i class="fas fa-exclamation-circle"></i> This club is currently suspended and cannot be linked</p>
+                                </div>
+                                <button class="btn-link-club" disabled style="background: #9ca3af; cursor: not-allowed; opacity: 0.5;">
+                                    <i class="fas fa-ban"></i> Suspended
+                                </button>
+                            `;
+                        } else {
+                            // Active club - normal display
+                            clubItem.innerHTML = `
+                                <div class="club-info">
+                                    <h4>${club.name}</h4>
+                                    <p><i class="fas fa-map-marker-alt"></i> ${club.location || 'Location not specified'}</p>
+                                </div>
+                                <button class="btn-link-club" onclick="linkClub('${club.name.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-link"></i> Link Club
+                                </button>
+                            `;
+                        }
+                        clubList.appendChild(clubItem);
+                    });
+                } else {
+                    // No clubs found
+                    clubList.innerHTML = `
+                        <div style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-search" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
+                            <h4 style="color: #4a5568; margin-bottom: 1rem;">We couldn't find any clubs for your email!</h4>
+                            <p style="color: #64748b; margin-bottom: 1.5rem;">
+                                Your email might not be registered as a club leader yet, or your club might not be in our directory.
+                            </p>
+                            <a href="https://apply.hackclub.com/" target="_blank" rel="noopener noreferrer"
+                               style="background: #ec3750; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
+                                <i class="fas fa-plus-circle"></i> Apply to Start a Hack Club
+                            </a>
+                            <p style="color: #64748b; font-size: 0.875rem; margin-top: 1rem;">
+                                Already have a club? Contact support to get it added to our directory.
+                            </p>
+                        </div>
+                    `;
+                }
+            } else {
+                console.error('Failed to load clubs:', result);
+                if (errorDiv) {
+                    errorDiv.textContent = result.error || 'Failed to load clubs from directory';
+                    errorDiv.style.display = 'block';
+                }
+
+                clubList.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b; margin-bottom: 1rem;"></i>
+                        <h4 style="color: #4a5568; margin-bottom: 1rem;">Error Loading Clubs</h4>
+                        <p style="color: #64748b; margin-bottom: 1rem;">
+                            ${result.error || 'Unable to fetch clubs from the directory'}
+                        </p>
+                        <button onclick="loadAvailableClubs()" class="btn-link-club">
+                            <i class="fas fa-refresh"></i> Try Again
+                        </button>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Load clubs error:', error);
+            if (errorDiv) {
+                errorDiv.textContent = 'Network error while loading clubs. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+
+            clubList.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b; margin-bottom: 1rem;"></i>
+                    <h4 style="color: #4a5568; margin-bottom: 1rem;">Connection Error</h4>
+                    <p style="color: #64748b; margin-bottom: 1rem;">
+                        Unable to connect to the club directory. Please check your connection and try again.
+                    </p>
+                    <button onclick="loadAvailableClubs()" class="btn-link-club">
+                        <i class="fas fa-refresh"></i> Try Again
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    // Link club function (make it global)
+    window.linkClub = async function(clubName) {
+        try {
+            const response = await fetch('/verify-leader', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    step: 'link_club',
+                    email: currentEmail,
+                    club_name: clubName
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                window.location.href = '/complete-leader-signup';
+            } else {
+                const errorDiv = document.getElementById('error-message');
+                if (errorDiv) {
+                    errorDiv.textContent = result.error || 'Failed to link club';
+                    errorDiv.style.display = 'block';
+                }
+            }
+        } catch (error) {
+            console.error('Link club error:', error);
+            const errorDiv = document.getElementById('error-message');
+            if (errorDiv) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+    };
+});
+</script>
+{% endblock %}

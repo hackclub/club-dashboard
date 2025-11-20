@@ -1,0 +1,17 @@
+flask
+flask-login
+flask-sqlalchemy
+requests
+psycopg2-binary
+werkzeug
+flask-limiter
+better-profanity
+gunicorn
+Flask-WTF
+python-dotenv
+Pillow>=11.0.0
+markdown
+bleach
+pyotp
+qrcode[pil]
+sqlalchemy

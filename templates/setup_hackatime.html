@@ -1,0 +1,540 @@
+{% extends "base.html" %}
+
+{% block title %}Setup Hackatime - Connect Your Coding Time Tracker{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ec3750;
+            --primary-dark: #d63146;
+            --primary-gradient: linear-gradient(135deg, #ec3750 0%, #ff6b7a 50%, #ff8c82 100%);
+            --secondary-gradient: linear-gradient(135deg, #ec3750 0%, #d63146 100%);
+            --accent-gradient: linear-gradient(135deg, #ff8c82 0%, #ff6b7a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --text-light: rgba(255, 255, 255, 0.9);
+            --text-dim: rgba(255, 255, 255, 0.7);
+            --text-dark: #1f2937;
+            --border-radius: 16px;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            background: var(--primary-gradient);
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 600;
+            position: relative;
+            z-index: 10;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, white 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .setup-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-strong);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-number {
+            width: 3rem;
+            height: 3rem;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .step-description {
+            color: #64748b;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .external-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--primary-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(236, 55, 80, 0.3);
+            margin-bottom: 1.5rem;
+        }
+
+        .external-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(236, 55, 80, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .screenshot {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+            margin: 1.5rem 0;
+            border: 2px solid #e2e8f0;
+        }
+
+        .form-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(236, 55, 80, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(236, 55, 80, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid var(--warning);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box .icon {
+            color: var(--warning);
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .highlight-box h4 {
+            color: #92400e;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box p {
+            color: #b45309;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid var(--success);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-message .icon {
+            color: var(--success);
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .success-message h4 {
+            color: #065f46;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .success-message p {
+            color: #047857;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .setup-container {
+                padding: 1.5rem;
+            }
+
+            .step-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .screenshot {
+                border-radius: 8px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <a href="javascript:history.back()" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back
+        </a>
+
+        <div class="header">
+            <h1><i class="fas fa-clock"></i> Setup Hackatime</h1>
+            <p>Connect your coding time tracker to enable project submissions</p>
+        </div>
+
+        <div class="setup-container">
+
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Visit Hackatime</div>
+                </div>
+                <div class="step-description">
+                    First, you need to go to Hackatime and create an account or sign in if you already have one.
+                </div>
+                <a href="https://hackatime.hackclub.com" target="_blank" class="external-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    Open Hackatime
+                </a>
+                <div class="highlight-box">
+                    <i class="fas fa-info-circle icon"></i>
+                    <h4>What is Hackatime?</h4>
+                    <p>Hackatime is a time tracking service built for Hack Club that monitors your coding activity across different editors and projects. It's essential for validating project submissions and tracking your coding progress.</p>
+                </div>
+            </div>
+
+
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Sign Up or Sign In</div>
+                </div>
+                <div class="step-description">
+                    If you don't have a Hackatime account yet, create one using your email. If you already have an account, simply sign in.
+                </div>
+                <div class="highlight-box">
+                    <i class="fas fa-user-plus icon"></i>
+                    <h4>New to Hackatime?</h4>
+                    <p>Creating an account is free and takes less than a minute. You'll need to verify your email address to get started.</p>
+                </div>
+            </div>
+
+
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Navigate to Settings</div>
+                </div>
+                <div class="step-description">
+                    Once you're logged in, go to your Settings page to find your API configuration.
+                </div>
+                <img src="{{ url_for('static', filename='assets/ht-2.png') }}" alt="Hackatime Settings Page" class="screenshot">
+                <div class="highlight-box">
+                    <i class="fas fa-mouse-pointer icon"></i>
+                    <h4>Finding Settings</h4>
+                    <p>Look for the Settings link in your Hackatime dashboard. It's usually located in the navigation menu or profile dropdown.</p>
+                </div>
+            </div>
+
+
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Find Your API Key</div>
+                </div>
+                <div class="step-description">
+                    Scroll down on the Settings page until you see the "Config File" section. Your API key will be displayed there.
+                </div>
+                <img src="{{ url_for('static', filename='assets/ht-1.png') }}" alt="Hackatime API Key Location" class="screenshot">
+                <div class="highlight-box">
+                    <i class="fas fa-key icon"></i>
+                    <h4>Important!</h4>
+                    <p>Copy the entire API key value after "api_key =" (without the quotes). It should look like a long string of characters and numbers separated by dashes.</p>
+                </div>
+            </div>
+
+
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">5</div>
+                    <div class="step-title">Enter Your API Key</div>
+                </div>
+                <div class="step-description">
+                    Paste your Hackatime API key in the field below and click save to connect your account.
+                </div>
+
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="hackatimeKey" class="form-label">
+                            <i class="fas fa-key"></i> Hackatime API Key
+                        </label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="hackatimeKey"
+                            value="{{ current_user.hackatime_api_key or '' }}"
+                            placeholder="Paste your API key here..."
+                        >
+                    </div>
+                    <button id="saveHackatime" class="btn btn-success">
+                        <i class="fas fa-save"></i>
+                        Save Hackatime Key
+                    </button>
+                </div>
+
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle icon"></i>
+                    <h4>Success!</h4>
+                    <p>Your Hackatime API key has been saved successfully. You can now submit projects!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        // Hackatime key save functionality
+        console.log('Setup Hackatime script loaded');
+        const saveHackatime = document.getElementById('saveHackatime');
+        const successMessage = document.getElementById('successMessage');
+
+        console.log('saveHackatime element:', saveHackatime);
+        console.log('successMessage element:', successMessage);
+
+        if (saveHackatime) {
+            console.log('Adding click listener to saveHackatime button');
+            saveHackatime.addEventListener('click', function(event) {
+                console.log('Save Hackatime button clicked!');
+                event.preventDefault();
+
+                const apiKey = document.getElementById('hackatimeKey').value;
+                console.log('API key value:', apiKey ? '[KEY PROVIDED]' : '[EMPTY]');
+
+                if (!apiKey.trim()) {
+                    if (typeof showToast === 'function') {
+                        showToast('warning', 'Please enter your Hackatime API key', 'Missing API Key');
+                    } else {
+                        alert('Please enter your Hackatime API key');
+                    }
+                    return;
+                }
+
+                // Show loading state
+                const originalText = saveHackatime.innerHTML;
+                saveHackatime.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                saveHackatime.disabled = true;
+
+                const data = {
+                    hackatime_api_key: apiKey
+                };
+
+                fetch('/api/user/update', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        successMessage.classList.add('show');
+                        saveHackatime.innerHTML = '<i class="fas fa-check"></i> Saved!';
+
+                        if (typeof showToast === 'function') {
+                            showToast('success', data.message, 'Hackatime Updated');
+                        }
+
+                        // Reset button after 3 seconds
+                        setTimeout(() => {
+                            saveHackatime.innerHTML = originalText;
+                            saveHackatime.disabled = false;
+                        }, 3000);
+                    } else {
+                        if (typeof showToast === 'function') {
+                            showToast('error', data.error || 'Failed to save Hackatime key', 'Error');
+                        } else {
+                            alert(data.error || 'Failed to save Hackatime key');
+                        }
+                        saveHackatime.innerHTML = originalText;
+                        saveHackatime.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (typeof showToast === 'function') {
+                        showToast('error', 'Network error. Please try again.', 'Error');
+                    } else {
+                        alert('Failed to save Hackatime key');
+                    }
+                    saveHackatime.innerHTML = originalText;
+                    saveHackatime.disabled = false;
+                });
+            });
+        }
+    </script>
+{% endblock %}

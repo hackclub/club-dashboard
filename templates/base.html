@@ -1,0 +1,2302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hack Club Dashboard{% endblock %}</title>
+
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#ec3750">
+    <meta name="background-color" content="#f5f7fa">
+    <meta name="display" content="standalone">
+    <meta name="orientation" content="portrait-primary">
+
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Hack Club Dashboard">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='assets/logo-rounded.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='assets/logo-rounded.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/logo-rounded.png') }}">
+    <link rel="apple-touch-icon" sizes="167x167" href="{{ url_for('static', filename='assets/logo-rounded.png') }}">
+
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/logo-rounded.png') }}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+    {% block extra_styles %}{% endblock %}
+
+    <style>
+        /* ============================================
+           LIGHT & DARK THEME SYSTEM
+           Beautiful themes with smooth transitions
+           ============================================ */
+
+        :root {
+            /* Brand Colors (same in both themes) */
+            --primary: #ec3750;
+            --primary-dark: #d63146;
+            --primary-light: #ff5e73;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+
+            /* Light Theme Colors */
+            --background: #f8f9fa;
+            --background-secondary: #f3f4f6;
+            --surface: #ffffff;
+            --surface-elevated: #ffffff;
+            --text: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+            --overlay: rgba(0, 0, 0, 0.5);
+
+            /* UI Elements */
+            --border-radius: 8px;
+            --transition: all 0.2s ease;
+            --backdrop-blur: blur(8px);
+        }
+
+        /* Dark Theme */
+        [data-theme="dark"] {
+            --background: #0f172a;
+            --background-secondary: #1e293b;
+            --surface: #1e293b;
+            --surface-elevated: #334155;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border: #334155;
+            --border-light: #475569;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.5);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.6);
+            --overlay: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Smooth theme transitions */
+        * {
+            transition: background-color 0.3s ease,
+                        color 0.3s ease,
+                        border-color 0.3s ease,
+                        box-shadow 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: var(--surface);
+            box-shadow: var(--shadow-md);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 10000;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: var(--text);
+            font-size: 1.5rem;
+            z-index: 1001;
+        }
+
+        .navbar-toggle:hover {
+            color: var(--primary);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.625rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(236, 55, 80, 0.1);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--surface-elevated);
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 0.25rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .theme-toggle:hover i {
+            color: white;
+        }
+
+        .theme-icon-dark,
+        .theme-icon-light {
+            position: absolute;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        /* Show moon in light mode, sun in dark mode */
+        [data-theme="light"] .theme-icon-light {
+            opacity: 0;
+            transform: rotate(180deg) scale(0);
+        }
+
+        [data-theme="light"] .theme-icon-dark {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+            color: #64748b;
+        }
+
+        [data-theme="dark"] .theme-icon-dark {
+            opacity: 0;
+            transform: rotate(-180deg) scale(0);
+        }
+
+        [data-theme="dark"] .theme-icon-light {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+            color: #fbbf24;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            z-index: 10000;
+        }
+
+        .dropdown::before {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            height: 0.5rem;
+            background: transparent;
+            z-index: 1;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--surface);
+            min-width: 200px;
+            box-shadow: var(--shadow-lg);
+            border-radius: 8px;
+            z-index: 2147483647 !important;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            border: 1px solid var(--border);
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-content a {
+            color: var(--text);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            border-radius: 0;
+            background: none;
+            transition: background-color 0.2s ease;
+            font-size: 0.9375rem;
+        }
+
+        .dropdown-content a i {
+            width: 1.125rem;
+            text-align: center;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--background);
+            color: var(--primary);
+        }
+
+        .dropdown-content a:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .dropdown-content a:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .dropdown:hover .dropdown-content,
+        .dropdown-content:hover {
+            display: block;
+        }
+
+        .dropdown:hover::before {
+            display: block;
+        }
+
+        .navbar .dropdown-toggle::after {
+            content: " ▼";
+            font-size: 0.65em;
+            margin-left: 0.25em;
+            opacity: 0.6;
+        }
+
+        /* Override admin dashboard dropdown styles for navbar */
+        .navbar .dropdown-toggle {
+            background: none !important;
+            color: var(--text-secondary) !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 0.625rem 1rem !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            min-width: auto !important;
+            justify-content: flex-start !important;
+            white-space: nowrap !important;
+        }
+
+        .navbar .dropdown-toggle:hover {
+            color: var(--primary) !important;
+            background: rgba(236, 55, 80, 0.1) !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Force override any conflicting z-index on club headers */
+        .club-header, .tutorial-highlight.club-header {
+            position: sticky !important;
+            top: 70px !important;
+            z-index: 1 !important;
+        }
+
+        /* Make dropdown appear above the sticky header by using a higher container z-index */
+        .navbar {
+            z-index: 20000 !important;
+        }
+
+        .dropdown {
+            z-index: 20001 !important;
+        }
+
+        /* Force lower z-index on club detail items that might cover dropdowns */
+        .club-detail-item, .balance-display, .join-code-display {
+            z-index: 1 !important;
+            position: relative !important;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.9375rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-footer {
+            padding: 1rem 1.5rem;
+            background-color: var(--background);
+            border-top: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-width: 350px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            border-left: 4px solid;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            pointer-events: auto;
+            min-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.hide {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+
+        .toast-success {
+            border-left-color: #4caf50;
+        }
+
+        .toast-error {
+            border-left-color: #f44336;
+        }
+
+        .toast-info {
+            border-left-color: #2196f3;
+        }
+
+        .toast-warning {
+            border-left-color: #ff9800;
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+
+        .toast-success .toast-icon {
+            color: #4caf50;
+        }
+
+        .toast-error .toast-icon {
+            color: #f44336;
+        }
+
+        .toast-info .toast-icon {
+            color: #2196f3;
+        }
+
+        .toast-warning .toast-icon {
+            color: #ff9800;
+        }
+
+        .toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .toast-message {
+            color: #718096;
+            font-size: 0.825rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            cursor: pointer;
+            padding: 0;
+            font-size: 1.1rem;
+            transition: color 0.2s;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+
+        .toast-close:hover {
+            color: #718096;
+        }
+
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, currentColor, currentColor);
+            transition: width linear;
+            opacity: 0.3;
+        }
+
+        .toast-success .toast-progress {
+            color: #10b981;
+        }
+
+        .toast-error .toast-progress {
+            color: #ef4444;
+        }
+
+        .toast-info .toast-progress {
+            color: #3b82f6;
+        }
+
+        .toast-warning .toast-progress {
+            color: #f59e0b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -0.5rem;
+        }
+
+        .col {
+            flex: 1;
+            padding: 0 0.5rem;
+        }
+
+        .col-2 { flex: 0 0 16.666667%; }
+        .col-3 { flex: 0 0 25%; }
+        .col-4 { flex: 0 0 33.333333%; }
+        .col-6 { flex: 0 0 50%; }
+        .col-8 { flex: 0 0 66.666667%; }
+        .col-9 { flex: 0 0 75%; }
+
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+        .p-0 { padding: 0; }
+        .p-1 { padding: 0.5rem; }
+        .p-2 { padding: 1rem; }
+        .p-3 { padding: 1.5rem; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: var(--surface);
+            margin: 120px auto 5% auto;
+            padding: 0;
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-hover);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-secondary);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .close:hover {
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .navbar-toggle {
+                display: block;
+            }
+
+            .navbar-content {
+                flex-wrap: wrap;
+                padding: 0 1rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.125rem;
+                flex: 1;
+            }
+
+            .navbar-nav {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--surface);
+                border-top: 1px solid var(--border);
+                box-shadow: var(--shadow-lg);
+                flex-direction: column;
+                width: 100%;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                transition: all 0.3s ease;
+                z-index: 1000;
+            }
+
+            .navbar-nav.active {
+                max-height: 600px;
+                opacity: 1;
+                padding: 1rem 0;
+            }
+
+            .nav-link {
+                justify-content: flex-start;
+                width: 100%;
+                padding: 0.75rem 1rem;
+                border-radius: 0;
+            }
+
+            .nav-link:hover {
+                background: var(--background);
+            }
+
+            .theme-toggle {
+                margin: 0.5rem 1rem;
+            }
+
+            .dropdown {
+                position: static;
+            }
+
+            .dropdown-content {
+                position: static;
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                background: var(--background);
+                width: 100%;
+                display: none;
+            }
+
+            .dropdown.active .dropdown-content {
+                display: block;
+            }
+
+            .dropdown-content a {
+                padding: 0.75rem 1.5rem;
+            }
+
+            .navbar .dropdown-toggle::after {
+                content: " ▼";
+                transition: transform 0.2s;
+            }
+
+            .dropdown.active .dropdown-toggle::after {
+                transform: rotate(180deg);
+            }
+
+            .btn-sm {
+                width: calc(100% - 2rem);
+                margin: 0.5rem 1rem;
+                justify-content: center;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .navbar-content {
+                padding: 0 1.5rem;
+            }
+
+            .navbar-nav {
+                gap: 0.375rem;
+            }
+
+            .nav-link {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9375rem;
+            }
+
+            .row {
+                flex-direction: column;
+            }
+
+            .col, .col-2, .col-3, .col-4, .col-6, .col-8, .col-9 {
+                flex: 1;
+                margin-bottom: 1rem;
+            }
+
+            .toast-container {
+                right: 10px;
+                left: 10px;
+                top: 10px;
+                max-width: none;
+            }
+
+            .toast {
+                margin: 0;
+            }
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(236, 55, 80, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Incident Banner Styles */
+        #incident-banner {
+            color: white;
+            padding: 0.75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 9998;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Banner severity colors */
+        #incident-banner.severity-critical {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+        }
+
+        #incident-banner.severity-major {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+        }
+
+        #incident-banner.severity-minor {
+            background: linear-gradient(135deg, #eab308, #ca8a04);
+            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.15);
+        }
+
+        .incident-banner-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1rem;
+            gap: 1rem;
+        }
+
+        .incident-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .incident-banner-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            animation: pulse 2s infinite;
+        }
+
+        .incident-banner-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.125rem;
+        }
+
+        .incident-banner-description {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .incident-banner-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .incident-banner-link {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .incident-banner-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+
+        .incident-banner-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            transition: opacity 0.2s ease, background-color 0.2s ease;
+        }
+
+        .incident-banner-close:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Adjust navbar z-index to prevent banner overlap */
+        .navbar {
+            z-index: 10000;
+        }
+
+        /* Ensure ALL modals appear above navbar - CRITICAL FIX */
+        .modal {
+            z-index: 150000 !important;
+        }
+
+        .modal-content {
+            z-index: 150001 !important;
+        }
+
+        /* Mobile responsive banner */
+        @media (max-width: 768px) {
+            .incident-banner-content {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .incident-banner-left {
+                justify-content: center;
+            }
+
+            .incident-banner-description {
+                white-space: normal;
+                text-overflow: initial;
+            }
+
+            .incident-banner-right {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* ===== SIMPLE ANIMATIONS & TRANSITIONS ===== */
+
+        /* Simple fade in animations */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .fade-in-delay-1 { animation-delay: 0.1s; }
+        .fade-in-delay-2 { animation-delay: 0.2s; }
+        .fade-in-delay-3 { animation-delay: 0.3s; }
+        .fade-in-delay-4 { animation-delay: 0.4s; }
+
+        /* Scroll-triggered animations */
+        .fade-in-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Ghost/Skeleton loading */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Simple button transitions */
+        .btn, button {
+            transition: opacity 0.2s ease;
+        }
+
+        .btn:hover, button:hover {
+            opacity: 0.9;
+        }
+
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="{{ url_for('index') }}" class="navbar-brand">
+                <img src="{{ url_for('static', filename='assets/logo-rounded.png') }}" alt="Hack Club Dashboard" style="width: 36px; height: 36px;">
+                Hack Club Dashboard
+            </a>
+
+            <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="navbar-nav" id="navbarNav">
+                {% if current_user and current_user.id %}
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    {% if economy_enabled %}
+                    <a href="{{ url_for('gallery') }}" class="nav-link">
+                        <i class="fas fa-images"></i>
+                        <span>Gallery</span>
+                    </a>
+                    <a href="{{ url_for('leaderboard') }}" class="nav-link">
+                        <i class="fas fa-trophy"></i>
+                        <span>Leaderboard</span>
+                    </a>
+                    {% endif %}
+
+                    {% if current_user.is_admin or current_user.is_reviewer or current_user.has_permission('orders.view') or current_user.has_permission('reviews.view') or current_user.has_permission('admin.access_dashboard') %}
+                    <div class="dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" style="border: 2px dotted #3b82f6;">
+                            <i class="fas fa-tools"></i>
+                            <span>Staff Tools</span>
+                        </a>
+                        <div class="dropdown-content">
+                            {% if current_user.has_permission('reviews.view') or current_user.is_reviewer %}
+                            <a href="/admin/projects/review">
+                                <i class="fas fa-clipboard-check"></i>
+                                <span>Review Projects</span>
+                            </a>
+                            {% endif %}
+                            {% if current_user.has_permission('orders.view') %}
+                            <a href="/admin/orders/review">
+                                <i class="fas fa-box-open"></i>
+                                <span>Review Orders</span>
+                            </a>
+                            {% endif %}
+                            {% if current_user.is_admin or current_user.has_permission('admin.access_dashboard') %}
+                            <a href="{{ url_for('admin.dashboard') }}" style="border: 2px dotted #ff8c37; border-radius: 6px; margin: 0.25rem;">
+                                <i class="fas fa-crown"></i>
+                                <span>Admin Dashboard</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="dropdown">
+                        <a href="#" class="nav-link dropdown-toggle">
+                            <i class="fas fa-user"></i>
+                            <span>Account</span>
+                        </a>
+                        <div class="dropdown-content">
+                            <a href="{{ url_for('main.account') }}">
+                                <i class="fas fa-user-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                            <a href="{{ url_for('auth.logout') }}">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <button id="themeToggle" class="nav-link theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                        <i class="fas fa-moon theme-icon-dark"></i>
+                        <i class="fas fa-sun theme-icon-light"></i>
+                    </button>
+                {% else %}
+                    {% if economy_enabled %}
+                    <a href="{{ url_for('gallery') }}" class="nav-link">
+                        <i class="fas fa-images"></i>
+                        <span>Gallery</span>
+                    </a>
+                    <a href="{{ url_for('leaderboard') }}" class="nav-link">
+                        <i class="fas fa-trophy"></i>
+                        <span>Leaderboard</span>
+                    </a>
+                    {% endif %}
+
+                    <a href="{{ url_for('login') }}" class="nav-link"">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </a>
+                    {% if user_registration_enabled %}
+                    <a href="{{ url_for('signup') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Sign Up</span>
+                    </a>
+                    {% endif %}
+
+                    <button id="themeToggle" class="nav-link theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                        <i class="fas fa-moon theme-icon-dark"></i>
+                        <i class="fas fa-sun theme-icon-light"></i>
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+
+    <div id="incident-banner" style="display: none;">
+        <div class="incident-banner-content">
+            <div class="incident-banner-left">
+                <i class="fas fa-exclamation-triangle incident-banner-icon"></i>
+                <div>
+                    <div class="incident-banner-title">
+                        <span id="banner-status">Active Incident</span>
+                    </div>
+                    <div class="incident-banner-description" id="banner-description"></div>
+                </div>
+            </div>
+            <div class="incident-banner-right">
+                <a href="/status" class="incident-banner-link">View Status Page</a>
+                <button class="incident-banner-close" onclick="closeBanner()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    {% for category, message in messages %}
+                        showToast('{{ category if category in ['success', 'error', 'info', 'warning'] else 'info' }}', '{{ message|replace("'", "\\'") }}');
+                    {% endfor %}
+                });
+                </script>
+            {% endif %}
+        {% endwith %}
+
+        <main class="fade-in">
+            {% block content %}{% endblock %}
+        </main>
+
+    <script>
+        // Simple fade-in on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach(el => {
+                el.classList.add('fade-in');
+            });
+
+            // Scroll-triggered animations
+            const scrollElements = document.querySelectorAll('.features-header, .feature-card, .stat-item');
+
+            const elementInView = (el, dividend = 1) => {
+                const elementTop = el.getBoundingClientRect().top;
+                return (
+                    elementTop <= (window.innerHeight || document.documentElement.clientHeight) / dividend
+                );
+            };
+
+            const displayScrollElement = (element) => {
+                element.classList.add('visible');
+            };
+
+            const handleScrollAnimation = () => {
+                scrollElements.forEach((el) => {
+                    if (elementInView(el, 1.25)) {
+                        displayScrollElement(el);
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', () => {
+                handleScrollAnimation();
+            });
+
+            // Initial check
+            handleScrollAnimation();
+        });
+
+        if (typeof window.toastCounter === 'undefined') {
+            window.toastCounter = 0;
+        }
+
+        function showToast(type, message, title = null) {
+            const toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) return;
+
+            const toastId = `toast-${++toastCounter}`;
+
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+
+            const titles = {
+                success: title || 'Success',
+                error: title || 'Error',
+                warning: title || 'Warning',
+                info: title || 'Info'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.id = toastId;
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="${icons[type]}"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type]}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="hideToast('${toastId}')">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="toast-progress" style="width: 100%;"></div>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+
+            const progressBar = toast.querySelector('.toast-progress');
+            setTimeout(() => {
+                progressBar.style.width = '0%';
+                progressBar.style.transitionDuration = '4s';
+            }, 200);
+
+            setTimeout(() => {
+                hideToast(toastId);
+            }, 4000);
+        }
+
+        function hideToast(toastId) {
+            const toast = document.getElementById(toastId);
+            if (toast) {
+                toast.classList.add('hide');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 400);
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+
+
+    <script>
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+
+        // PWA Install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Show install prompt if there's an install button
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) {
+                installBtn.style.display = 'block';
+                installBtn.addEventListener('click', () => {
+                    installBtn.style.display = 'none';
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the A2HS prompt');
+                        }
+                        deferredPrompt = null;
+                    });
+                });
+            }
+        });
+
+        // Handle PWA app installed
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA was installed');
+        });
+
+        // Incident Banner functionality
+        function checkIncidentBanner() {
+            fetch('/api/status/banner')
+                .then(response => response.json())
+                .then(data => {
+                    const banner = document.getElementById('incident-banner');
+                    if (data.has_active_incidents && data.incidents && data.incidents.length > 0) {
+                        const topIncident = data.incidents[0]; // Show the most severe incident
+                        document.getElementById('banner-description').textContent = topIncident.title;
+                        banner.setAttribute('data-incident-id', topIncident.id);
+
+                        // Set severity class for color
+                        banner.className = `severity-${data.banner_severity}`;
+
+                        // Set status text with proper capitalization
+                        const statusText = topIncident.status.charAt(0).toUpperCase() + topIncident.status.slice(1);
+                        document.getElementById('banner-status').textContent = statusText;
+
+                        // Check if banner was previously dismissed for this incident
+                        const dismissedKey = `incident-banner-dismissed-${topIncident.id}`;
+                        if (!localStorage.getItem(dismissedKey)) {
+                            banner.style.display = 'block';
+                        }
+                    } else {
+                        banner.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to fetch incident banner:', error);
+                });
+        }
+
+        function closeBanner() {
+            const banner = document.getElementById('incident-banner');
+
+            // Get the current incident ID from the banner data attribute
+            const incidentId = banner.getAttribute('data-incident-id');
+            if (incidentId) {
+                const dismissedKey = `incident-banner-dismissed-${incidentId}`;
+                localStorage.setItem(dismissedKey, 'true');
+            }
+
+            banner.style.display = 'none';
+        }
+
+        // Check for incident banner on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkIncidentBanner();
+        });
+    </script>
+
+
+
+    <div id="universalModal" class="universal-modal" style="display: none;">
+        <div class="universal-modal-overlay"></div>
+        <div class="universal-modal-content">
+            <div class="universal-modal-header">
+                <div class="universal-modal-icon" id="modalIcon"></div>
+                <h3 id="modalTitle">Alert</h3>
+            </div>
+            <div class="universal-modal-body" id="modalBody"></div>
+            <div class="universal-modal-footer" id="modalFooter">
+                <button class="modal-btn modal-btn-primary" id="modalPrimaryBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .universal-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.2s ease;
+        }
+
+        .universal-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .universal-modal-content {
+            position: relative;
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideUp 0.3s ease;
+        }
+
+        /* Wider modal support */
+        .universal-modal-content.modal-wide {
+            max-width: 800px;
+        }
+
+        .universal-modal-content.modal-large {
+            max-width: 1000px;
+        }
+
+        .universal-modal-header {
+            padding: 2rem 2rem 1rem 2rem;
+            text-align: center;
+        }
+
+        .universal-modal-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        .universal-modal-icon.info {
+            background: #e7f3ff;
+            color: #0369a1;
+        }
+
+        .universal-modal-icon.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .universal-modal-icon.warning {
+            background: #fff7ed;
+            color: #92400e;
+        }
+
+        .universal-modal-icon.error {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .universal-modal-icon.confirm {
+            background: #faf5ff;
+            color: #581c87;
+        }
+
+        .universal-modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .universal-modal-body {
+            padding: 0 2rem 2rem 2rem;
+            color: #4a5568;
+            font-size: 1rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .universal-modal-footer {
+            padding: 1rem 2rem 2rem 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 100px;
+        }
+
+        .modal-btn-primary {
+            background: #ec3750;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .modal-btn-secondary {
+            background: #f8fafc;
+            color: #2d3748;
+            border: 1px solid #e2e8f0;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .universal-modal-content {
+                width: 95%;
+            }
+
+            .modal-btn {
+                flex: 1;
+                min-width: auto;
+            }
+        }
+
+        /* ===================================================================
+           UNIVERSAL MODAL STYLING FOR ALL EXISTING MODALS
+           Apply UniversalModal look to ALL .modal elements
+           =================================================================== */
+
+        .modal:not(.universal-modal) {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 999998;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+
+        .modal:not(.universal-modal) .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideUp 0.3s ease-out;
+        }
+
+        .modal .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal .modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal .modal-close,
+        .modal .close,
+        .modal button.close {
+            background: none !important;
+            border: none !important;
+            font-size: 1.5rem !important;
+            cursor: pointer !important;
+            color: #9ca3af !important;
+            width: 32px !important;
+            height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 8px !important;
+            transition: all 0.2s !important;
+            padding: 0 !important;
+        }
+
+        .modal .modal-close:hover,
+        .modal .close:hover {
+            background: #f3f4f6 !important;
+            color: #111827 !important;
+        }
+
+        .modal .modal-body {
+            padding: 2rem;
+        }
+
+        .modal .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            background: #f9fafb;
+            border-radius: 0 0 16px 16px;
+        }
+
+        /* Button styling */
+        .modal .btn,
+        .modal .btn-modal,
+        .modal button[class*="btn"] {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .modal .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .modal .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .modal .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .modal .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .modal .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .modal .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .modal .btn-success:hover {
+            background: #059669;
+        }
+
+        /* Forms */
+        .modal .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .modal .form-label,
+        .modal label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.9375rem;
+        }
+
+        .modal .form-control,
+        .modal input[type="text"],
+        .modal input[type="email"],
+        .modal input[type="password"],
+        .modal input[type="number"],
+        .modal input[type="url"],
+        .modal input[type="date"],
+        .modal input[type="time"],
+        .modal input[type="datetime-local"],
+        .modal select,
+        .modal textarea {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+        }
+
+        .modal input:focus,
+        .modal select:focus,
+        .modal textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+    </style>
+
+    <script>
+        // Universal Modal System
+        const UniversalModal = {
+            currentCallback: null,
+
+            show: function(options) {
+                const modal = document.getElementById('universalModal');
+                const modalContent = modal.querySelector('.universal-modal-content');
+                const icon = document.getElementById('modalIcon');
+                const title = document.getElementById('modalTitle');
+                const body = document.getElementById('modalBody');
+                const footer = document.getElementById('modalFooter');
+
+                // Reset modal content classes
+                modalContent.className = 'universal-modal-content';
+                if (options.size === 'wide') {
+                    modalContent.classList.add('modal-wide');
+                } else if (options.size === 'large') {
+                    modalContent.classList.add('modal-large');
+                }
+
+                // Set type (info, success, warning, error, confirm, custom)
+                const type = options.type || 'info';
+                icon.className = `universal-modal-icon ${type}`;
+
+                // Set icon
+                const icons = {
+                    info: '<i class="fas fa-info-circle"></i>',
+                    success: '<i class="fas fa-check-circle"></i>',
+                    warning: '<i class="fas fa-exclamation-triangle"></i>',
+                    error: '<i class="fas fa-times-circle"></i>',
+                    confirm: '<i class="fas fa-question-circle"></i>',
+                    custom: options.customIcon || '<i class="fas fa-info-circle"></i>'
+                };
+                icon.innerHTML = icons[type] || icons.info;
+
+                // Hide icon if requested
+                if (options.hideIcon) {
+                    icon.style.display = 'none';
+                } else {
+                    icon.style.display = 'flex';
+                }
+
+                // Set title and body
+                title.textContent = options.title || 'Alert';
+
+                // Support both string and HTML content
+                if (options.html) {
+                    body.innerHTML = options.html;
+                } else {
+                    body.innerHTML = options.message || '';
+                }
+
+                // Support custom body class
+                if (options.bodyClass) {
+                    body.className = 'universal-modal-body ' + options.bodyClass;
+                } else {
+                    body.className = 'universal-modal-body';
+                }
+
+                // Set buttons
+                footer.innerHTML = '';
+
+                // Custom footer content
+                if (options.customFooter) {
+                    footer.innerHTML = options.customFooter;
+                } else {
+                    if (options.confirmText) {
+                        const confirmBtn = document.createElement('button');
+                        confirmBtn.className = 'modal-btn modal-btn-primary';
+                        confirmBtn.textContent = options.confirmText || 'OK';
+                        confirmBtn.onclick = () => {
+                            this.hide();
+                            if (options.onConfirm) options.onConfirm();
+                        };
+                        footer.appendChild(confirmBtn);
+                    }
+
+                    if (options.cancelText) {
+                        const cancelBtn = document.createElement('button');
+                        cancelBtn.className = 'modal-btn modal-btn-secondary';
+                        cancelBtn.textContent = options.cancelText || 'Cancel';
+                        cancelBtn.onclick = () => {
+                            this.hide();
+                            if (options.onCancel) options.onCancel();
+                        };
+                        footer.appendChild(cancelBtn);
+                    }
+
+                    if (!options.confirmText && !options.cancelText) {
+                        const okBtn = document.createElement('button');
+                        okBtn.className = 'modal-btn modal-btn-primary';
+                        okBtn.textContent = 'OK';
+                        okBtn.onclick = () => this.hide();
+                        footer.appendChild(okBtn);
+                    }
+                }
+
+                // Show modal
+                modal.style.display = 'flex';
+
+                // Close on overlay click (unless disabled)
+                if (!options.disableOverlayClose) {
+                    modal.querySelector('.universal-modal-overlay').onclick = () => {
+                        this.hide();
+                        if (options.onCancel) options.onCancel();
+                    };
+                } else {
+                    modal.querySelector('.universal-modal-overlay').onclick = null;
+                }
+
+                // Close on Escape key (unless disabled)
+                if (!options.disableEscape) {
+                    const escapeHandler = (e) => {
+                        if (e.key === 'Escape') {
+                            this.hide();
+                            if (options.onCancel) options.onCancel();
+                            document.removeEventListener('keydown', escapeHandler);
+                        }
+                    };
+                    document.addEventListener('keydown', escapeHandler);
+                }
+
+                // Store current callback for external access
+                this.currentCallback = options.onConfirm;
+
+                // Auto-focus first input if present
+                setTimeout(() => {
+                    const firstInput = body.querySelector('input, textarea, select');
+                    if (firstInput) firstInput.focus();
+                }, 100);
+            },
+
+            hide: function() {
+                document.getElementById('universalModal').style.display = 'none';
+                this.currentCallback = null;
+            },
+
+            alert: function(message, title = 'Alert', type = 'info') {
+                this.show({
+                    type: type,
+                    title: title,
+                    message: message,
+                    confirmText: 'OK'
+                });
+            },
+
+            success: function(message, title = 'Success') {
+                this.show({
+                    type: 'success',
+                    title: title,
+                    message: message,
+                    confirmText: 'OK'
+                });
+            },
+
+            error: function(message, title = 'Error') {
+                this.show({
+                    type: 'error',
+                    title: title,
+                    message: message,
+                    confirmText: 'OK'
+                });
+            },
+
+            warning: function(message, title = 'Warning') {
+                this.show({
+                    type: 'warning',
+                    title: title,
+                    message: message,
+                    confirmText: 'OK'
+                });
+            },
+
+            confirm: function(message, onConfirm, onCancel, title = 'Confirm') {
+                this.show({
+                    type: 'confirm',
+                    title: title,
+                    message: message,
+                    confirmText: 'Confirm',
+                    cancelText: 'Cancel',
+                    onConfirm: onConfirm,
+                    onCancel: onCancel
+                });
+            },
+
+            // Custom modal with full control
+            custom: function(options) {
+                this.show(options);
+            }
+        };
+
+        // Global modal helper functions to make ALL modals use UniversalModal styling
+        window.openModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) {
+                console.error('Modal not found:', modalId);
+                return;
+            }
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            // Add ESC key handler
+            const escHandler = function(e) {
+                if (e.key === 'Escape') {
+                    closeModal(modalId);
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+            modal._escHandler = escHandler;
+
+            // Add click outside to close
+            setTimeout(() => {
+                const clickHandler = function(e) {
+                    if (e.target === modal) {
+                        closeModal(modalId);
+                        modal.removeEventListener('click', clickHandler);
+                    }
+                };
+                modal.addEventListener('click', clickHandler);
+                modal._clickHandler = clickHandler;
+            }, 100);
+        };
+
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+
+            // Remove event listeners
+            if (modal._escHandler) {
+                document.removeEventListener('keydown', modal._escHandler);
+                delete modal._escHandler;
+            }
+            if (modal._clickHandler) {
+                modal.removeEventListener('click', modal._clickHandler);
+                delete modal._clickHandler;
+            }
+        };
+
+        // Make it globally available
+        window.UniversalModal = UniversalModal;
+
+        // Add global showUniversalModal helper function
+        window.showUniversalModal = function(options) {
+            UniversalModal.show(options);
+        };
+
+        // Override native alert and confirm
+        window.alert = function(message) {
+            UniversalModal.alert(message);
+        };
+
+        window.confirm = function(message) {
+            return new Promise((resolve) => {
+                UniversalModal.confirm(
+                    message,
+                    () => resolve(true),
+                    () => resolve(false)
+                );
+            });
+        };
+    </script>
+
+    <script>
+        // Force modal z-index above navbar on page load and when modals open
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply z-index to all existing modals
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.style.zIndex = '150000';
+                const content = modal.querySelector('.modal-content');
+                if (content) {
+                    content.style.zIndex = '150001';
+                }
+            });
+
+            // Watch for modal display changes
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.target.classList.contains('modal') && mutation.target.style.display === 'block') {
+                        mutation.target.style.zIndex = '150000';
+                        const content = mutation.target.querySelector('.modal-content');
+                        if (content) {
+                            content.style.zIndex = '150001';
+                        }
+                    }
+                });
+            });
+
+            modals.forEach(modal => {
+                observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
+            });
+        });
+    </script>
+
+
+    <script src="{{ url_for('static', filename='js/darkreader.min.js') }}"></script>
+
+
+    <script>
+        // ============================================
+        //  DARK READER THEME IMPLEMENTATION
+        // ============================================
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+
+            if (savedTheme === 'dark') {
+                DarkReader.enable({
+                    brightness: 100,
+                    contrast: 100,
+                    sepia: 0,
+                    darkSchemeBackgroundColor: '#0f172a',
+                    darkSchemeForegroundColor: '#f1f5f9',
+                    darkSchemeTextColor: '#e2e8f0'
+                });
+            }
+
+            console.log('Dark Reader theme initialized:', savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = DarkReader.isEnabled() ? 'dark' : 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            console.log('Toggling theme from', currentTheme, 'to', newTheme);
+
+            if (newTheme === 'dark') {
+                // Show beta warning unless user checked "Don't show again"
+                const dontShowAgain = localStorage.getItem('darkThemeBetaDontShow') === 'true';
+                if (!dontShowAgain) {
+                    showDarkThemeBetaModal();
+                } else {
+                    enableDarkTheme();
+                }
+            } else {
+                DarkReader.disable();
+                localStorage.setItem('theme', 'light');
+                animateThemeButton();
+            }
+
+            console.log('Theme changed to:', newTheme);
+        }
+
+        function showDarkThemeBetaModal() {
+            const modal = document.createElement('div');
+            modal.className = 'universal-modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="universal-modal-overlay"></div>
+                <div class="universal-modal-content">
+                    <div class="universal-modal-header">
+                        <div class="universal-modal-icon warning">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <h3>Dark Theme Beta</h3>
+                    </div>
+                    <div class="universal-modal-body">
+                        <p>Dark theme is currently in beta! Some elements may look a bit off while we fine-tune the experience. Your feedback helps us improve! 🌙</p>
+                        <div style="margin-top: 15px; padding: 12px; background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; border-radius: 4px;">
+                            <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
+                                <input type="checkbox" id="dontShowDarkThemeWarning" style="margin-right: 8px; cursor: pointer; width: 16px; height: 16px;">
+                                <span style="font-size: 14px; color: #64748b;">Don't show this again</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="universal-modal-footer">
+                        <button class="modal-btn modal-btn-primary" onclick="confirmDarkThemeEnable()">
+                            <i class="fas fa-check"></i> Enable Dark Theme
+                        </button>
+                        <button class="modal-btn modal-btn-secondary" onclick="closeDarkThemeModal()">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Add click listener to overlay
+            modal.querySelector('.universal-modal-overlay').addEventListener('click', closeDarkThemeModal);
+        }
+
+        function confirmDarkThemeEnable() {
+            const checkbox = document.getElementById('dontShowDarkThemeWarning');
+            if (checkbox && checkbox.checked) {
+                localStorage.setItem('darkThemeBetaDontShow', 'true');
+            }
+            closeDarkThemeModal();
+            enableDarkTheme();
+        }
+
+        function closeDarkThemeModal() {
+            const modal = document.querySelector('.universal-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function enableDarkTheme() {
+            DarkReader.enable({
+                brightness: 100,
+                contrast: 100,
+                sepia: 0,
+                darkSchemeBackgroundColor: '#0f172a',
+                darkSchemeForegroundColor: '#f1f5f9',
+                darkSchemeTextColor: '#e2e8f0'
+            });
+            localStorage.setItem('theme', 'dark');
+            animateThemeButton();
+        }
+
+        function animateThemeButton() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.style.transform = 'rotate(360deg) scale(1.2)';
+                setTimeout(() => {
+                    toggle.style.transform = 'rotate(0deg) scale(1)';
+                }, 300);
+            }
+        }
+
+        // Initialize immediately
+        initTheme();
+
+        // Make available globally
+        window.toggleTheme = toggleTheme;
+
+        // Debug: Check if button exists
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('themeToggle');
+            console.log('Theme toggle button found:', btn !== null);
+        });
+    </script>
+
+    <script>
+        // Mobile navbar toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbarToggle = document.getElementById('navbarToggle');
+            const navbarNav = document.getElementById('navbarNav');
+            const dropdowns = document.querySelectorAll('.navbar .dropdown');
+
+            if (navbarToggle && navbarNav) {
+                navbarToggle.addEventListener('click', function() {
+                    navbarNav.classList.toggle('active');
+                    const icon = this.querySelector('i');
+                    if (navbarNav.classList.contains('active')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+
+                // Handle dropdown clicks on mobile
+                dropdowns.forEach(dropdown => {
+                    const toggle = dropdown.querySelector('.dropdown-toggle');
+                    if (toggle) {
+                        toggle.addEventListener('click', function(e) {
+                            if (window.innerWidth <= 768) {
+                                e.preventDefault();
+                                dropdown.classList.toggle('active');
+                            }
+                        });
+                    }
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!navbarNav.contains(e.target) && !navbarToggle.contains(e.target)) {
+                        navbarNav.classList.remove('active');
+                        const icon = navbarToggle.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-bars');
+                        }
+                    }
+                });
+
+                // Close menu on window resize to desktop
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768) {
+                        navbarNav.classList.remove('active');
+                        const icon = navbarToggle.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-bars');
+                        }
+                        dropdowns.forEach(dropdown => {
+                            dropdown.classList.remove('active');
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

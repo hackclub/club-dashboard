@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Users - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <div class="admin-header" style="background: linear-gradient(135deg, #ec3750 0%, #ff6b7a 100%); color: white; padding: 2rem; border-radius: 20px; margin-bottom: 2rem;">
+        <h1 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 0.5rem;">User Management</h1>
+        <p style="opacity: 0.9; margin: 0;">Manage all users in the system</p>
+    </div>
+
+    <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <form method="GET" action="{{ url_for('admin.users') }}">
+            <div style="display: flex; gap: 1rem;">
+                <input type="text" name="search" value="{{ search }}" placeholder="Search users..." style="flex: 1; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px;">
+                <button type="submit" style="background: #ec3750; color: white; padding: 0.75rem 2rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Search</button>
+            </div>
+        </form>
+    </div>
+
+    {% if users %}
+    <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #e2e8f0;">
+                    <th style="padding: 1rem; text-align: left;">ID</th>
+                    <th style="padding: 1rem; text-align: left;">Username</th>
+                    <th style="padding: 1rem; text-align: left;">Email</th>
+                    <th style="padding: 1rem; text-align: left;">Created</th>
+                    <th style="padding: 1rem; text-align: left;">Status</th>
+                    <th style="padding: 1rem; text-align: left;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 1rem;">{{ user.id }}</td>
+                    <td style="padding: 1rem; font-weight: 600;">{{ user.username }}</td>
+                    <td style="padding: 1rem;">{{ user.email }}</td>
+                    <td style="padding: 1rem;">{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}</td>
+                    <td style="padding: 1rem;">
+                        {% if user.is_suspended %}
+                        <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem; font-weight: 600;">Suspended</span>
+                        {% elif user.is_admin %}
+                        <span style="background: #fef3c7; color: #d97706; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem; font-weight: 600;">Admin</span>
+                        {% else %}
+                        <span style="background: #d1fae5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem; font-weight: 600;">Active</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">
+                        <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" style="background: #3b82f6; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-size: 0.875rem;">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 0.5rem;">
+            {% if pagination.has_prev %}
+            <a href="{{ url_for('admin.users', page=pagination.prev_num, search=search) }}" style="background: #ec3750; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none;">Previous</a>
+            {% endif %}
+            <span style="padding: 0.5rem 1rem; color: #64748b;">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+            {% if pagination.has_next %}
+            <a href="{{ url_for('admin.users', page=pagination.next_num, search=search) }}" style="background: #ec3750; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none;">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div style="background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <i class="fas fa-users" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+        <h3 style="color: #64748b;">No users found</h3>
+        <p style="color: #94a3b8;">{% if search %}Try a different search term{% else %}No users in the system yet{% endif %}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,1720 @@
+{% extends "base.html" %}
+
+{% block title %}API Documentation - Hack Club Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* API Documentation Styles - Clean & Modern Design */
+
+    .api-docs {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        color: var(--text);
+    }
+
+    /* Header Section */
+    .api-header {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: white;
+        border-radius: 16px;
+        margin-bottom: 3rem;
+        box-shadow: var(--shadow);
+    }
+
+    .api-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0 0 1rem 0;
+    }
+
+    .api-header p {
+        font-size: 1.125rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    /* Navigation */
+    .api-nav {
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+    }
+
+    .api-nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .api-nav a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        display: block;
+    }
+
+    .api-nav a:hover {
+        background: var(--background);
+        color: var(--primary);
+    }
+
+    /* Sections */
+    .api-section {
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+    }
+
+    .api-section h2 {
+        color: var(--text);
+        margin: 0 0 1.5rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 3px solid var(--primary);
+        font-size: 1.75rem;
+        font-weight: 600;
+    }
+
+    .api-section h3 {
+        color: var(--text);
+        margin: 2rem 0 1rem 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    /* Endpoints */
+    .endpoint {
+        background: var(--background);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--primary);
+        border: 1px solid var(--border);
+    }
+
+    .endpoint-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .method {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        color: white;
+        font-family: monospace;
+    }
+
+    .method.get { background: var(--success); }
+    .method.post { background: var(--secondary); }
+    .method.put { background: var(--warning); }
+    .method.delete { background: var(--error); }
+
+    .endpoint-url {
+        font-family: monospace;
+        background: var(--text);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        flex: 1;
+        min-width: 200px;
+        font-weight: 500;
+    }
+
+    .auth-badge {
+        background: #fef3c7;
+        color: #92400e;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .auth-badge.oauth {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    /* Code Blocks */
+    .code-block {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 1.5rem;
+        border-radius: 8px;
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+        font-size: 0.875rem;
+        overflow-x: auto;
+        margin: 1rem 0;
+        border: 1px solid #334155;
+    }
+
+    /* Tables */
+    .params-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .params-table th,
+    .params-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .params-table th {
+        background: var(--primary);
+        color: white;
+        font-weight: 600;
+    }
+
+    .params-table tr:nth-child(even) {
+        background: var(--background);
+    }
+
+    .param-type {
+        background: var(--border);
+        color: var(--text);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-family: monospace;
+        font-weight: 500;
+    }
+
+    .required {
+        color: var(--error);
+        font-weight: 600;
+    }
+
+    /* Quick Start Box */
+    .quick-start {
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        border: 1px solid var(--info);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .quick-start h3 {
+        color: #0c4a6e;
+        margin-top: 0;
+    }
+
+    /* Auth Overview */
+    .auth-overview {
+        background: linear-gradient(135deg, var(--background), #f8fafc);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+
+    .auth-comparison {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .auth-method {
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+    }
+
+    .auth-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border);
+    }
+
+    .auth-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        margin-right: 1rem;
+        background: var(--primary);
+    }
+
+    .auth-title h4 {
+        margin: 0 0 0.25rem 0;
+        color: var(--text);
+        font-size: 1.125rem;
+    }
+
+    .auth-title span {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text);
+    }
+
+    .feature-item i {
+        margin-right: 0.75rem;
+        width: 16px;
+        color: var(--primary);
+    }
+
+    /* Decision Guide */
+    .decision-guide {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: 1px solid var(--warning);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .decision-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .decision-item {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .decision-item h5 {
+        margin: 0 0 0.75rem 0;
+        color: var(--secondary);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Alert Boxes */
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+        border-left: 4px solid;
+    }
+
+    .alert-warning {
+        background: #fef3c7;
+        border-color: var(--warning);
+        color: #92400e;
+    }
+
+    .alert-info {
+        background: #f0f9ff;
+        border-color: var(--info);
+        color: #0c4a6e;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .api-docs {
+            padding: 1rem;
+        }
+
+        .api-header {
+            padding: 2rem 1rem;
+        }
+
+        .api-header h1 {
+            font-size: 2rem;
+        }
+
+        .auth-comparison,
+        .decision-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .endpoint-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .endpoint-url {
+            flex: none;
+            width: 100%;
+        }
+
+        .api-nav ul {
+            flex-direction: column;
+        }
+
+        .params-table {
+            font-size: 0.875rem;
+        }
+
+        .params-table th,
+        .params-table td {
+            padding: 0.5rem;
+        }
+    }
+
+    /* Smooth Scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Focus States for Accessibility */
+    .api-nav a:focus,
+    .endpoint:focus-within {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="api-docs">
+    <div class="api-header">
+        <h1><i class="fas fa-code"></i> API Documentation</h1>
+        <p>Build amazing applications with the Hack Club Dashboard API</p>
+    </div>
+
+    <div class="quick-start">
+        <h3><i class="fas fa-rocket"></i> Quick Start</h3>
+        <p>Get started with the Hack Club Dashboard API in minutes:</p>
+        <ol>
+            <li>Get an API key from your admin</li>
+            <li>Include your API key in the Authorization header</li>
+            <li>Start making requests to our endpoints</li>
+        </ol>
+    </div>
+
+    <div class="api-nav">
+        <ul>
+            <li><a href="#authentication">Authentication</a></li>
+            <li><a href="#clubs">Clubs</a></li>
+            <li><a href="#users">Users</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#admin-tokens">Admin Token Management</a></li>
+            <li><a href="#analytics">Analytics</a></li>
+            <li><a href="#oauth">OAuth</a></li>
+            <li><a href="#rate-limits">Rate Limits</a></li>
+        </ul>
+    </div>
+
+    <div class="api-section" id="authentication">
+        <h2>Authentication</h2>
+        <p>The Hack Club Dashboard API supports two authentication systems, each designed for different use cases. Understanding which to use is crucial for building successful integrations.</p>
+
+        <div class="auth-overview">
+            <div class="auth-overview-header">
+                <h3><i class="fas fa-shield-alt"></i> Authentication Overview</h3>
+                <p>Choose the right authentication method for your use case</p>
+            </div>
+
+            <div class="auth-comparison">
+                <div class="auth-method">
+                    <div class="auth-header admin-header">
+                        <div class="auth-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="auth-title">
+                            <h4>Admin API Keys</h4>
+                            <span>For platform administration</span>
+                        </div>
+                    </div>
+                    <div class="auth-features">
+                        <div class="feature-item">
+                            <i class="fas fa-globe"></i>
+                            <span>Platform-wide access</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-database"></i>
+                            <span>Access to all clubs, users, analytics</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-search"></i>
+                            <span>Search/lookup functionality</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-infinity"></i>
+                            <span>No expiration (until revoked)</span>
+                        </div>
+                    </div>
+                    <div class="auth-endpoints">
+                        <strong>Endpoints:</strong> /api/v1/clubs, /api/v1/users, /api/v1/analytics
+                    </div>
+                    <div class="auth-usecase">
+                        <strong>Use case:</strong> Admin tools, monitoring, search
+                    </div>
+                </div>
+
+                <div class="auth-method">
+                    <div class="auth-header oauth-header">
+                        <div class="auth-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="auth-title">
+                            <h4>OAuth Access Tokens</h4>
+                            <span>For user-facing applications</span>
+                        </div>
+                    </div>
+                    <div class="auth-features">
+                        <div class="feature-item">
+                            <i class="fas fa-user"></i>
+                            <span>User-specific data access</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-lock"></i>
+                            <span>Limited to user's own data</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-handshake"></i>
+                            <span>Requires user consent</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Expires after 1 hour (refreshable)</span>
+                        </div>
+                    </div>
+                    <div class="auth-endpoints">
+                        <strong>Endpoints:</strong> /oauth/user, /oauth/user/clubs, /oauth/user/projects
+                    </div>
+                    <div class="auth-usecase">
+                        <strong>Use case:</strong> Personal apps, user dashboards
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="decision-guide">
+            <h4><i class="fas fa-compass"></i> Quick Decision Guide</h4>
+            <div class="decision-grid">
+                <div class="decision-item">
+                    <h5><i class="fas fa-tools"></i> Use Admin API when:</h5>
+                    <ul>
+                        <li>Need to search users/clubs</li>
+                        <li>Building admin dashboards</li>
+                        <li>Need platform-wide data</li>
+                    </ul>
+                </div>
+                <div class="decision-item">
+                    <h5><i class="fas fa-user-friends"></i> Use OAuth when:</h5>
+                    <ul>
+                        <li>Building user-facing apps</li>
+                        <li>Users access their own data</li>
+                        <li>Need user consent/login</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h3>1. Admin API Keys (Platform-wide Access)</h3>
+        <p>For accessing platform-wide data like all clubs, analytics, and administrative functions. These keys are created by administrators and have broad access to the platform.</p>
+
+        <div class="code-block">
+# Search for clubs (admin key required)
+curl -H "Authorization: Bearer YOUR_ADMIN_API_KEY" \
+  "{{ request.host_url }}api/v1/clubs"
+
+# Get analytics (admin key required)
+curl -H "Authorization: Bearer YOUR_ADMIN_API_KEY" \
+  "{{ request.host_url }}api/v1/analytics/overview"
+
+# Search users by name (admin key required)
+curl -H "Authorization: Bearer YOUR_ADMIN_API_KEY" \
+  "{{ request.host_url }}api/v1/users/search?q=john"
+        </div>
+
+        <h3>2. OAuth Access Tokens (User-scoped Access)</h3>
+        <p>For accessing user-specific data on behalf of an authenticated user. These tokens are obtained through the OAuth flow and are limited to the user's own data and the scopes they've granted.</p>
+
+        <p><strong>What OAuth tokens can access:</strong></p>
+        <ul>
+            <li><strong>User Profile:</strong> Basic user information (name, email, username)</li>
+            <li><strong>User's Clubs:</strong> Only clubs where the user is a member or leader</li>
+            <li><strong>User's Projects:</strong> Projects created by the user across their clubs</li>
+            <li><strong>User's Assignments:</strong> Assignments from clubs the user belongs to</li>
+            <li><strong>User's Meetings:</strong> Meetings from clubs the user belongs to</li>
+        </ul>
+
+        <p><strong>What OAuth tokens CANNOT access:</strong></p>
+        <ul>
+            <li>Other users' data or profiles</li>
+            <li>Clubs the user doesn't belong to</li>
+            <li>Platform-wide analytics or statistics</li>
+            <li>Search functionality across all users/clubs</li>
+        </ul>
+
+        <div class="code-block">
+# Get authenticated user's info (OAuth token)
+curl -H "Authorization: Bearer OAUTH_ACCESS_TOKEN" \
+  "{{ request.host_url }}oauth/user"
+
+# Get user's clubs (OAuth token with clubs:read scope)
+curl -H "Authorization: Bearer OAUTH_ACCESS_TOKEN" \
+  "{{ request.host_url }}oauth/user/clubs"
+
+# Get user's projects (OAuth token with projects:read scope)
+curl -H "Authorization: Bearer OAUTH_ACCESS_TOKEN" \
+  "{{ request.host_url }}oauth/user/projects"
+
+# Get user's assignments (OAuth token with assignments:read scope)
+curl -H "Authorization: Bearer OAUTH_ACCESS_TOKEN" \
+  "{{ request.host_url }}oauth/user/assignments"
+
+# Get user's meetings (OAuth token with meetings:read scope)
+curl -H "Authorization: Bearer OAUTH_ACCESS_TOKEN" \
+  "{{ request.host_url }}oauth/user/meetings"
+        </div>
+
+        <h3>API Key Scopes</h3>
+        <table class="params-table">
+            <tr>
+                <th>Scope</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>clubs:read</code></td>
+                <td>Read club information, members, and basic data</td>
+            </tr>
+            <tr>
+                <td><code>clubs:write</code></td>
+                <td>Create and modify club data</td>
+            </tr>
+            <tr>
+                <td><code>users:read</code></td>
+                <td>Read user profiles and information</td>
+            </tr>
+            <tr>
+                <td><code>projects:read</code></td>
+                <td>Read project data and submissions</td>
+            </tr>
+            <tr>
+                <td><code>assignments:read</code></td>
+                <td>Read assignments and tasks</td>
+            </tr>
+            <tr>
+                <td><code>meetings:read</code></td>
+                <td>Read meeting schedules and information</td>
+            </tr>
+            <tr>
+                <td><code>analytics:read</code></td>
+                <td>Access platform analytics and statistics</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="api-section" id="clubs">
+        <h2>Clubs</h2>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/api/v1/clubs</span>
+                <span class="auth-badge">Admin API Key Required</span>
+            </div>
+            <p>Get a list of all clubs with pagination support. <strong>Requires admin API key</strong> - this endpoint provides platform-wide club data.</p>
+
+            <h4>Query Parameters</h4>
+            <table class="params-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Required</th>
+                </tr>
+                <tr>
+                    <td>page</td>
+                    <td><span class="param-type">integer</span></td>
+                    <td>Page number (default: 1)</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>per_page</td>
+                    <td><span class="param-type">integer</span></td>
+                    <td>Items per page (default: 20, no upper limit)</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>search</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Search term for club name or location</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>all</td>
+                    <td><span class="param-type">boolean</span></td>
+                    <td>Set to "true" to return all clubs without pagination</td>
+                    <td>No</td>
+                </tr>
+            </table>
+
+            <div class="code-block">
+// Standard paginated response
+{
+  "clubs": [
+    {
+      "id": 1,
+      "name": "Tech High Hack Club",
+      "description": "A club for passionate young programmers",
+      "location": "San Francisco, CA",
+      "leader": {
+        "id": 5,
+        "username": "alex_codes",
+        "email": "alex@example.com"
+      },
+      "member_count": 25,
+      "balance": 150.00,
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 20,
+    "total": 50,
+    "pages": 3,
+    "has_next": true,
+    "has_prev": false
+  }
+}
+
+// Response when using ?all=true
+{
+  "clubs": [
+    // ... all clubs in the database
+  ],
+  "total": 150
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/api/v1/clubs/search</span>
+                <span class="auth-badge">Admin API Key Required</span>
+            </div>
+            <p>Search for clubs by name, location, or description. Useful for finding club IDs when you only know the club name.</p>
+
+            <h4>Query Parameters</h4>
+            <table class="params-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Required</th>
+                </tr>
+                <tr>
+                    <td>q</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Search query (searches name, location, description)</td>
+                    <td><span class="required">Yes</span></td>
+                </tr>
+                <tr>
+                    <td>limit</td>
+                    <td><span class="param-type">integer</span></td>
+                    <td>Maximum results to return (default: 20, max: 100)</td>
+                    <td>No</td>
+                </tr>
+            </table>
+
+            <div class="code-block">
+GET /api/v1/clubs/search?q=tech&limit=10
+
+{
+  "clubs": [
+    {
+      "id": 1,
+      "name": "Tech High Hack Club",
+      "location": "San Francisco, CA",
+      "description": "A club for passionate young programmers",
+      "leader": {
+        "id": 5,
+        "username": "alex_codes",
+        "email": "alex@example.com"
+      },
+      "member_count": 25,
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "total_results": 1,
+  "search_query": "tech",
+  "limit": 10
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/api/v1/clubs/{id}</span>
+                <span class="auth-badge">API Key Required</span>
+            </div>
+            <p>Get detailed information about a specific club. If the club isn't in our database, we'll check Airtable as a fallback.</p>
+
+            <div class="code-block">
+{
+  "club": {
+    "id": 1,
+    "name": "Tech High Hack Club",
+    "description": "A club for passionate young programmers",
+    "location": "San Francisco, CA",
+    "leader": {
+      "id": 5,
+      "username": "alex_codes",
+      "email": "alex@example.com"
+    },
+    "member_count": 25,
+    "balance": 150.00,
+    "join_code": "ABCD1234",
+    "created_at": "2024-01-15T10:30:00Z",
+    "source": "database"
+  }
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/api/v1/clubs/{id}/members</span>
+                <span class="auth-badge">API Key Required</span>
+            </div>
+            <p>Get all members of a specific club.</p>
+
+            <div class="code-block">
+{
+  "members": [
+    {
+      "id": 5,
+      "username": "alex_codes",
+      "email": "alex@example.com",
+      "role": "leader",
+      "joined_at": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": 12,
+      "username": "sarah_dev",
+      "email": "sarah@example.com",
+      "role": "member",
+      "joined_at": "2024-01-20T14:15:00Z"
+    }
+  ]
+}
+            </div>
+        </div>
+    </div>
+
+    <div class="api-section" id="projects">
+        <h2>Projects</h2>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/api/v1/clubs/{id}/projects</span>
+                <span class="auth-badge">API Key Required</span>
+            </div>
+            <p>Get all projects from a specific club.</p>
+
+            <div class="code-block">
+{
+  "projects": [
+    {
+      "id": 15,
+      "name": "Weather App",
+      "description": "A simple weather forecasting application",
+      "url": "https://weather-app.example.com",
+      "github_url": "https://github.com/user/weather-app",
+      "featured": true,
+      "author": {
+        "id": 12,
+        "username": "sarah_dev"
+      },
+      "created_at": "2024-02-01T09:00:00Z",
+      "updated_at": "2024-02-15T16:30:00Z"
+    }
+  ]
+}
+            </div>
+        </div>
+    </div>
+
+    <div class="api-section" id="users">
+        <h2>Users</h2>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/api/v1/users/search</span>
+                <span class="auth-badge">Admin API Key Required</span>
+            </div>
+            <p>Search for users by username, email, first name, or last name. Useful for finding user IDs when you only know their name or email.</p>
+
+            <h4>Query Parameters</h4>
+            <table class="params-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Required</th>
+                </tr>
+                <tr>
+                    <td>q</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Search query (searches username, email, first/last name)</td>
+                    <td><span class="required">Yes</span></td>
+                </tr>
+                <tr>
+                    <td>limit</td>
+                    <td><span class="param-type">integer</span></td>
+                    <td>Maximum results to return (default: 20, max: 100)</td>
+                    <td>No</td>
+                </tr>
+            </table>
+
+            <div class="code-block">
+GET /api/v1/users/search?q=alex&limit=10
+
+{
+  "users": [
+    {
+      "id": 5,
+      "username": "alex_codes",
+      "email": "alex@example.com",
+      "full_name": "Alex Johnson",
+      "is_admin": false,
+      "clubs_led": 1,
+      "clubs_joined": 2,
+      "created_at": "2024-01-10T08:00:00Z",
+      "last_login": "2024-02-15T14:30:00Z"
+    }
+  ],
+  "total_results": 1,
+  "search_query": "alex",
+  "limit": 10
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/api/v1/users/{id}</span>
+                <span class="auth-badge">Admin API Key Required</span>
+            </div>
+            <p>Get detailed information about a specific user by ID.</p>
+
+            <div class="code-block">
+{
+  "user": {
+    "id": 5,
+    "username": "alex_codes",
+    "email": "alex@example.com",
+    "first_name": "Alex",
+    "last_name": "Johnson",
+    "created_at": "2024-01-10T08:00:00Z",
+    "clubs_led": 1,
+    "clubs_joined": 2
+  }
+}
+            </div>
+        </div>
+    </div>
+
+    <div class="api-section" id="admin-tokens">
+        <h2>Admin Token Management</h2>
+        <p>These endpoints allow administrators to grant or remove tokens from clubs using API keys. All operations are logged in both club transactions and admin audit logs.</p>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-url">/api/v1/admin/clubs/{id}/tokens/grant</span>
+                <span class="auth-badge">Admin API Key Required (clubs:write)</span>
+            </div>
+            <p>Grant tokens to a specific club. Creates a transaction record and logs the action in admin audit logs.</p>
+
+            <h4>Path Parameters</h4>
+            <table class="params-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Required</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td><span class="param-type">integer</span></td>
+                    <td>Club ID to grant tokens to</td>
+                    <td><span class="required">Yes</span></td>
+                </tr>
+            </table>
+
+            <h4>Request Body</h4>
+            <table class="params-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Required</th>
+                </tr>
+                <tr>
+                    <td>amount</td>
+                    <td><span class="param-type">integer</span></td>
+                    <td>Number of tokens to grant (max: 100,000)</td>
+                    <td><span class="required">Yes</span></td>
+                </tr>
+                <tr>
+                    <td>description</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Description for the token grant</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>admin_note</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Internal admin note for audit purposes</td>
+                    <td>No</td>
+                </tr>
+            </table>
+
+            <div class="code-block">
+POST /api/v1/admin/clubs/123/tokens/grant
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_API_KEY
+
+{
+  "amount": 5000,
+  "description": "Bonus tokens for excellent project submission",
+  "admin_note": "Approved by leadership team"
+}
+            </div>
+
+            <h4>Response</h4>
+            <div class="code-block">
+{
+  "success": true,
+  "message": "Granted 5000 tokens to Tech High Hack Club",
+  "club_id": 123,
+  "club_name": "Tech High Hack Club",
+  "amount_granted": 5000,
+  "new_balance": 15000,
+  "transaction_id": 456
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-url">/api/v1/admin/clubs/{id}/tokens/remove</span>
+                <span class="auth-badge">Admin API Key Required (clubs:write)</span>
+            </div>
+            <p>Remove tokens from a specific club. Creates a transaction record and logs the action in admin audit logs.</p>
+
+            <h4>Path Parameters</h4>
+            <table class="params-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Required</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td><span class="param-type">integer</span></td>
+                    <td>Club ID to remove tokens from</td>
+                    <td><span class="required">Yes</span></td>
+                </tr>
+            </table>
+
+            <h4>Request Body</h4>
+            <table class="params-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Required</th>
+                </tr>
+                <tr>
+                    <td>amount</td>
+                    <td><span class="param-type">integer</span></td>
+                    <td>Number of tokens to remove</td>
+                    <td><span class="required">Yes</span></td>
+                </tr>
+                <tr>
+                    <td>description</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Description for the token removal</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>admin_note</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Internal admin note for audit purposes</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>force</td>
+                    <td><span class="param-type">boolean</span></td>
+                    <td>Allow removal even if it results in negative balance (default: false)</td>
+                    <td>No</td>
+                </tr>
+            </table>
+
+            <div class="code-block">
+POST /api/v1/admin/clubs/123/tokens/remove
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_API_KEY
+
+{
+  "amount": 2000,
+  "description": "Penalty for policy violation",
+  "admin_note": "Approved by compliance team",
+  "force": false
+}
+            </div>
+
+            <h4>Response (Success)</h4>
+            <div class="code-block">
+{
+  "success": true,
+  "message": "Removed 2000 tokens from Tech High Hack Club",
+  "club_id": 123,
+  "club_name": "Tech High Hack Club",
+  "amount_removed": 2000,
+  "new_balance": 13000,
+  "transaction_id": 457
+}
+            </div>
+
+            <h4>Response (Insufficient Balance)</h4>
+            <div class="code-block">
+{
+  "error": "Insufficient balance",
+  "current_balance": 1500,
+  "requested_amount": 2000,
+  "message": "Use force=true to allow negative balance"
+}
+            </div>
+        </div>
+
+        <div class="alert alert-warning">
+            <h4><i class="fas fa-exclamation-triangle"></i> Important Notes</h4>
+            <ul>
+                <li><strong>Authentication:</strong> Both endpoints require an admin API key with <code>clubs:write</code> scope</li>
+                <li><strong>Logging:</strong> All token operations are logged in club transaction history and admin audit logs</li>
+                <li><strong>Limits:</strong> Token grants are limited to 100,000 tokens (1000 USD) per operation</li>
+                <li><strong>Negative Balance:</strong> Token removal prevents negative balance by default, use <code>force: true</code> to override</li>
+                <li><strong>Rate Limits:</strong> These endpoints have a stricter rate limit of 50 requests per hour</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="api-section" id="analytics">
+        <h2>Analytics</h2>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/api/v1/analytics/overview</span>
+                <span class="auth-badge">Admin API Key Required</span>
+            </div>
+            <p>Get platform-wide analytics and statistics. <strong>Requires admin API key</strong> - provides sensitive platform metrics.</p>
+
+            <div class="code-block">
+{
+  "analytics": {
+    "totals": {
+      "users": 1250,
+      "clubs": 85,
+      "posts": 3500,
+      "assignments": 420,
+      "meetings": 180,
+      "projects": 980
+    },
+    "recent": {
+      "new_users_30d": 45,
+      "new_clubs_30d": 8,
+      "active_users_30d": 380
+    }
+  }
+}
+            </div>
+        </div>
+    </div>
+
+    <div class="api-section" id="oauth">
+        <h2>OAuth 2.0</h2>
+        <p>Use OAuth to allow users to authenticate with their Hack Club Dashboard accounts in your application.</p>
+
+        <h3>Authorization Code Flow</h3>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/oauth/authorize</span>
+                <span class="auth-badge oauth">OAuth</span>
+            </div>
+            <p>Start the OAuth authorization flow.</p>
+
+            <h4>Query Parameters</h4>
+            <table class="params-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Required</th>
+                </tr>
+                <tr>
+                    <td>client_id</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Your application's client ID</td>
+                    <td><span class="required">Yes</span></td>
+                </tr>
+                <tr>
+                    <td>redirect_uri</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Where to redirect after authorization</td>
+                    <td><span class="required">Yes</span></td>
+                </tr>
+                <tr>
+                    <td>response_type</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Must be "code"</td>
+<td><span class="required">Yes</span></td>
+                </tr>
+                <tr>
+                    <td>scope</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Space-separated list of scopes</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>state</td>
+                    <td><span class="param-type">string</span></td>
+                    <td>Random string for security</td>
+                    <td>Recommended</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-url">/oauth/token</span>
+                <span class="auth-badge oauth">OAuth</span>
+            </div>
+            <p>Exchange authorization code for access token.</p>
+
+            <div class="code-block">
+curl -X POST {{ request.host_url }}oauth/token \
+  -d "grant_type=authorization_code" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "client_secret=YOUR_CLIENT_SECRET" \
+  -d "code=AUTHORIZATION_CODE" \
+  -d "redirect_uri=YOUR_REDIRECT_URI"
+            </div>
+
+            <h4>Response</h4>
+            <div class="code-block">
+{
+  "access_token": "abc123...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "refresh_token": "def456...",
+  "scope": "clubs:read users:read"
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/oauth/user</span>
+                <span class="auth-badge oauth">OAuth Token Required</span>
+            </div>
+            <p>Get the authenticated user's information. This endpoint uses OAuth access tokens and returns data for the authenticated user only.</p>
+
+            <div class="code-block">
+{
+  "user": {
+    "id": 5,
+    "username": "alex_codes",
+    "email": "alex@example.com",
+    "first_name": "Alex",
+    "last_name": "Johnson"
+  }
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/oauth/user/clubs</span>
+                <span class="auth-badge oauth">OAuth Token Required (clubs:read scope)</span>
+            </div>
+            <p>Get all clubs that the authenticated user is a member of or leads. Returns both clubs they lead and clubs they've joined.</p>
+
+            <div class="code-block">
+{
+  "clubs": [
+    {
+      "id": 1,
+      "name": "Tech High Hack Club",
+      "description": "A club for passionate young programmers",
+      "location": "San Francisco, CA",
+      "member_count": 25,
+      "balance": 150.00,
+      "role": "leader",
+      "joined_at": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": 8,
+      "name": "Downtown Coders",
+      "description": "Community coding group",
+      "location": "Oakland, CA",
+      "member_count": 18,
+      "role": "member",
+      "joined_at": "2024-02-20T15:45:00Z"
+    }
+  ],
+  "total_clubs": 2,
+  "clubs_led": 1,
+  "clubs_joined": 1
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/oauth/user/projects</span>
+                <span class="auth-badge oauth">OAuth Token Required (projects:read scope)</span>
+            </div>
+            <p>Get all projects created by the authenticated user across all their clubs.</p>
+
+            <div class="code-block">
+{
+  "projects": [
+    {
+      "id": 15,
+      "name": "Weather App",
+      "description": "A simple weather forecasting application",
+      "url": "https://weather-app.example.com",
+      "github_url": "https://github.com/user/weather-app",
+      "featured": true,
+      "club": {
+        "id": 1,
+        "name": "Tech High Hack Club"
+      },
+      "created_at": "2024-02-01T09:00:00Z",
+      "updated_at": "2024-02-15T16:30:00Z"
+    }
+  ],
+  "total_projects": 1
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/oauth/user/assignments</span>
+                <span class="auth-badge oauth">OAuth Token Required (assignments:read scope)</span>
+            </div>
+            <p>Get all assignments from clubs where the authenticated user is a member or leader.</p>
+
+            <div class="code-block">
+{
+  "assignments": [
+    {
+      "id": 23,
+      "title": "Build a Personal Website",
+      "description": "Create a portfolio website using HTML, CSS, and JavaScript",
+      "due_date": "2024-03-15T23:59:59Z",
+      "status": "active",
+      "club": {
+        "id": 1,
+        "name": "Tech High Hack Club"
+      },
+      "created_at": "2024-02-20T14:30:00Z"
+    }
+  ],
+  "total_assignments": 1
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">/oauth/user/meetings</span>
+                <span class="auth-badge oauth">OAuth Token Required (meetings:read scope)</span>
+            </div>
+            <p>Get all meetings from clubs where the authenticated user is a member or leader.</p>
+
+            <div class="code-block">
+{
+  "meetings": [
+    {
+      "id": 42,
+      "title": "Weekly Hack Session",
+      "description": "Work on personal projects and help each other debug code",
+      "scheduled_time": "2024-03-08T16:00:00Z",
+      "location": "Room 204, Tech High School",
+      "meeting_type": "in-person",
+      "club": {
+        "id": 1,
+        "name": "Tech High Hack Club"
+      },
+      "created_at": "2024-02-25T10:15:00Z"
+    }
+  ],
+  "total_meetings": 1
+}
+            </div>
+        </div>
+
+        <h3>OAuth vs Admin API Comparison</h3>
+        <table class="params-table">
+            <tr>
+                <th>Feature</th>
+                <th>OAuth Access Token</th>
+                <th>Admin API Key</th>
+            </tr>
+            <tr>
+                <td>Data Access</td>
+                <td>User-specific data only</td>
+                <td>Platform-wide data</td>
+            </tr>
+            <tr>
+                <td>Lifespan</td>
+                <td>1 hour (refreshable)</td>
+                <td>Permanent (until revoked)</td>
+            </tr>
+            <tr>
+                <td>Creation</td>
+                <td>User grants via OAuth flow</td>
+                <td>Admin creates via dashboard</td>
+            </tr>
+            <tr>
+                <td>Use Cases</td>
+                <td>User apps, personal dashboards</td>
+                <td>Admin tools, analytics platforms</td>
+            </tr>
+            <tr>
+                <td>Available Endpoints</td>
+                <td>/oauth/user, /oauth/user/clubs, /oauth/user/projects, /oauth/user/assignments, /oauth/user/meetings</td>
+                <td>/api/v1/clubs, /api/v1/users, /api/v1/analytics, /api/v1/admin/clubs/*/tokens/grant, /api/v1/admin/clubs/*/tokens/remove</td>
+            </tr>
+            <tr>
+                <td>Identity Verification</td>
+                <td>Can trigger Hack Club Identity verification during OAuth flow</td>
+                <td>Can check any user's identity verification status</td>
+            </tr>
+        </table>
+
+        <h3>OAuth with Identity Verification Flow</h3>
+        <div class="code-block">
+# 1. Start OAuth flow with identity verification option
+GET /oauth/authorize?client_id=...&redirect_uri=...&response_type=code
+
+# 2. User consents and optionally selects "Verify Identity"
+POST /oauth/authorize
+{
+  "action": "approve",
+  "verify_identity": "on"
+}
+
+# 3. System redirects to Hack Club Identity
+# User completes identity verification
+
+# 4. After verification, user is redirected back with authorization code
+# 5. Exchange code for access token
+POST /oauth/token
+{
+  "grant_type": "authorization_code",
+  "client_id": "...",
+  "client_secret": "...",
+  "code": "...",
+  "redirect_uri": "..."
+}
+
+# 6. Use access token to access user data (now with verified identity)
+GET /oauth/user
+Authorization: Bearer ACCESS_TOKEN
+
+# Response includes identity verification status
+{
+  "user": {
+    "id": 123,
+    "username": "verified_user",
+    "email": "user@example.com",
+    "identity_verified": true
+  }
+}
+        </div>
+    </div>
+
+    <div class="api-section" id="rate-limits">
+        <h2>Rate Limits</h2>
+        <p>API endpoints have the following rate limits:</p>
+
+        <table class="params-table">
+            <tr>
+                <th>Endpoint Type</th>
+                <th>Rate Limit</th>
+            </tr>
+            <tr>
+                <td>General API</td>
+                <td>200 requests per hour</td>
+            </tr>
+            <tr>
+                <td>Club listings</td>
+                <td>100 requests per hour</td>
+            </tr>
+            <tr>
+                <td>Analytics</td>
+                <td>100 requests per hour</td>
+            </tr>
+            <tr>
+                <td>Admin Token Management</td>
+                <td>50 requests per hour</td>
+            </tr>
+            <tr>
+                <td>OAuth endpoints</td>
+                <td>60 requests per minute</td>
+            </tr>
+        </table>
+
+        <p>Rate limit headers are included in all responses:</p>
+        <div class="code-block">
+X-RateLimit-Limit: 200
+X-RateLimit-Remaining: 150
+X-RateLimit-Reset: 1609459200
+        </div>
+    </div>
+
+    <div class="api-section">
+        <h2>Error Responses</h2>
+        <p>The API provides detailed error information to help you diagnose and fix issues quickly. All errors include:</p>
+        <ul>
+            <li><strong>error</strong>: Human-readable error description</li>
+            <li><strong>error_code</strong>: Machine-readable error identifier</li>
+            <li><strong>message</strong>: Detailed explanation of what went wrong</li>
+            <li><strong>how_to_fix</strong>: Specific instructions on how to resolve the issue</li>
+        </ul>
+
+        <h3>Example Error Response</h3>
+        <div class="code-block">
+{
+  "error": "Invalid API key format",
+  "error_code": "INVALID_KEY_FORMAT",
+  "message": "API key appears to be malformed or too short",
+  "how_to_fix": "Ensure you are using the complete API key provided by your administrator"
+}
+        </div>
+
+        <h3>Authentication Error Codes</h3>
+        <table class="params-table">
+            <tr>
+                <th>Error Code</th>
+                <th>Status</th>
+                <th>Description</th>
+                <th>Common Causes</th>
+            </tr>
+            <tr>
+                <td>MISSING_AUTH_HEADER</td>
+                <td>401</td>
+                <td>Authorization header is missing</td>
+                <td>Forgot to include Authorization header</td>
+            </tr>
+            <tr>
+                <td>INVALID_AUTH_FORMAT</td>
+                <td>401</td>
+                <td>Authorization header format is incorrect</td>
+                <td>Not using "Bearer TOKEN" format</td>
+            </tr>
+            <tr>
+                <td>INVALID_KEY_FORMAT</td>
+                <td>401</td>
+                <td>API key appears malformed</td>
+                <td>Truncated or corrupted API key</td>
+            </tr>
+            <tr>
+                <td>INVALID_API_KEY</td>
+                <td>401</td>
+                <td>API key doesn't exist</td>
+                <td>Wrong key or key was deleted</td>
+            </tr>
+            <tr>
+                <td>KEY_DISABLED</td>
+                <td>401</td>
+                <td>API key has been disabled</td>
+                <td>Administrator disabled the key</td>
+            </tr>
+            <tr>
+                <td>INSUFFICIENT_SCOPES</td>
+                <td>403</td>
+                <td>API key lacks required permissions</td>
+                <td>Key doesn't have needed scopes</td>
+            </tr>
+        </table>
+
+        <h3>OAuth Error Codes</h3>
+        <table class="params-table">
+            <tr>
+                <th>Error Code</th>
+                <th>Status</th>
+                <th>Description</th>
+                <th>Common Causes</th>
+            </tr>
+            <tr>
+                <td>MISSING_CLIENT_ID</td>
+                <td>400</td>
+                <td>client_id parameter missing</td>
+                <td>Forgot client_id in authorization URL</td>
+            </tr>
+            <tr>
+                <td>INVALID_CLIENT_ID</td>
+                <td>400</td>
+                <td>client_id doesn't exist</td>
+                <td>Wrong client_id or app deleted</td>
+            </tr>
+            <tr>
+                <td>CLIENT_DISABLED</td>
+                <td>400</td>
+                <td>OAuth application is disabled</td>
+                <td>Administrator disabled the app</td>
+            </tr>
+            <tr>
+                <td>INVALID_REDIRECT_URI</td>
+                <td>400</td>
+                <td>redirect_uri not registered</td>
+                <td>Using unregistered redirect URI</td>
+            </tr>
+            <tr>
+                <td>INVALID_SCOPES</td>
+                <td>400</td>
+                <td>Requesting unauthorized scopes</td>
+                <td>App not configured for requested scopes</td>
+            </tr>
+            <tr>
+                <td>TOKEN_EXPIRED</td>
+                <td>401</td>
+                <td>Access token has expired</td>
+                <td>Token older than 1 hour</td>
+            </tr>
+            <tr>
+                <td>TOKEN_REVOKED</td>
+                <td>401</td>
+                <td>Access token was revoked</td>
+                <td>User or admin revoked token</td>
+            </tr>
+            <tr>
+                <td>CODE_EXPIRED</td>
+                <td>400</td>
+                <td>Authorization code expired</td>
+                <td>Code older than 10 minutes</td>
+            </tr>
+            <tr>
+                <td>CODE_ALREADY_USED</td>
+                <td>400</td>
+                <td>Authorization code already used</td>
+                <td>Codes can only be used once</td>
+            </tr>
+        </table>
+
+        <h3>HTTP Status Codes</h3>
+        <table class="params-table">
+            <tr>
+                <th>Status Code</th>
+                <th>Description</th>
+                <th>When It Occurs</th>
+            </tr>
+            <tr>
+                <td>200</td>
+                <td>Success</td>
+                <td>Request completed successfully</td>
+            </tr>
+            <tr>
+                <td>400</td>
+                <td>Bad Request</td>
+                <td>Invalid parameters or malformed request</td>
+            </tr>
+            <tr>
+                <td>401</td>
+                <td>Unauthorized</td>
+                <td>Authentication failed or missing</td>
+            </tr>
+            <tr>
+                <td>403</td>
+                <td>Forbidden</td>
+                <td>Authenticated but insufficient permissions</td>
+            </tr>
+            <tr>
+                <td>404</td>
+                <td>Not Found</td>
+                <td>Resource doesn't exist</td>
+            </tr>
+            <tr>
+                <td>429</td>
+                <td>Too Many Requests</td>
+                <td>Rate limit exceeded</td>
+            </tr>
+            <tr>
+                <td>500</td>
+                <td>Internal Server Error</td>
+                <td>Unexpected server error</td>
+            </tr>
+        </table>
+
+        <h3>Troubleshooting Tips</h3>
+        <div class="alert alert-info">
+            <h4>Common Issues and Solutions</h4>
+            <ul>
+                <li><strong>401 errors:</strong> Check your Authorization header format and API key validity</li>
+                <li><strong>403 errors:</strong> Verify your API key has the required scopes</li>
+                <li><strong>OAuth issues:</strong> Ensure redirect URIs match exactly (including http/https)</li>
+                <li><strong>Token expiration:</strong> Implement refresh token logic for long-running applications</li>
+                <li><strong>Rate limits:</strong> Implement exponential backoff and respect rate limit headers</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

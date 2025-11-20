@@ -1,0 +1,3459 @@
+{% extends "base.html" %} {% block title %}{{ club.name }} - Shop{% endblock %}
+{% block extra_head %}
+<link
+    rel="stylesheet"
+    type="text/css"
+    href="{{ url_for('static', filename='css/dash.css') }}"
+/>
+<style>
+    .shop-container {
+        min-height: 100vh;
+        background: #f5f7fa;
+        padding: 0;
+    }
+
+    .shop-header {
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+        position: sticky;
+        top: 70px;
+        z-index: 100;
+    }
+
+    .shop-header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+    }
+
+    .shop-title-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .shop-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 15px rgba(236, 55, 80, 0.3);
+    }
+
+    .shop-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0;
+    }
+
+    .shop-subtitle {
+        color: #718096;
+        font-size: 0.9rem;
+        margin: 0.25rem 0 0 0;
+    }
+
+    .header-right {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .shop-balance {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .balance-icon {
+        width: 40px;
+        height: 40px;
+        background: #16a34a;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.1rem;
+    }
+
+    .balance-info {
+        text-align: left;
+    }
+
+    .balance-label {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin: 0;
+    }
+
+    .balance-amount {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #16a34a;
+        margin: 0;
+    }
+
+    .cart-button {
+        background: #ec3750;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(236, 55, 80, 0.3);
+    }
+
+    .cart-button:hover {
+        background: #d63146;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(236, 55, 80, 0.4);
+    }
+
+    .cart-icon {
+        font-size: 1.2rem;
+    }
+
+    .cart-count {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #16a34a;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        min-width: 20px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .orders-button {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        margin-right: 1rem;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+
+    .orders-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        text-decoration: none;
+        color: white;
+    }
+
+    .back-button {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        text-decoration: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        position: fixed;
+        top: 100px;
+        left: 2rem;
+        z-index: 200;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .back-button:hover {
+        border-color: #ec3750;
+        color: #ec3750;
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+    .shop-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .shop-controls {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .controls-row {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .search-group {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #ec3750;
+        box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .sort-select {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+        color: #4a5568;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 180px;
+    }
+
+    .sort-select:focus {
+        outline: none;
+        border-color: #ec3750;
+        box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+    }
+
+    .view-toggle {
+        display: flex;
+        background: #f3f4f6;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+
+    .view-btn {
+        padding: 0.75rem 1rem;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .view-btn.active {
+        background: #ec3750;
+        color: white;
+    }
+
+    .view-btn:hover:not(.active) {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .items-container {
+        min-height: 400px;
+    }
+
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .items-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .item-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+    .item-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: #ec3750;
+    }
+
+    .item-image {
+        width: 100%;
+        height: 180px;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.2s ease;
+    }
+
+    .item-card:hover .item-image img {
+        transform: scale(1.05);
+    }
+
+    .item-image-placeholder {
+        color: #9ca3af;
+        font-size: 2.5rem;
+    }
+
+    .item-content {
+        padding: 1.25rem;
+    }
+
+    .item-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a202c;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.3;
+    }
+
+    .item-description {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin: 0 0 0.75rem 0;
+        line-height: 1.4;
+        opacity: 0.9;
+    }
+
+    .item-badges {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .item-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .badge-starred {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #92400e;
+        box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+    }
+
+    .badge-limited {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%,
+        100% {
+            transform: scale(1);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+        }
+    }
+
+    .item-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #ec3750;
+        margin: 0 0 1rem 0;
+    }
+
+    .item-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .quantity-btn {
+        background: #f3f4f6;
+        border: none;
+        padding: 0.5rem 0.75rem;
+        cursor: pointer;
+        color: #4a5568;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .quantity-btn:hover {
+        background: #e5e7eb;
+        color: #1a202c;
+    }
+
+    .quantity-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .quantity-input {
+        width: 50px;
+        text-align: center;
+        border: none;
+        padding: 0.5rem 0.25rem;
+        font-weight: 600;
+        color: #1a202c;
+    }
+
+    .quantity-input:focus {
+        outline: none;
+    }
+
+    .btn-add-cart {
+        flex: 1;
+        background: #ec3750;
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-add-cart:hover {
+        background: #d63146;
+        transform: translateY(-1px);
+    }
+
+    .btn-add-cart.added {
+        background: #16a34a;
+    }
+
+    .btn-add-cart.insufficient-balance {
+        background: #9ca3af;
+        color: #6b7280;
+        cursor: not-allowed;
+        border: 1px solid #d1d5db;
+    }
+
+    .btn-add-cart.insufficient-balance:hover {
+        background: #9ca3af;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Locked feature styles */
+    .locked-feature {
+        opacity: 0.6 !important;
+        position: relative;
+    }
+
+    .locked-feature::after {
+        content: '🔒';
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        font-size: 1rem;
+    }
+
+    .btn-add-cart.locked-feature,
+    .btn-purchase-rank.locked-feature {
+        background: #9ca3af !important;
+        color: #6b7280 !important;
+        cursor: not-allowed !important;
+        border: 1px solid #d1d5db !important;
+    }
+
+    .btn-add-cart.locked-feature:hover,
+    .btn-purchase-rank.locked-feature:hover {
+        background: #9ca3af !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* List view styles */
+    .items-list .item-card {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+    }
+
+    .items-list .item-image {
+        width: 120px;
+        height: 80px;
+        margin-right: 1.5rem;
+        border-radius: 8px;
+        border-bottom: none;
+        flex-shrink: 0;
+    }
+
+    .items-list .item-content {
+        flex: 1;
+        padding: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .items-list .item-info {
+        flex: 1;
+    }
+
+    .items-list .item-actions {
+        margin-left: 1.5rem;
+        flex-shrink: 0;
+        gap: 1rem;
+    }
+
+    .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        flex-direction: column;
+        gap: 1rem;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f3f4f6;
+        border-radius: 50%;
+        border-top-color: #ec3750;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    .loading-text {
+        color: #6b7280;
+        font-size: 1rem;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        color: #6b7280;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #d1d5db;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+
+    /* Cart Modal */
+    .cart-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    .cart-modal-content {
+        background: white;
+        max-width: 600px;
+        margin: 120px auto 2rem auto;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+            margin-top: 60px;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+            margin-top: 120px;
+        }
+    }
+
+    .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .cart-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0;
+    }
+
+    .close-cart {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: color 0.2s ease;
+    }
+
+    .close-cart:hover {
+        color: #1a202c;
+    }
+
+    .cart-items {
+        padding: 1.5rem;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .cart-item-image {
+        width: 60px;
+        height: 60px;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin-right: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .cart-item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .cart-item-details {
+        flex: 1;
+    }
+
+    .cart-item-name {
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 0.25rem;
+    }
+
+    .cart-item-description {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+        line-height: 1.3;
+    }
+
+    .cart-item-price {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .cart-item-quantity {
+        margin-left: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .cart-item-remove {
+        background: #ef4444;
+        color: white;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-left: 1rem;
+        transition: background 0.2s ease;
+    }
+
+    .cart-item-remove:hover {
+        background: #dc2626;
+    }
+
+    .cart-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+        background: #f9fafb;
+        border-radius: 0 0 16px 16px;
+    }
+
+    .cart-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .cart-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-continue-shopping {
+        flex: 1;
+        background: white;
+        color: #6b7280;
+        border: 2px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-continue-shopping:hover {
+        border-color: #ec3750;
+        color: #ec3750;
+    }
+
+    .btn-checkout {
+        flex: 1;
+        background: #ec3750;
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-checkout:hover {
+        background: #d63146;
+        transform: translateY(-1px);
+    }
+
+    .empty-cart {
+        text-align: center;
+        padding: 3rem;
+        color: #6b7280;
+    }
+
+    .empty-cart i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #d1d5db;
+    }
+
+    @media (max-width: 1200px) {
+        .items-grid {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .back-button {
+            position: static;
+            margin: 1rem auto 0;
+            width: fit-content;
+        }
+
+        .shop-header-content {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .header-right {
+            justify-content: center;
+        }
+
+        .shop-balance {
+            justify-content: center;
+        }
+
+        .controls-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-group {
+            min-width: auto;
+        }
+
+        .filter-group {
+            justify-content: center;
+        }
+
+        .items-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+
+        .items-list .item-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .items-list .item-image {
+            margin-right: 0;
+            margin-bottom: 1rem;
+            width: 100%;
+            height: 200px;
+        }
+
+        .items-list .item-content {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .items-list .item-actions {
+            margin-left: 0;
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .cart-modal-content {
+            margin: 2rem 1rem 1rem 1rem;
+        }
+    }
+
+    /* Image Zoom Modal */
+    .image-zoom-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 2000;
+        cursor: zoom-out;
+    }
+
+    .image-zoom-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 90vw;
+        max-height: 90vh;
+        transition: transform 0.3s ease;
+    }
+
+    .image-zoom-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .zoom-controls {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 10px;
+        z-index: 2001;
+    }
+
+    .zoom-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: #333;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .zoom-btn:hover {
+        background: white;
+        transform: scale(1.1);
+    }
+
+    .zoom-close {
+        background: rgba(236, 55, 80, 0.9);
+        color: white;
+    }
+
+    .zoom-close:hover {
+        background: #ec3750;
+    }
+
+    @keyframes zoomIn {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+
+    .image-zoom-container.zoom-in {
+        animation: zoomIn 0.3s ease-out;
+    }
+
+    .item-image img {
+        cursor: zoom-in;
+    }
+
+    /* Shop Tabs */
+    .shop-nav-tabs {
+        display: flex;
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+
+    .shop-tab {
+        flex: 1;
+        padding: 1rem 1.5rem;
+        border: none;
+        background: white;
+        color: #6b7280;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        position: relative;
+    }
+
+    .shop-tab:hover {
+        background: #f8fafc;
+        color: #374151;
+    }
+
+    .shop-tab.active {
+        background: #ec3750;
+        color: white;
+    }
+
+    .shop-tab-content {
+        display: none;
+    }
+
+    .shop-tab-content.active {
+        display: block;
+    }
+
+    /* Club Ranks Styles */
+    .ranks-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border-radius: 16px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ranks-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+                circle at 20% 80%,
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 50%
+            ),
+            radial-gradient(
+                circle at 80% 20%,
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 50%
+            );
+        z-index: 1;
+    }
+
+    .ranks-header > * {
+        position: relative;
+        z-index: 2;
+    }
+
+    .ranks-header h2 {
+        font-size: 2rem;
+        margin: 0 0 0.5rem 0;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .ranks-header p {
+        margin: 0 0 1rem 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+
+    .coming-soon-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+
+    .ranks-container {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .ranks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+
+    .rank-item {
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 2rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .rank-item::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--rank-gradient);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .rank-item:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        border-color: var(--rank-color);
+    }
+
+    .rank-item:hover::before {
+        transform: scaleX(1);
+    }
+
+    .rank-item.purchased {
+        border-color: #10b981;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    }
+
+    .rank-purchased-badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: #10b981;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.4rem 0.8rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        z-index: 10;
+    }
+
+    .rank-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: var(--rank-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        box-shadow: 0 8px 25px var(--rank-shadow);
+        position: relative;
+        transition: all 0.4s ease;
+    }
+
+    .rank-item:hover .rank-icon {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 12px 35px var(--rank-shadow);
+    }
+
+    .rank-icon::after {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border-radius: 50%;
+        border: 2px solid var(--rank-color);
+        opacity: 0.3;
+        animation: pulse 3s ease-in-out infinite;
+    }
+
+    .rank-name {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 0.75rem;
+        background: var(--rank-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .rank-level {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--rank-color);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .rank-description {
+        font-size: 0.95rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .rank-price {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--rank-color);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .rank-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .btn-purchase-rank {
+        flex: 1;
+        background: var(--rank-gradient);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px var(--rank-shadow);
+    }
+
+    .btn-purchase-rank:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px var(--rank-shadow);
+    }
+
+    .btn-purchase-rank:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Rank-specific color schemes */
+    .rank-bronze {
+        --rank-gradient: linear-gradient(135deg, #cd7f32 0%, #b8860b 100%);
+        --rank-color: #cd7f32;
+        --rank-shadow: rgba(205, 127, 50, 0.4);
+    }
+
+    .rank-silver {
+        --rank-gradient: linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 100%);
+        --rank-color: #c0c0c0;
+        --rank-shadow: rgba(192, 192, 192, 0.4);
+    }
+
+    .rank-gold {
+        --rank-gradient: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        --rank-color: #ffd700;
+        --rank-shadow: rgba(255, 215, 0, 0.4);
+    }
+
+    .rank-platinum {
+        --rank-gradient: linear-gradient(135deg, #e5e4e2 0%, #b8b8b8 100%);
+        --rank-color: #e5e4e2;
+        --rank-shadow: rgba(229, 228, 226, 0.4);
+    }
+
+    .rank-diamond {
+        --rank-gradient: linear-gradient(135deg, #b9f2ff 0%, #7dd3fc 100%);
+        --rank-color: #0ea5e9;
+        --rank-shadow: rgba(14, 165, 233, 0.4);
+    }
+
+    .rank-emerald {
+        --rank-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        --rank-color: #10b981;
+        --rank-shadow: rgba(16, 185, 129, 0.4);
+    }
+
+    .rank-ruby {
+        --rank-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        --rank-color: #ef4444;
+        --rank-shadow: rgba(239, 68, 68, 0.4);
+    }
+
+    .rank-legendary {
+        --rank-gradient: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+        --rank-color: #9333ea;
+        --rank-shadow: rgba(147, 51, 234, 0.4);
+        animation: legendary-glow 2s ease-in-out infinite alternate;
+    }
+
+    .rank-mythic {
+        --rank-gradient: linear-gradient(
+            45deg,
+            #ff6b35,
+            #f7931e,
+            #ffd23f,
+            #06d6a0,
+            #118ab2,
+            #073b4c
+        );
+        --rank-color: #ff6b35;
+        --rank-shadow: rgba(255, 107, 53, 0.4);
+        animation: spectrum-border 3s linear infinite;
+    }
+
+    @keyframes legendary-glow {
+        0% {
+            box-shadow: 0 4px 15px var(--rank-shadow);
+        }
+        100% {
+            box-shadow:
+                0 8px 30px var(--rank-shadow),
+                0 0 20px var(--rank-shadow);
+        }
+    }
+
+    @keyframes rainbow-border {
+        0% {
+            filter: hue-rotate(0deg);
+        }
+        100% {
+            filter: hue-rotate(360deg);
+        }
+    }
+
+    /* Special Effect Previews */
+    .name-effect-spectrum {
+        background: linear-gradient(
+            45deg,
+            #ff6b35,
+            #f7931e,
+            #ffd23f,
+            #06d6a0,
+            #118ab2,
+            #073b4c
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: spectrum-shift 3s linear infinite;
+        font-weight: 700;
+    }
+
+    @keyframes spectrum-shift {
+        0% {
+            filter: hue-rotate(0deg);
+        }
+        100% {
+            filter: hue-rotate(360deg);
+        }
+    }
+
+    .name-effect-gold {
+        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+
+    .name-effect-fire {
+        background: linear-gradient(45deg, #ff4444, #ff8800, #ff4444);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        animation: fire-flicker 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes fire-flicker {
+        0% {
+            text-shadow: 0 0 5px #ff4444;
+        }
+        100% {
+            text-shadow:
+                0 0 15px #ff8800,
+                0 0 25px #ff4444;
+        }
+    }
+
+    .name-effect-ice {
+        background: linear-gradient(45deg, #87ceeb, #b0e0e6, #87ceeb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(135, 206, 235, 0.5);
+    }
+
+    .name-effect-neon {
+        color: #00ff88;
+        font-weight: 700;
+        text-shadow:
+            0 0 5px #00ff88,
+            0 0 10px #00ff88,
+            0 0 15px #00ff88,
+            0 0 20px #00ff88;
+        animation: neon-pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes neon-pulse {
+        0% {
+            text-shadow:
+                0 0 5px #00ff88,
+                0 0 10px #00ff88,
+                0 0 15px #00ff88,
+                0 0 20px #00ff88;
+        }
+        100% {
+            text-shadow:
+                0 0 2px #00ff88,
+                0 0 5px #00ff88,
+                0 0 8px #00ff88,
+                0 0 12px #00ff88;
+        }
+    }
+
+    /* Role Badges */
+    .role-badge-vip {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #8b6914;
+        border: 1px solid #d4af37;
+    }
+
+    .role-badge-legend {
+        background: linear-gradient(135deg, #9333ea, #7c3aed);
+        color: white;
+        border: 1px solid #7c3aed;
+    }
+
+    .role-badge-mythic {
+        background: linear-gradient(
+            45deg,
+            #ff6b35,
+            #f7931e,
+            #ffd23f,
+            #06d6a0,
+            #118ab2,
+            #073b4c
+        );
+        color: white;
+        border: 1px solid #ffd700;
+        animation: spectrum-border 3s linear infinite;
+    }
+
+    @keyframes spectrum-border {
+        0% {
+            border-color: #ff6b35;
+        }
+        16% {
+            border-color: #f7931e;
+        }
+        33% {
+            border-color: #ffd23f;
+        }
+        50% {
+            border-color: #06d6a0;
+        }
+        66% {
+            border-color: #118ab2;
+        }
+        83% {
+            border-color: #073b4c;
+        }
+        100% {
+            border-color: #ff6b35;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .ranks-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .shop-tab span {
+            display: none;
+        }
+
+        .ranks-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .rank-item {
+            padding: 1.5rem;
+        }
+
+        .rank-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+
+        .rank-name {
+            font-size: 1.2rem;
+        }
+
+        .rank-benefits {
+            padding: 0.75rem;
+        }
+
+        .btn-purchase-rank {
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+{% endblock %} {% block content %}
+<div class="shop-container">
+    <a
+        href="{{ url_for('club_dashboard', club_id=club.id) }}"
+        class="back-button"
+    >
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+    </a>
+
+    <div class="shop-header">
+        <div class="shop-header-content">
+            <div class="shop-title-section">
+                <div class="shop-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div>
+                    <h1 class="shop-title">The Shop</h1>
+                    <p class="shop-subtitle">
+                        Browse, explore and buy items for your club
+                    </p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="shop-balance">
+                    <div class="balance-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="balance-info">
+                        <p class="balance-label">Club Tokens</p>
+                        <p class="balance-amount">
+                            {{ (club.balance|float * 100)|int }} tokens
+                        </p>
+                    </div>
+                </div>
+
+                <a
+                    href="{{ url_for('club_orders', club_id=club.id) }}"
+                    class="orders-button"
+                >
+                    <i class="fas fa-box"></i>
+                    <span>View Orders</span>
+                </a>
+
+                <a
+                    href="{{ url_for('project_submission', club_id=club.id) }}"
+                    class="orders-button"
+                    style="
+                        background: linear-gradient(135deg, #10b981, #059669);
+                        margin-right: 1rem;
+                    "
+                >
+                    <i class="fas fa-code"></i>
+                    <span>Submit Project</span>
+                </a>
+
+                <button class="cart-button" onclick="openCart()">
+                    <i class="fas fa-shopping-cart cart-icon"></i>
+                    <span>Cart</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="shop-content">
+        <div class="shop-controls">
+            <div class="controls-row">
+                <div class="search-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input
+                        type="text"
+                        class="search-input"
+                        id="searchInput"
+                        placeholder="Search for items..."
+                    />
+                </div>
+
+                <div class="filter-group">
+                    <select class="sort-select" id="sortSelect">
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                        <option value="price-asc">Price (Low to High)</option>
+                        <option value="price-desc">Price (High to Low)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="shop-nav-tabs">
+            <button
+                class="shop-tab active"
+                onclick="switchShopTab('items')"
+                data-tab="items"
+            >
+                <i class="fas fa-shopping-bag"></i>
+                <span>Shop Items</span>
+            </button>
+        </div>
+
+        <div id="loadingContainer" class="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading shop items...</div>
+        </div>
+
+
+        <div id="shopItemsTab" class="shop-tab-content active">
+            <div
+                id="itemsContainer"
+                class="items-list items-container"
+                style="display: none; margin-bottom: 2rem"
+            >
+
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none">
+                <i class="fas fa-shopping-bag"></i>
+                <h3>No items found</h3>
+                <p>Try adjusting your search or filters</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="cartModal" class="cart-modal">
+    <div class="cart-modal-content">
+        <div class="cart-header">
+            <h2 class="cart-title">Shopping Cart</h2>
+            <button class="close-cart" onclick="closeCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="cartItemsContainer" class="cart-items">
+
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">0 tokens</span>
+            </div>
+            <div class="cart-actions">
+                <button class="btn-continue-shopping" onclick="closeCart()">
+                    Continue Shopping
+                </button>
+                <button class="btn-checkout" onclick="checkout()">
+                    Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="checkoutModal" class="cart-modal">
+    <div class="cart-modal-content">
+        <div class="cart-header">
+            <h2 class="cart-title">Checkout</h2>
+            <button class="close-cart" onclick="closeCheckoutModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-items">
+            <form id="checkoutForm" onsubmit="submitOrder(event)">
+                <div style="margin-bottom: 1.5rem">
+                    <h3 style="margin-bottom: 1rem; color: #1a202c">
+                        Order Summary
+                    </h3>
+                    <div id="checkoutItems"></div>
+                    <div
+                        style="
+                            font-weight: 700;
+                            font-size: 1.2rem;
+                            margin-top: 1rem;
+                            padding-top: 1rem;
+                            border-top: 1px solid #e2e8f0;
+                        "
+                    >
+                        Total: <span id="checkoutTotal">0 tokens</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem">
+                    <h3 style="margin-bottom: 1rem; color: #1a202c">
+                        Delivery Information
+                    </h3>
+                    <div
+                        style="
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 1rem;
+                            margin-bottom: 1rem;
+                        "
+                    >
+                        <div>
+                            <label
+                                style="
+                                    display: block;
+                                    margin-bottom: 0.5rem;
+                                    font-weight: 600;
+                                "
+                                >First Name</label
+                            >
+                            <input
+                                type="text"
+                                id="firstName"
+                                readonly
+                                style="
+                                    width: 100%;
+                                    padding: 0.75rem;
+                                    border: 2px solid #f3f4f6;
+                                    border-radius: 8px;
+                                    background: #f8fafc;
+                                    color: #6b7280;
+                                "
+                            />
+                        </div>
+                        <div>
+                            <label
+                                style="
+                                    display: block;
+                                    margin-bottom: 0.5rem;
+                                    font-weight: 600;
+                                "
+                                >Last Name</label
+                            >
+                            <input
+                                type="text"
+                                id="lastName"
+                                readonly
+                                style="
+                                    width: 100%;
+                                    padding: 0.75rem;
+                                    border: 2px solid #f3f4f6;
+                                    border-radius: 8px;
+                                    background: #f8fafc;
+                                    color: #6b7280;
+                                "
+                            />
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 1rem">
+                        <label
+                            style="
+                                display: block;
+                                margin-bottom: 0.5rem;
+                                font-weight: 600;
+                            "
+                            >Email</label
+                        >
+                        <input
+                            type="email"
+                            id="email"
+                            readonly
+                            style="
+                                width: 100%;
+                                padding: 0.75rem;
+                                border: 2px solid #f3f4f6;
+                                border-radius: 8px;
+                                background: #f8fafc;
+                                color: #6b7280;
+                            "
+                        />
+                    </div>
+                    <div style="margin-bottom: 1rem">
+                        <label
+                            style="
+                                display: block;
+                                margin-bottom: 0.5rem;
+                                font-weight: 600;
+                            "
+                            >Address Line 1 *</label
+                        >
+                        <input
+                            type="text"
+                            id="addressLine1"
+                            required
+                            style="
+                                width: 100%;
+                                padding: 0.75rem;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 8px;
+                            "
+                        />
+                    </div>
+                    <div style="margin-bottom: 1rem">
+                        <label
+                            style="
+                                display: block;
+                                margin-bottom: 0.5rem;
+                                font-weight: 600;
+                            "
+                            >Address Line 2</label
+                        >
+                        <input
+                            type="text"
+                            id="addressLine2"
+                            style="
+                                width: 100%;
+                                padding: 0.75rem;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 8px;
+                            "
+                        />
+                    </div>
+                    <div style="margin-bottom: 1rem">
+                        <label
+                            style="
+                                display: block;
+                                margin-bottom: 0.5rem;
+                                font-weight: 600;
+                            "
+                            >City/Town *</label
+                        >
+                        <input
+                            type="text"
+                            id="city"
+                            required
+                            style="
+                                width: 100%;
+                                padding: 0.75rem;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 8px;
+                            "
+                        />
+                    </div>
+                    <div
+                        style="
+                            display: grid;
+                            grid-template-columns: 1fr 1fr 1fr;
+                            gap: 1rem;
+                            margin-bottom: 1rem;
+                        "
+                    >
+                        <div>
+                            <label
+                                style="
+                                    display: block;
+                                    margin-bottom: 0.5rem;
+                                    font-weight: 600;
+                                "
+                                >ZIP/Postal Code *</label
+                            >
+                            <input
+                                type="text"
+                                id="zipCode"
+                                required
+                                style="
+                                    width: 100%;
+                                    padding: 0.75rem;
+                                    border: 2px solid #e2e8f0;
+                                    border-radius: 8px;
+                                "
+                            />
+                        </div>
+                        <div>
+                            <label
+                                style="
+                                    display: block;
+                                    margin-bottom: 0.5rem;
+                                    font-weight: 600;
+                                "
+                                >State/Area *</label
+                            >
+                            <input
+                                type="text"
+                                id="state"
+                                required
+                                style="
+                                    width: 100%;
+                                    padding: 0.75rem;
+                                    border: 2px solid #e2e8f0;
+                                    border-radius: 8px;
+                                "
+                            />
+                        </div>
+                        <div>
+                            <label
+                                style="
+                                    display: block;
+                                    margin-bottom: 0.5rem;
+                                    font-weight: 600;
+                                "
+                                >Country *</label
+                            >
+                            <input
+                                type="text"
+                                id="country"
+                                required
+                                style="
+                                    width: 100%;
+                                    padding: 0.75rem;
+                                    border: 2px solid #e2e8f0;
+                                    border-radius: 8px;
+                                "
+                                value="United States"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem">
+                    <h3 style="margin-bottom: 1rem; color: #1a202c">
+                        Order Details
+                    </h3>
+                    <div style="margin-bottom: 1rem">
+                        <label
+                            style="
+                                display: block;
+                                margin-bottom: 0.5rem;
+                                font-weight: 600;
+                            "
+                            >Usage Reason *</label
+                        >
+                        <textarea
+                            id="usageReason"
+                            required
+                            placeholder="Please describe how these items will be used for your club activities..."
+                            style="
+                                width: 100%;
+                                padding: 0.75rem;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 8px;
+                                min-height: 80px;
+                                resize: vertical;
+                            "
+                        ></textarea>
+                    </div>
+                    <div style="margin-bottom: 1rem">
+                        <label
+                            style="
+                                display: block;
+                                margin-bottom: 0.5rem;
+                                font-weight: 600;
+                            "
+                            >Special Notes</label
+                        >
+                        <textarea
+                            id="specialNotes"
+                            placeholder="Any special delivery instructions or notes..."
+                            style="
+                                width: 100%;
+                                padding: 0.75rem;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 8px;
+                                min-height: 60px;
+                                resize: vertical;
+                            "
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="cart-actions">
+                    <button
+                        type="button"
+                        class="btn-continue-shopping"
+                        onclick="closeCheckoutModal()"
+                    >
+                        Back to Cart
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn-checkout"
+                        id="submitOrderBtn"
+                    >
+                        Place Order
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div id="successModal" class="cart-modal">
+    <div class="cart-modal-content" style="max-width: 500px">
+        <div
+            class="cart-header"
+            style="background: #f0f9ff; border-color: #bfdbfe"
+        >
+            <h2 class="cart-title" style="color: #1e40af">
+                <i
+                    class="fas fa-check-circle"
+                    style="color: #10b981; margin-right: 0.5rem"
+                ></i>
+                Order Placed Successfully!
+            </h2>
+        </div>
+        <div class="cart-items" style="text-align: center; padding: 2rem">
+            <div style="margin-bottom: 1.5rem">
+                <i
+                    class="fas fa-box"
+                    style="font-size: 3rem; color: #10b981; margin-bottom: 1rem"
+                ></i>
+                <p
+                    style="
+                        font-size: 1.1rem;
+                        color: #374151;
+                        margin-bottom: 0.5rem;
+                    "
+                >
+                    Your order has been submitted and logged to our system.
+                </p>
+                <p style="color: #6b7280; font-size: 0.9rem">
+                    Your club balance has been updated automatically.
+                </p>
+            </div>
+            <div style="display: flex; gap: 1rem; justify-content: center">
+                <button
+                    onclick="closeSuccessModal()"
+                    class="btn-continue-shopping"
+                >
+                    Continue Shopping
+                </button>
+                <a
+                    href="{{ url_for('club_orders', club_id=club.id) }}"
+                    class="btn-checkout"
+                    style="
+                        text-decoration: none;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                    "
+                >
+                    <i class="fas fa-box" style="margin-right: 0.5rem"></i>
+                    View Orders
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="errorModal" class="cart-modal">
+    <div class="cart-modal-content" style="max-width: 500px">
+        <div
+            class="cart-header"
+            style="background: #fef2f2; border-color: #fecaca"
+        >
+            <h2 class="cart-title" style="color: #dc2626">
+                <i
+                    class="fas fa-exclamation-triangle"
+                    style="color: #ef4444; margin-right: 0.5rem"
+                ></i>
+                Order Failed
+            </h2>
+            <button class="close-cart" onclick="closeErrorModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-items" style="text-align: center; padding: 2rem">
+            <div style="margin-bottom: 1.5rem">
+                <i
+                    class="fas fa-exclamation-circle"
+                    style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem"
+                ></i>
+                <p
+                    id="errorMessage"
+                    style="
+                        font-size: 1.1rem;
+                        color: #374151;
+                        margin-bottom: 0.5rem;
+                    "
+                >
+                    An error occurred while placing your order.
+                </p>
+                <p style="color: #6b7280; font-size: 0.9rem">
+                    Please try again or contact support if the problem persists.
+                </p>
+            </div>
+            <button onclick="closeErrorModal()" class="btn-checkout">
+                Try Again
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div id="imageZoomModal" class="image-zoom-modal">
+    <div class="zoom-controls">
+        <button class="zoom-btn zoom-close" onclick="closeImageZoom()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="image-zoom-container" id="imageZoomContainer">
+        <img id="zoomedImage" src="" alt="" />
+    </div>
+</div>
+
+<script>
+    let allItems = [];
+    let filteredItems = [];
+    let currentView = 'list';
+    let cart = [];
+    let allCosmetics = [];
+    let currentTab = 'items';
+    const CLUB_ID = '{{ club.id }}';
+    const CART_COOKIE_NAME = `club_${CLUB_ID}_cart`;
+    const CLUB_BALANCE = {{ club.balance|float }};
+    const LEADER_FIRST_NAME = '{{ current_user.first_name or "" }}';
+    const LEADER_LAST_NAME = '{{ current_user.last_name or "" }}';
+    const LEADER_EMAIL = '{{ current_user.email }}';
+
+    // Load shop items on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadShopItems();
+        setupEventListeners();
+        loadCartFromCookie();
+        updateCartUI();
+    });
+
+    function setupEventListeners() {
+        // Search input
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterItems();
+        });
+
+        // Sort select
+        document.getElementById('sortSelect').addEventListener('change', function() {
+            filterItems();
+        });
+
+
+        // Close modal when clicking outside
+        document.getElementById('cartModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCart();
+            }
+        });
+    }
+
+    // Cookie functions
+    function setCookie(name, value, days) {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))};expires=${expires.toUTCString()};path=/`;
+    }
+
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) {
+                try {
+                    return JSON.parse(decodeURIComponent(c.substring(nameEQ.length, c.length)));
+                } catch(e) {
+                    return [];
+                }
+            }
+        }
+        return [];
+    }
+
+    function saveCartToCookie() {
+        setCookie(CART_COOKIE_NAME, cart, 7); // Save for 7 days
+    }
+
+    function loadCartFromCookie() {
+        cart = getCookie(CART_COOKIE_NAME) || [];
+    }
+
+    // Cart functions
+    function addToCart(itemId, quantity) {
+        const item = allItems.find(i => i.id === itemId);
+        if (!item) return;
+
+        const existingItem = cart.find(i => i.id === itemId);
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            cart.push({
+                id: itemId,
+                name: item.name,
+                price: parseFloat(item.price) || 0,
+                picture: item.picture,
+                description: item.description || '',
+                starred: item.starred || false,
+                limited: item.limited || false,
+                source: item.source || 'Warehouse',
+                quantity: quantity
+            });
+        }
+
+        saveCartToCookie();
+        updateCartUI();
+        showAddedAnimation(itemId);
+    }
+
+    function removeFromCart(itemId) {
+        cart = cart.filter(item => item.id !== itemId);
+        saveCartToCookie();
+        updateCartUI();
+        updateCartModal();
+    }
+
+    function updateCartItemQuantity(itemId, quantity) {
+        const item = cart.find(i => i.id === itemId);
+        if (item) {
+            item.quantity = Math.max(1, quantity);
+            saveCartToCookie();
+            updateCartUI();
+            updateCartModal();
+        }
+    }
+
+    function updateCartUI() {
+        const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+        document.getElementById('cartCount').textContent = cartCount;
+        document.getElementById('cartCount').style.display = cartCount > 0 ? 'block' : 'none';
+    }
+
+    function showAddedAnimation(itemId) {
+        const button = document.querySelector(`[data-item-id="${itemId}"] .btn-add-cart`);
+        if (button) {
+            button.classList.add('added');
+            button.innerHTML = '<i class="fas fa-check"></i> Added!';
+            setTimeout(() => {
+                button.classList.remove('added');
+                button.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
+            }, 1000);
+        }
+    }
+
+    function openCart() {
+        document.getElementById('cartModal').style.display = 'block';
+        updateCartModal();
+    }
+
+    function closeCart() {
+        document.getElementById('cartModal').style.display = 'none';
+    }
+
+    function updateCartModal() {
+        const cartItemsContainer = document.getElementById('cartItemsContainer');
+        const cartTotal = document.getElementById('cartTotal');
+
+        if (cart.length === 0) {
+            cartItemsContainer.innerHTML = `
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Your cart is empty</h3>
+                    <p>Add some items to get started!</p>
+                </div>
+            `;
+            cartTotal.textContent = '0 tokens';
+            return;
+        }
+
+        let total = 0;
+        cartItemsContainer.innerHTML = cart.map(item => {
+            total += item.price * item.quantity;
+            return `
+                <div class="cart-item">
+                    <div class="cart-item-image">
+                        ${item.picture ? `<img src="${item.picture}" alt="${item.name}" onclick="openImageZoom('${item.picture}', '${item.name}')" style="cursor: zoom-in;">` : '<i class="fas fa-image"></i>'}
+                    </div>
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${item.name}</div>
+                        ${(item.starred || item.limited) ? `
+                            <div class="item-badges" style="margin-bottom: 0.5rem;">
+                                ${item.starred ? `<span class="item-badge badge-starred"><i class="fas fa-star"></i> Featured</span>` : ''}
+                                ${item.limited ? `<span class="item-badge badge-limited"><i class="fas fa-clock"></i> Limited Time</span>` : ''}
+                            </div>
+                        ` : ''}
+                        ${item.description ? `<div class="cart-item-description">${item.description}</div>` : ''}
+                        <div class="cart-item-price">${Math.round(item.price * 100)} tokens each</div>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <button onclick="updateCartItemQuantity('${item.id}', ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateCartItemQuantity('${item.id}', ${item.quantity + 1})">+</button>
+                    </div>
+                    <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        cartTotal.textContent = `${Math.round(total * 100)} tokens`;
+    }
+
+    function checkout() {
+        if (cart.length === 0) {
+            showErrorModal('Your cart is empty! Add some items before checking out.');
+            return;
+        }
+
+        // Close cart modal and open checkout modal
+        closeCart();
+        openCheckoutModal();
+    }
+
+    // Load shop items from API
+    async function loadShopItems() {
+        try {
+            const response = await fetch(`/api/club/${CLUB_ID}/shop-items`);
+            if (response.ok) {
+                const data = await response.json();
+                allItems = data.items || [];
+
+                // Initial sort: starred items first, then by name
+                allItems.sort((a, b) => {
+                    // First, sort by starred status (starred items first)
+                    if (a.starred && !b.starred) return -1;
+                    if (!a.starred && b.starred) return 1;
+
+                    // Then sort by name alphabetically
+                    return a.name.localeCompare(b.name);
+                });
+
+                filteredItems = [...allItems];
+
+                document.getElementById('loadingContainer').style.display = 'none';
+                document.getElementById('itemsContainer').style.display = 'block';
+
+                renderItems();
+            } else {
+                throw new Error('Failed to load items');
+            }
+        } catch (error) {
+            console.error('Error loading shop items:', error);
+            document.getElementById('loadingContainer').innerHTML = `
+                <div class="loading-text" style="color: #ef4444;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Failed to load shop items
+                </div>
+            `;
+        }
+    }
+
+    function filterItems() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const sortBy = document.getElementById('sortSelect').value;
+
+        // Filter by search term
+        filteredItems = allItems.filter(item =>
+            item.name.toLowerCase().includes(searchTerm)
+        );
+
+        // Sort items - starred items always come first
+        filteredItems.sort((a, b) => {
+            // First, sort by starred status (starred items first)
+            if (a.starred && !b.starred) return -1;
+            if (!a.starred && b.starred) return 1;
+
+            // Then sort by the selected criteria
+            switch (sortBy) {
+                case 'name-asc':
+                    return a.name.localeCompare(b.name);
+                case 'name-desc':
+                    return b.name.localeCompare(a.name);
+                case 'price-asc':
+                    return (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0);
+                case 'price-desc':
+                    return (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0);
+                default:
+                    return 0;
+            }
+        });
+
+        renderItems();
+    }
+
+    function renderItems() {
+        const container = document.getElementById('itemsContainer');
+        const emptyState = document.getElementById('emptyState');
+
+        if (filteredItems.length === 0) {
+            container.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        container.style.display = 'block';
+
+        // Always use list view
+        container.className = 'items-list items-container';
+
+        container.innerHTML = filteredItems.map(item => {
+            const itemPrice = parseFloat(item.price || 0);
+            const canAfford = itemPrice <= CLUB_BALANCE;
+
+            let buttonClass, buttonText, buttonDisabled;
+            if (canAfford) {
+                buttonClass = 'btn-add-cart';
+                buttonText = 'Add to Cart';
+                buttonDisabled = '';
+            } else {
+                buttonClass = 'btn-add-cart insufficient-balance';
+                buttonText = 'Insufficient Tokens';
+                buttonDisabled = 'disabled';
+            }
+
+            return `
+            <div class="item-card" data-item-id="${item.id}">
+                <div class="item-image">
+                    ${item.picture ? `<img src="${item.picture}" alt="${item.name}" onclick="openImageZoom('${item.picture}', '${item.name}')">` : '<i class="fas fa-image item-image-placeholder"></i>'}
+                </div>
+                <div class="item-content">
+                    <div class="item-info">
+                    <h3 class="item-name">${item.name}</h3>
+                    ${(item.starred || item.limited) ? `
+                        <div class="item-badges">
+                            ${item.starred ? `<span class="item-badge badge-starred"><i class="fas fa-star"></i> Featured</span>` : ''}
+                            ${item.limited ? `<span class="item-badge badge-limited"><i class="fas fa-clock"></i> Limited Time</span>` : ''}
+                        </div>
+                    ` : ''}
+                    ${item.description ? `<p class="item-description">${item.description}</p>` : ''}
+                    <p class="item-price">${Math.round(itemPrice * 100)} tokens</p>
+                    </div>
+                    <div class="item-actions">
+                        <div class="quantity-selector">
+                            <button class="quantity-btn" onclick="decreaseQuantity('${item.id}')" ${!canAfford ? 'disabled' : ''}>-</button>
+                            <input type="number" class="quantity-input" id="qty-${item.id}" value="1" min="1" max="${canAfford ? Math.floor(CLUB_BALANCE / itemPrice) : 0}" onchange="validateQuantity('${item.id}')" ${!canAfford ? 'disabled' : ''}>
+                            <button class="quantity-btn" onclick="increaseQuantity('${item.id}')" ${!canAfford ? 'disabled' : ''}>+</button>
+                        </div>
+                        <button class="${buttonClass}" onclick="addToCartHandler('${item.id}')" ${buttonDisabled}>
+                            <i class="fas fa-shopping-cart"></i>
+                            ${buttonText}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+    }
+
+    function increaseQuantity(itemId) {
+        const input = document.getElementById(`qty-${itemId}`);
+        const item = allItems.find(i => i.id === itemId);
+        const itemPrice = parseFloat(item.price || 0);
+        const maxQuantity = Math.floor(CLUB_BALANCE / itemPrice);
+        const currentValue = parseInt(input.value);
+
+        if (currentValue < maxQuantity) {
+            input.value = currentValue + 1;
+        }
+    }
+
+    function decreaseQuantity(itemId) {
+        const input = document.getElementById(`qty-${itemId}`);
+        const currentValue = parseInt(input.value);
+        if (currentValue > 1) {
+            input.value = currentValue - 1;
+        }
+    }
+
+    function validateQuantity(itemId) {
+        const input = document.getElementById(`qty-${itemId}`);
+        const item = allItems.find(i => i.id === itemId);
+        const itemPrice = parseFloat(item.price || 0);
+        const maxQuantity = Math.floor(CLUB_BALANCE / itemPrice);
+        const currentValue = parseInt(input.value);
+
+        if (currentValue > maxQuantity) {
+            input.value = maxQuantity;
+        } else if (currentValue < 1) {
+            input.value = 1;
+        }
+    }
+
+    function addToCartHandler(itemId) {
+        const item = allItems.find(i => i.id === itemId);
+        const itemPrice = parseFloat(item.price || 0);
+        const quantity = parseInt(document.getElementById(`qty-${itemId}`).value);
+        const totalCost = itemPrice * quantity;
+
+        if (totalCost > CLUB_BALANCE) {
+            showErrorModal(`Insufficient tokens! This item costs ${Math.round(totalCost * 100)} tokens but you only have ${Math.round(CLUB_BALANCE * 100)} tokens available.`);
+            return;
+        }
+
+        addToCart(itemId, quantity);
+
+        // Reset quantity to 1
+        document.getElementById(`qty-${itemId}`).value = 1;
+    }
+
+    // Image zoom functionality
+    function openImageZoom(imageSrc, imageAlt) {
+        const modal = document.getElementById('imageZoomModal');
+        const zoomedImage = document.getElementById('zoomedImage');
+        const container = document.getElementById('imageZoomContainer');
+
+        zoomedImage.src = imageSrc;
+        zoomedImage.alt = imageAlt;
+
+        modal.style.display = 'block';
+        container.classList.add('zoom-in');
+
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageZoom() {
+        const modal = document.getElementById('imageZoomModal');
+        const container = document.getElementById('imageZoomContainer');
+
+        container.classList.remove('zoom-in');
+        modal.style.display = 'none';
+
+        // Restore body scroll
+        document.body.style.overflow = 'auto';
+    }
+
+    // Close zoom when clicking on modal background
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('imageZoomModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeImageZoom();
+                }
+            });
+        }
+
+        // Close zoom with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('imageZoomModal');
+                if (modal && modal.style.display === 'block') {
+                    closeImageZoom();
+                }
+            }
+        });
+    });
+
+    // Checkout functions
+    function openCheckoutModal() {
+        const modal = document.getElementById('checkoutModal');
+        modal.style.display = 'block';
+        updateCheckoutSummary();
+
+        // Autofill leader information
+        document.getElementById('firstName').value = LEADER_FIRST_NAME;
+        document.getElementById('lastName').value = LEADER_LAST_NAME;
+        document.getElementById('email').value = LEADER_EMAIL;
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCheckoutModal();
+            }
+        });
+    }
+
+    function closeCheckoutModal() {
+        document.getElementById('checkoutModal').style.display = 'none';
+    }
+
+    function showSuccessModal() {
+        document.getElementById('successModal').style.display = 'block';
+
+        // Close modal when clicking outside
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSuccessModal();
+            }
+        });
+    }
+
+    function closeSuccessModal() {
+        document.getElementById('successModal').style.display = 'none';
+        // Refresh the page to show updated balance
+        window.location.reload();
+    }
+
+    function showErrorModal(message) {
+        document.getElementById('errorMessage').textContent = message;
+        document.getElementById('errorModal').style.display = 'block';
+
+        // Close modal when clicking outside
+        document.getElementById('errorModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeErrorModal();
+            }
+        });
+    }
+
+    function closeErrorModal() {
+        document.getElementById('errorModal').style.display = 'none';
+    }
+
+    function updateCheckoutSummary() {
+        const checkoutItems = document.getElementById('checkoutItems');
+        const checkoutTotal = document.getElementById('checkoutTotal');
+
+        let total = 0;
+        checkoutItems.innerHTML = cart.map(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            return `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6;">
+                    <div>
+                        <strong>${item.name}</strong>
+                        <span style="color: #6b7280; margin-left: 0.5rem;">x${item.quantity}</span>
+                    </div>
+                    <div style="font-weight: 600;">${Math.round(itemTotal * 100)} tokens</div>
+                </div>
+            `;
+        }).join('');
+
+        checkoutTotal.textContent = `${Math.round(total * 100)} tokens`;
+    }
+
+    async function submitOrder(event) {
+        event.preventDefault();
+
+        const submitBtn = document.getElementById('submitOrderBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
+
+        try {
+            // Get form data
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const addressLine1 = document.getElementById('addressLine1').value.trim();
+            const addressLine2 = document.getElementById('addressLine2').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const zipCode = document.getElementById('zipCode').value.trim();
+            const state = document.getElementById('state').value.trim();
+            const country = document.getElementById('country').value.trim();
+            const usageReason = document.getElementById('usageReason').value.trim();
+            const specialNotes = document.getElementById('specialNotes').value.trim();
+
+            // Calculate order sources based on items in cart
+            const uniqueSources = [...new Set(cart.map(item => item.source))];
+            const orderSources = uniqueSources;
+
+            // Calculate total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            // Check if total exceeds balance
+            if (total > CLUB_BALANCE) {
+                showErrorModal(`Order total (${Math.round(total * 100)} tokens) exceeds club balance (${Math.round(CLUB_BALANCE * 100)} tokens)`);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Place Order';
+                return;
+            }
+
+            // Format products list
+            const products = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
+
+            // Prepare order data
+            const orderData = {
+                delivery_address_line_1: addressLine1,
+                delivery_address_line_2: addressLine2,
+                delivery_city: city,
+                delivery_zip: zipCode,
+                delivery_state: state,
+                delivery_country: country,
+                special_notes: specialNotes,
+                usage_reason: usageReason,
+                order_sources: orderSources,
+                products: products,
+                total_amount: total,
+                cart_items: cart
+            };
+
+            // Submit order
+            const response = await fetch(`/api/club/${CLUB_ID}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Clear cart
+                cart = [];
+                saveCartToCookie();
+                updateCartUI();
+
+                closeCheckoutModal();
+                showSuccessModal();
+            } else {
+                throw new Error(result.error || 'Failed to place order');
+            }
+        } catch (error) {
+            console.error('Error placing order:', error);
+            showErrorModal(`Error placing order: ${error.message}`);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Place Order';
+        }
+    }
+
+    // Tab switching functionality
+    function switchShopTab(tab) {
+        currentTab = tab;
+
+        // Update tab buttons
+        document.querySelectorAll('.shop-tab').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.tab === tab) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Update tab content
+        document.querySelectorAll('.shop-tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+
+        if (tab === 'items') {
+            document.getElementById('shopItemsTab').classList.add('active');
+            document.getElementById('loadingContainer').style.display = filteredItems.length === 0 ? 'block' : 'none';
+    }
+
+    // Club Ranks functionality loaded
+
+    async function loadRanks() {
+        const loadingContainer = document.getElementById('ranksLoading');
+
+        if (allRanks.length === 0) {
+            loadingContainer.style.display = 'block';
+
+            try {
+                // Load static ranks data and check purchased cosmetics
+                allRanks = getStaticRanks();
+                await loadPurchasedCosmetics();
+                renderRanks();
+            } catch (error) {
+                console.error('Error loading ranks:', error);
+            } finally {
+                loadingContainer.style.display = 'none';
+            }
+        } else {
+            renderRanks();
+        }
+    }
+
+    async function loadPurchasedCosmetics() {
+        try {
+            const response = await fetch(`/api/club/${CLUB_ID}/cosmetics`);
+            if (response.ok) {
+                const data = await response.json();
+                const purchasedCosmetics = data.cosmetics || [];
+
+                // Mark ranks as purchased
+                allRanks.forEach(rank => {
+                    const purchased = purchasedCosmetics.find(c => c.name === rank.name);
+                    rank.purchased = !!purchased;
+                });
+            }
+        } catch (error) {
+            console.error('Error loading purchased cosmetics:', error);
+        }
+    }
+
+    function getStaticRanks() {
+        return [
+            {
+                id: 'bronze_rank',
+                name: 'Bronze',
+                level: 'Tier I',
+                description: 'dirt cheap...',
+                basePrice: 500,
+                icon: '🥉',
+                cssClass: 'rank-bronze',
+                type: 'rank'
+            },
+            {
+                id: 'silver_rank',
+                name: 'Silver',
+                level: 'Tier II',
+                description: 'better than bronze.',
+                basePrice: 1250,
+                icon: '🥈',
+                cssClass: 'rank-silver',
+                type: 'rank'
+            },
+            {
+                id: 'gold_rank',
+                name: 'Gold',
+                level: 'Tier III',
+                description: 'its better than silver at least!',
+                basePrice: 2500,
+                icon: '🥇',
+                cssClass: 'rank-gold',
+                type: 'rank'
+            },
+            {
+                id: 'platinum_rank',
+                name: 'Platinum',
+                level: 'Tier IV',
+                description: 'now this is pretty good',
+                basePrice: 5000,
+                icon: '💎',
+                cssClass: 'rank-platinum',
+                type: 'rank'
+            },
+            {
+                id: 'diamond_rank',
+                name: 'Diamond',
+                level: 'Tier V',
+                description: 'ooh shiny',
+                basePrice: 10000,
+                icon: '💠',
+                cssClass: 'rank-diamond',
+                type: 'rank'
+            },
+            {
+                id: 'emerald_rank',
+                name: 'Emerald',
+                level: 'Tier VI',
+                description: 'Its green!!!',
+                basePrice: 20000,
+                icon: '💚',
+                cssClass: 'rank-emerald',
+                type: 'rank'
+            },
+            {
+                id: 'ruby_rank',
+                name: 'Ruby',
+                level: 'Tier VII',
+                description: 'ooh.. shiny red!!',
+                basePrice: 35000,
+                icon: '♦️',
+                cssClass: 'rank-ruby',
+                type: 'rank'
+            },
+            {
+                id: 'legendary_rank',
+                name: 'Legendary ',
+                level: 'Tier VIII',
+                description: 'VERY legendary!!!',
+                basePrice: 60000,
+                icon: '👑',
+                cssClass: 'rank-legendary',
+                type: 'rank'
+            },
+            {
+                id: 'mythic_rank',
+                name: 'Mythic',
+                level: 'Beyond Mortal Comprehension',
+                description: 'idk how you would afford this tbh.',
+                basePrice: 100000,
+                icon: '🌟',
+                cssClass: 'rank-mythic',
+                type: 'rank'
+            }
+        ];
+    }
+
+    function renderRanks() {
+        const container = document.getElementById('ranksGrid');
+
+        container.innerHTML = allRanks.map((rank, index) => {
+            // Calculate dynamic price based on previously purchased ranks
+            let finalPrice = rank.basePrice;
+            let discount = 0;
+
+            // Only apply discount if this rank hasn't been purchased yet
+            if (!rank.purchased) {
+                // Check all previous ranks and subtract their prices if purchased
+                for (let i = 0; i < index; i++) {
+                    if (allRanks[i].purchased) {
+                        discount += allRanks[i].basePrice;
+                    }
+                }
+                finalPrice = Math.max(0, finalPrice - discount);
+            } else {
+                // If already purchased, show the actual price paid (stored as basePrice for display)
+                finalPrice = rank.basePrice;
+            }
+
+            rank.price = finalPrice; // Update the rank's price
+
+            const canAfford = finalPrice <= Math.round(CLUB_BALANCE * 100);
+            const isPurchased = rank.purchased;
+            let buttonClass, buttonText, buttonDisabled;
+
+            if (isPurchased) {
+                buttonClass = 'btn-purchase-rank';
+                buttonText = 'UNLOCKED';
+                buttonDisabled = 'disabled';
+            } else if (canAfford) {
+                buttonClass = 'btn-purchase-rank';
+                buttonText = 'Unlock Rank';
+                buttonDisabled = '';
+            } else {
+                buttonClass = 'btn-purchase-rank';
+                buttonText = 'Insufficient Tokens';
+                buttonDisabled = 'disabled';
+            }
+
+            const discountText = discount > 0 && !isPurchased ? `<div style="color: #10b981; font-size: 0.8rem; margin-bottom: 0.5rem;"><i class="fas fa-tag"></i> ${discount.toLocaleString()} tokens discount applied!</div>` : '';
+            const purchasedBadge = isPurchased ? '<div class="rank-purchased-badge">✓ UNLOCKED</div>' : '';
+            const priceText = isPurchased ? 'UNLOCKED' : `${finalPrice.toLocaleString()} tokens`;
+
+            return `
+                <div class="rank-item ${rank.cssClass} ${isPurchased ? 'purchased' : ''}" data-rank-id="${rank.id}">
+                    ${purchasedBadge}
+                    <div class="rank-icon">
+                        ${rank.icon}
+                    </div>
+                    <div class="rank-name">${rank.name}</div>
+                    <div class="rank-level">${rank.level}</div>
+                    <div class="rank-description">${rank.description}</div>
+                    ${discountText}
+                    <div class="rank-price">${priceText}</div>
+                    <div class="rank-actions">
+                        <button class="${buttonClass}" onclick="purchaseRank('${rank.id}')" ${buttonDisabled}>
+                            <i class="fas fa-crown"></i>
+                            ${buttonText}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function purchaseRank(rankId) {
+        const rank = allRanks.find(r => r.id === rankId);
+        if (!rank || rank.purchased) return;
+
+        const cost = rank.price;
+        const balance = Math.round(CLUB_BALANCE * 100);
+
+        if (cost > balance) {
+            showErrorModal(`Insufficient tokens! ${rank.name} costs ${cost.toLocaleString()} tokens but you only have ${balance.toLocaleString()} tokens available.`);
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/club/${CLUB_ID}/cosmetics/purchase`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    cosmetic_id: rankId,
+                    cosmetic_type: rank.type,
+                    cosmetic_name: rank.name,
+                    cost: cost // Cost in tokens
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                showSuccessModal(`🎉 Congratulations! You've unlocked ${rank.name}! Enhanced rank features are coming soon to make your membership even more special.`);
+
+                // Mark as purchased and refresh the display
+                rank.purchased = true;
+
+                // Update balance display
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            } else {
+                const error = await response.json();
+                showErrorModal(error.error || 'Failed to purchase rank');
+            }
+        } catch (error) {
+            console.error('Error purchasing rank:', error);
+            showErrorModal('Failed to purchase rank. Please try again.');
+        }
+    }
+
+    // Tutorial System for Shop
+    function checkTutorialRestore() {
+        const tutorialInProgress = localStorage.getItem('tutorialInProgress');
+        const savedStep = localStorage.getItem('tutorialCurrentStep');
+
+        if (tutorialInProgress === 'true' && savedStep) {
+            // Clear stored state
+            localStorage.removeItem('tutorialInProgress');
+            localStorage.removeItem('tutorialCurrentStep');
+
+            // Show shop-specific tutorial step
+            showShopTutorialStep();
+            return true;
+        }
+        return false;
+    }
+
+    let shopTutorialStep = 0;
+    const shopTutorialSteps = [
+        {
+            title: "Welcome to the Club Shop! 🛒",
+            text: "Use your tokens to purchase supplies, equipment, and rewards for your club. Everything here helps support your club activities and meetings!",
+            target: ".shop-header",
+            position: "bottom",
+            action: null
+        },
+        {
+            title: "Browse Available Items",
+            text: "Scroll through the available items. Each item shows its token cost and description. Look for items that will benefit your club meetings and projects!",
+            target: ".shop-grid",
+            position: "top",
+            action: null
+        },
+        {
+            title: "Click an Item to See Details",
+            text: "Let's click on an item to see how purchasing works. I'll open the purchase modal for you.",
+            target: ".item-card:first-child",
+            position: "top",
+            action: () => {
+                const firstItem = document.querySelector('.item-card');
+                if (firstItem) {
+                    firstItem.click();
+                }
+            }
+        },
+        {
+            title: "Purchase Modal",
+            text: "This modal shows item details, price, and purchase options. You can add items to your cart and checkout to complete the purchase using your tokens!",
+            target: ".modal-content",
+            position: "top",
+            action: null
+        },
+        {
+            title: "Purchase Process",
+            text: "Click 'Add to Cart' to purchase items. Your token balance is checked automatically. After purchasing, items will be processed for delivery to your club!",
+            target: ".add-to-cart-btn",
+            position: "top",
+            action: null
+        },
+        {
+            title: "Member Ranks & Cosmetics",
+            text: "You can also purchase special ranks and cosmetics for your club members. These add fun customization and recognition to your club! Let's close this modal and continue.",
+            target: ".close",
+            position: "left",
+            action: () => {
+                const closeBtn = document.querySelector('.modal .close');
+                if (closeBtn) {
+                    closeBtn.click();
+                }
+            }
+        }
+    ];
+
+    function showShopTutorialStep() {
+        // Create tutorial overlay if it doesn't exist
+        if (!document.getElementById('tutorialOverlay')) {
+            createTutorialOverlay();
+        }
+
+        document.getElementById('tutorialOverlay').style.display = 'block';
+        showCurrentShopStep();
+    }
+
+    function showCurrentShopStep() {
+        const step = shopTutorialSteps[shopTutorialStep];
+
+        // Update content
+        document.getElementById('tutorialTitle').textContent = step.title;
+        document.getElementById('tutorialText').textContent = step.text;
+        document.getElementById('tutorialStep').textContent = shopTutorialStep + 1;
+        document.getElementById('tutorialTotal').textContent = shopTutorialSteps.length;
+
+        // Update buttons
+        const nextBtn = document.getElementById('nextBtn');
+        const finishBtn = document.getElementById('finishBtn');
+        const prevBtn = document.getElementById('prevBtn');
+
+        prevBtn.disabled = shopTutorialStep === 0;
+        prevBtn.style.display = shopTutorialStep === 0 ? 'none' : 'inline-block';
+
+        if (shopTutorialStep === shopTutorialSteps.length - 1) {
+            nextBtn.textContent = 'Back to Dashboard';
+            nextBtn.onclick = function() {
+                localStorage.setItem('tutorialInProgress', 'true');
+                localStorage.setItem('tutorialCurrentStep', '10');
+                window.location.href = '/dashboard';
+            };
+        } else {
+            nextBtn.textContent = 'Next';
+            nextBtn.onclick = function() {
+                // Execute step action before moving to next step
+                if (step.action) {
+                    step.action();
+                    // Wait a bit for modal to open/close
+                    setTimeout(() => {
+                        shopTutorialStep++;
+                        showCurrentShopStep();
+                    }, 500);
+                } else {
+                    shopTutorialStep++;
+                    showCurrentShopStep();
+                }
+            };
+        }
+
+        prevBtn.onclick = function() {
+            if (shopTutorialStep > 0) {
+                shopTutorialStep--;
+                showCurrentShopStep();
+            }
+        };
+
+        // Position bubble
+        const bubble = document.getElementById('tutorialBubble');
+        let target = document.querySelector(step.target);
+
+        // Wait for modal to appear if targeting modal content
+        if (!target && (step.target.includes('modal') || step.target.includes('add-to-cart') || step.target.includes('close'))) {
+            setTimeout(() => {
+                target = document.querySelector(step.target);
+                if (target) {
+                    positionTutorialBubble(bubble, target, step);
+                }
+            }, 600);
+            return;
+        }
+
+        if (bubble && target) {
+            positionTutorialBubble(bubble, target, step);
+        }
+    }
+
+    function positionTutorialBubble(bubble, target, step) {
+        const rect = target.getBoundingClientRect();
+        const navbarHeight = 70;
+
+        let bubbleX = rect.left + rect.width / 2 - 200;
+        let bubbleY = step.position === 'top' ? rect.top - 200 : rect.bottom + 20;
+
+        // Special positioning for modal elements
+        if (step.target.includes('modal')) {
+            bubbleX = rect.left + rect.width / 2 - 200;
+            bubbleY = rect.top + 50;
+        }
+
+        // Keep within viewport and below navbar
+        bubbleX = Math.max(20, Math.min(window.innerWidth - 400 - 20, bubbleX));
+        bubbleY = Math.max(navbarHeight + 20, Math.min(window.innerHeight - 200 - 20, bubbleY));
+
+        bubble.style.left = bubbleX + 'px';
+        bubble.style.top = bubbleY + 'px';
+
+        const arrow = document.getElementById('tutorialArrow');
+        if (arrow) {
+            arrow.className = `tutorial-arrow ${step.position === 'top' ? 'bottom' : 'top'}`;
+        }
+
+        // Highlight target
+        document.querySelectorAll('.tutorial-highlight').forEach(el => {
+            el.classList.remove('tutorial-highlight');
+        });
+        target.classList.add('tutorial-highlight');
+    }
+
+    function createTutorialOverlay() {
+        const overlay = document.createElement('div');
+        overlay.id = 'tutorialOverlay';
+        overlay.className = 'tutorial-overlay';
+        overlay.style.display = 'none';
+
+        overlay.innerHTML = `
+            <div class="tutorial-backdrop"></div>
+            <div class="tutorial-bubble" id="tutorialBubble">
+                <div class="tutorial-content">
+                    <div class="tutorial-header">
+                        <h3 id="tutorialTitle"></h3>
+                        <button class="tutorial-close" onclick="closeTutorial()">&times;</button>
+                    </div>
+                    <div class="tutorial-body">
+                        <p id="tutorialText"></p>
+                    </div>
+                    <div class="tutorial-footer">
+                        <div class="tutorial-progress">
+                            <span id="tutorialStep">1</span> of <span id="tutorialTotal">6</span>
+                        </div>
+                        <div class="tutorial-buttons">
+                            <button class="tutorial-btn tutorial-btn-secondary" id="prevBtn">Previous</button>
+                            <button class="tutorial-btn tutorial-btn-primary" id="nextBtn">Next</button>
+                            <button class="tutorial-btn tutorial-btn-primary" id="finishBtn" style="display: none;">Finish</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="tutorial-arrow" id="tutorialArrow"></div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+    }
+
+    function closeTutorial() {
+        const overlay = document.getElementById('tutorialOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+        localStorage.setItem('clubDashboardTutorialCompleted', 'true');
+    }
+
+    // Check for tutorial restore on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        checkTutorialRestore();
+    });
+    }
+</script>
+
+
+<style>
+    .tutorial-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 20000;
+        pointer-events: none;
+    }
+
+    .tutorial-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        pointer-events: all;
+    }
+
+    .tutorial-bubble {
+        position: absolute;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        max-width: 400px;
+        min-width: 300px;
+        pointer-events: all;
+        transform-origin: center center;
+        animation: tutorialAppear 0.3s ease-out;
+        border: 2px solid #ec3750;
+    }
+
+    @keyframes tutorialAppear {
+        0% {
+            opacity: 0;
+            transform: scale(0.8) translateY(10px);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .tutorial-content {
+        padding: 0;
+    }
+
+    .tutorial-header {
+        padding: 20px 20px 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .tutorial-header h3 {
+        margin: 0;
+        color: #1a202c;
+        font-size: 1.25rem;
+        font-weight: 600;
+        line-height: 1.4;
+        flex: 1;
+        padding-right: 10px;
+    }
+
+    .tutorial-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .tutorial-close:hover {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .tutorial-body {
+        padding: 15px 20px 20px 20px;
+    }
+
+    .tutorial-body p {
+        margin: 0;
+        color: #4b5563;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    .tutorial-footer {
+        padding: 0 20px 20px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .tutorial-progress {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .tutorial-progress #tutorialStep {
+        color: #ec3750;
+        font-weight: 600;
+    }
+
+    .tutorial-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .tutorial-btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        min-width: 80px;
+    }
+
+    .tutorial-btn-primary {
+        background: #ec3750;
+        color: white;
+    }
+
+    .tutorial-btn-primary:hover:not(:disabled) {
+        background: #dc2626;
+        transform: translateY(-1px);
+    }
+
+    .tutorial-btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+
+    .tutorial-btn-secondary:hover:not(:disabled) {
+        background: #e5e7eb;
+    }
+
+    .tutorial-arrow {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        background: #ffffff;
+        border: 2px solid #ec3750;
+        transform: rotate(45deg);
+        border-radius: 0 0 4px 0;
+    }
+
+    .tutorial-arrow.top {
+        top: -10px;
+        left: 50%;
+        margin-left: -8px;
+        border-top: none;
+        border-left: none;
+    }
+
+    .tutorial-arrow.bottom {
+        bottom: -10px;
+        left: 50%;
+        margin-left: -8px;
+        border-bottom: none;
+        border-right: none;
+    }
+
+    .tutorial-highlight {
+        position: relative;
+        z-index: 9999;
+        box-shadow:
+            0 0 0 4px rgba(236, 55, 80, 0.3),
+            0 0 0 8px rgba(236, 55, 80, 0.1);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+</style>
+
+{% endblock %}

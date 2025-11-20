@@ -1,0 +1,558 @@
+{% extends "base.html" %}
+
+{% block title %}Setup Two-Factor Authentication - Hack Clubs Dash{% endblock %}
+
+{% block extra_head %}
+<style>
+    .setup-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: var(--background);
+    }
+
+    .setup-card {
+        background: var(--surface);
+        border-radius: 16px;
+        box-shadow: var(--shadow-xl);
+        padding: 3rem;
+        max-width: 650px;
+        width: 100%;
+        animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .setup-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .setup-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(236, 55, 80, 0.3);
+    }
+
+    .setup-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+    }
+
+    .setup-header p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+    }
+
+    .setup-steps {
+        margin: 0;
+    }
+
+    .step {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--background);
+        border-radius: 12px;
+        border: 2px solid var(--border);
+        transition: all 0.2s ease;
+    }
+
+    .step:hover {
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(236, 55, 80, 0.1);
+    }
+
+    .step:last-child {
+        margin-bottom: 0;
+    }
+
+    .step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        color: white;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-right: 0.75rem;
+        box-shadow: 0 4px 12px rgba(236, 55, 80, 0.3);
+    }
+
+    .step-title {
+        display: flex;
+        align-items: center;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text);
+    }
+
+    .step p, .step ul {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .step ul {
+        margin: 0.5rem 0 0 0;
+        padding-left: 2rem;
+    }
+
+    .step ul li {
+        margin-bottom: 0.5rem;
+    }
+
+    .qr-code-container {
+        text-align: center;
+        margin: 1.5rem 0;
+        padding: 1.5rem;
+        background: var(--surface);
+        border-radius: 12px;
+        border: 2px solid var(--border);
+    }
+
+    .qr-code {
+        max-width: 256px;
+        border: 3px solid var(--primary);
+        border-radius: 12px;
+        padding: 1rem;
+        background: white;
+        box-shadow: 0 4px 12px rgba(236, 55, 80, 0.2);
+    }
+
+    .secret-key {
+        background: var(--surface-elevated);
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: monospace;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: center;
+        word-break: break-all;
+        margin: 1rem 0;
+        color: var(--text);
+        letter-spacing: 2px;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-family: monospace;
+        font-weight: 600;
+        letter-spacing: 4px;
+        text-align: center;
+        background: var(--surface);
+        color: var(--text);
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+    }
+
+    .form-control:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.75rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-right: 0.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        color: white;
+        box-shadow: 0 4px 12px rgba(236, 55, 80, 0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(236, 55, 80, 0.4);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        background: var(--surface-elevated);
+        color: var(--text);
+        border: 2px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+        background: var(--background);
+        border-color: var(--text-tertiary);
+    }
+
+    .button-group {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .backup-codes-container {
+        display: none;
+        animation: slideUp 0.4s ease-out;
+    }
+
+    .backup-codes-container.show {
+        display: block;
+    }
+
+    .backup-codes-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .backup-codes-header h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+    }
+
+    .backup-codes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+    }
+
+    .backup-code {
+        font-family: monospace;
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0.875rem;
+        background: var(--surface-elevated);
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        text-align: center;
+        color: var(--text);
+        letter-spacing: 1px;
+        transition: all 0.2s;
+    }
+
+    .backup-code:hover {
+        border-color: var(--primary);
+        box-shadow: 0 2px 8px rgba(236, 55, 80, 0.1);
+    }
+
+    .alert {
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: start;
+        gap: 0.75rem;
+        line-height: 1.6;
+    }
+
+    .alert strong {
+        font-weight: 700;
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: 2px solid #fbbf24;
+        color: #78350f;
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        border: 2px solid #3b82f6;
+        color: #1e40af;
+    }
+
+    .alert i {
+        font-size: 1.25rem;
+        margin-top: 0.125rem;
+    }
+
+    @media (max-width: 768px) {
+        .setup-container {
+            padding: 1rem;
+        }
+
+        .setup-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .setup-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .setup-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 2rem;
+        }
+
+        .backup-codes-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+            margin-right: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-card">
+        <div class="setup-header">
+            <div class="setup-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1>Setup Two-Factor Authentication</h1>
+            <p>Add an extra layer of security to your account</p>
+        </div>
+
+        <div class="setup-steps">
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">1</span>
+                    Install an Authenticator App
+                </div>
+                <p>Download and install an authenticator app on your phone:</p>
+                <ul>
+                    <li><strong>Google Authenticator</strong> (iOS / Android)</li>
+                    <li><strong>Microsoft Authenticator</strong> (iOS / Android)</li>
+                    <li><strong>Authy</strong> (iOS / Android / Desktop)</li>
+                    <li><strong>1Password</strong> (iOS / Android / Desktop)</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">2</span>
+                    Scan QR Code or Enter Secret Key
+                </div>
+
+                {% if not qr_code_data %}
+                <button type="button" class="btn btn-primary" onclick="generateSecret()">Generate QR Code</button>
+                {% else %}
+                <div class="qr-code-container">
+                    <img src="data:image/png;base64,{{ qr_code_data }}" alt="QR Code" class="qr-code">
+                </div>
+
+                <p style="text-align: center; margin: 1rem 0; color: var(--text-secondary);">Or enter this secret key manually:</p>
+                <div class="secret-key">{{ secret }}</div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>💡 Tip:</strong> Save this secret key in a safe place. You can use it to set up 2FA on another device.
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">3</span>
+                    Verify Your Setup
+                </div>
+                <p>Enter the 6-digit code from your authenticator app:</p>
+                <form id="verifyForm">
+                    <div class="form-group">
+                        <label for="token" class="form-label">Authentication Code</label>
+                        <input type="text" id="token" name="token" class="form-control"
+                               placeholder="000000" maxlength="6" pattern="[0-9]{6}" required
+                               {% if not qr_code_data %}disabled{% endif %}>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary" {% if not qr_code_data %}disabled{% endif %}>
+                            <i class="fas fa-check"></i> Enable 2FA
+                        </button>
+                        <a href="{{ url_for('main.account') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="backup-codes-container" id="backupCodesContainer">
+            <div class="backup-codes-header">
+                <h3>🔑 Your Backup Codes</h3>
+            </div>
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>⚠️ Important:</strong> Save these backup codes in a secure location. Each code can only be used once if you lose access to your authenticator app.
+                </div>
+            </div>
+            <div class="backup-codes-grid" id="backupCodesGrid"></div>
+            <div class="button-group">
+                <button type="button" class="btn btn-primary" onclick="downloadBackupCodes()">
+                    <i class="fas fa-download"></i> Download Backup Codes
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="finishSetup()">
+                    <i class="fas fa-check"></i> I've Saved My Codes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let backupCodes = [];
+
+function showNotification(message, type = 'info') {
+    // Use the base.html toast system
+    if (typeof showToast === 'function') {
+        showToast(type, message);
+    } else {
+        // Fallback to console if toast not available
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+}
+
+async function generateSecret() {
+    try {
+        const response = await fetch('{{ url_for("auth.setup_2fa") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=generate'
+        });
+
+        if (response.ok) {
+            location.reload();
+        } else {
+            showNotification('Failed to generate secret. Please try again.', 'error');
+        }
+    } catch (error) {
+        showNotification('An error occurred. Please try again.', 'error');
+    }
+}
+
+document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const token = document.getElementById('token').value;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Verifying...';
+
+    try {
+        const response = await fetch('{{ url_for("auth.setup_2fa") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=verify&token=${encodeURIComponent(token)}`
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Show backup codes
+            backupCodes = data.backup_codes;
+            displayBackupCodes(backupCodes);
+            document.querySelector('.setup-steps').style.display = 'none';
+            document.getElementById('backupCodesContainer').classList.add('show');
+        } else {
+            showNotification(data.message || 'Invalid token. Please try again.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    } catch (error) {
+        showNotification('An error occurred. Please try again.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+});
+
+function displayBackupCodes(codes) {
+    const grid = document.getElementById('backupCodesGrid');
+    grid.innerHTML = '';
+    codes.forEach(code => {
+        const div = document.createElement('div');
+        div.className = 'backup-code';
+        div.textContent = code;
+        grid.appendChild(div);
+    });
+}
+
+function downloadBackupCodes() {
+    const text = backupCodes.join('\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'hackclub-backup-codes.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function finishSetup() {
+    window.location.href = '{{ url_for("main.account") }}';
+}
+</script>
+{% endblock %}

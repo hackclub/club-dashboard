@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=test-secret-key-for-docker-testing-change-in-production
+      - DATABASE_URL=postgresql://hackclub:password@db:5432/hackclub_dashboard
+      - PORT=5000
+      - HACKCLUB_CDN_TOKEN=${HACKCLUB_CDN_TOKEN}
+    depends_on:
+      - db
+    volumes:
+      - uploads:/app/static/uploads
+    networks:
+      - hackclub-network
+    restart: unless-stopped
+    
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=hackclub_dashboard
+      - POSTGRES_USER=hackclub
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hackclub-network
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+  uploads:
+
+networks:
+  hackclub-network:
+    driver: bridge

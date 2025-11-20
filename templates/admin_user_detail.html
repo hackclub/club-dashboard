@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}User Details - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <h1>User Details: {{ user.username }}</h1>
+
+    <div style="background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2>Profile Information</h2>
+        <p><strong>ID:</strong> {{ user.id }}</p>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+        <p><strong>Created:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else 'N/A' }}</p>
+        <p><strong>Last Login:</strong> {{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</p>
+        <p><strong>Status:</strong> {% if user.is_suspended %}<span style="color: red;">Suspended</span>{% else %}<span style="color: green;">Active</span>{% endif %}</p>
+
+        <h3>Roles & Permissions</h3>
+        <p><strong>Admin:</strong> {{ 'Yes' if user.is_admin else 'No' }}</p>
+        {% if user.roles %}
+        <p><strong>Roles:</strong> {{ user.roles|map(attribute='name')|join(', ') }}</p>
+        {% endif %}
+    </div>
+
+    <div style="background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2>Club Memberships ({{ clubs|length }})</h2>
+        {% if clubs %}
+        <ul>
+            {% for club in clubs %}
+            <li><a href="{{ url_for('admin.club_detail', club_id=club.id) }}">{{ club.name }}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No club memberships</p>
+        {% endif %}
+    </div>
+
+    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2>Actions</h2>
+        {% if not user.is_suspended %}
+        <form method="POST" action="{{ url_for('admin.suspend_user', user_id=user.id) }}" style="display: inline;">
+            <label>Reason: <input type="text" name="reason" required></label>
+            <button type="submit" style="background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer;">Suspend User</button>
+        </form>
+        {% else %}
+        <form method="POST" action="{{ url_for('admin.unsuspend_user', user_id=user.id) }}" style="display: inline;">
+            <button type="submit" style="background: #10b981; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer;">Unsuspend User</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('admin.users') }}" style="color: #3b82f6;">← Back to Users List</a>
+    </div>
+</div>
+{% endblock %}

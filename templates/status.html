@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hack Club Dashboard Status</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ec3750;
+            --primary-dark: #d63146;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+
+            --operational: #10b981;
+            --degraded: #f59e0b;
+            --partial-outage: #f59e0b;
+            --major-outage: #ef4444;
+
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .main-content {
+            padding: 3rem 0;
+            display: grid;
+            gap: 2rem;
+        }
+
+        /* Status Overview */
+        .status-overview {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-overview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--operational);
+            transition: background-color 0.3s ease;
+        }
+
+        .status-overview.degraded::before { background: var(--degraded); }
+        .status-overview.partial-outage::before { background: var(--partial-outage); }
+        .status-overview.major-outage::before { background: var(--major-outage); }
+
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: var(--operational);
+            transition: all 0.3s ease;
+        }
+
+        .status-overview.degraded .status-icon { color: var(--degraded); }
+        .status-overview.partial-outage .status-icon { color: var(--partial-outage); }
+        .status-overview.major-outage .status-icon { color: var(--major-outage); }
+
+        .status-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--operational);
+        }
+
+        .status-overview.degraded .status-title { color: var(--degraded); }
+        .status-overview.partial-outage .status-title { color: var(--partial-outage); }
+        .status-overview.major-outage .status-title { color: var(--major-outage); }
+
+        .status-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .last-updated {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Services Grid */
+        .services-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .services-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .services-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+
+        .service-item:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .service-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .service-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+        }
+
+        .service-status.operational {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--operational);
+        }
+
+        .service-status.degraded {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--degraded);
+        }
+
+        .service-status.partial-outage {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--partial-outage);
+        }
+
+        .service-status.major-outage {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--major-outage);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Incidents Section */
+        .incidents-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .incidents-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .incident-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .incident-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-radius: var(--radius) var(--radius) 0 0;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .incident-tab.active {
+            color: var(--primary);
+            background: var(--bg-secondary);
+        }
+
+        .incident-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .incidents-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .incident-item {
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .incident-item:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+        }
+
+        .incident-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .incident-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .incident-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .incident-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .incident-badge.status-investigating {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        .incident-badge.status-identified {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .incident-badge.status-monitoring {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .incident-badge.status-resolved {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .incident-badge.impact-minor {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        .incident-badge.impact-major {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .incident-badge.impact-critical {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+
+        .incident-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .incident-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .incident-duration {
+            font-weight: 600;
+        }
+
+        .no-incidents {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .no-incidents i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+
+        .admin-toggle {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.2s ease;
+        }
+
+        .admin-toggle:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .admin-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-xl);
+            padding: 1rem;
+            min-width: 250px;
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .admin-menu.show {
+            display: block;
+        }
+
+        .admin-menu button {
+            width: 100%;
+            padding: 0.75rem;
+            background: none;
+            border: none;
+            text-align: left;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-menu button:hover {
+            background: var(--bg-secondary);
+        }
+
+        .admin-menu button:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 2rem 0;
+            }
+
+            .status-overview,
+            .services-section,
+            .incidents-section {
+                padding: 1.5rem;
+            }
+
+            .incident-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .incident-badges {
+                order: -1;
+            }
+
+            .admin-panel {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 2rem 0;
+                text-align: center;
+            }
+
+            .admin-menu {
+                position: static;
+                box-shadow: var(--shadow-md);
+                margin-top: 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 120px 2rem 2rem 2rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-container {
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 2rem 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+            background: var(--bg-primary);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(236, 55, 80, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex !important;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: normal !important;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            transition: background-color 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto !important;
+            margin: 0;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-light);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-success:hover,
+        .btn-warning:hover,
+        .btn-danger:hover,
+        .btn-info:hover {
+            transform: translateY(-1px);
+            filter: brightness(110%);
+        }
+
+        /* Incident Actions */
+        .incident-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+        }
+
+        .incident-updates-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .incident-updates-section h4 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .update-item {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--info);
+        }
+
+        .update-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .update-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .incident-creator {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .incident-creator i {
+            margin-right: 0.25rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .modal-container {
+                max-width: 95vw;
+                margin: 0 1rem;
+            }
+
+            .modal-header,
+            .modal-body,
+            .modal-footer {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .incident-actions {
+                flex-direction: column;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="container">
+            <h1>
+                <i class="fas fa-heartbeat"></i>
+                Hack Club Dashboard Status
+            </h1>
+            <p>Real-time status and incident reports for all Hack Club Dashboard services</p>
+        </div>
+    </div>
+
+
+    <div class="admin-panel" id="adminPanel" style="display: none;">
+        <button class="admin-toggle" onclick="toggleAdminMenu()">
+            <i class="fas fa-cog"></i> Admin
+        </button>
+        <div class="admin-menu" id="adminMenu">
+            <button onclick="createIncident()">
+                <i class="fas fa-plus"></i> Create Incident
+            </button>
+            <button onclick="viewAllIncidents()">
+                <i class="fas fa-list"></i> Manage Incidents
+            </button>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <div class="main-content">
+
+            <div class="status-overview fade-in" id="statusOverview">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading system status...</p>
+                </div>
+            </div>
+
+
+            <div class="incidents-section fade-in">
+                <h2>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Incident History
+                </h2>
+
+                <div class="incident-tabs">
+                    <button class="incident-tab active" data-filter="active" onclick="switchIncidentTab('active', this)">
+                        Active Incidents
+                    </button>
+                    <button class="incident-tab" data-filter="resolved" onclick="switchIncidentTab('resolved', this)">
+                        Recent Resolved
+                    </button>
+                    <button class="incident-tab" data-filter="all" onclick="switchIncidentTab('all', this)">
+                        All Incidents
+                    </button>
+                </div>
+
+                <div class="incidents-list" id="incidentsList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading incidents...</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="services-section fade-in">
+                <h2>
+                    <i class="fas fa-server"></i>
+                    Services
+                </h2>
+                <div class="services-grid" id="servicesGrid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading services status...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="modalOverlay" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-container" onclick="event.stopPropagation()">
+
+            <div id="createIncidentModal" class="modal">
+                <div class="modal-header">
+                    <h3><i class="fas fa-plus"></i> Create New Incident</h3>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="createIncidentForm">
+                        <div class="form-group">
+                            <label for="incidentTitle">Title *</label>
+                            <input type="text" id="incidentTitle" required placeholder="Brief description of the issue">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="incidentDescription">Description *</label>
+                            <textarea id="incidentDescription" required rows="4" placeholder="Detailed description of the issue and its impact"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="incidentImpact">Impact Level *</label>
+                                <select id="incidentImpact" required>
+                                    <option value="">Select impact...</option>
+                                    <option value="minor">Minor - Limited impact</option>
+                                    <option value="major">Major - Significant impact</option>
+                                    <option value="critical">Critical - Severe disruption</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="incidentStatus">Status</label>
+                                <select id="incidentStatus">
+                                    <option value="investigating">Investigating</option>
+                                    <option value="identified">Identified</option>
+                                    <option value="monitoring">Monitoring</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="affectedServices">Affected Services</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="Dashboard"> Dashboard
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="API"> API
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="Authentication"> Authentication
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="CDN"> CDN
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="Database"> Database
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="Economy"> Economy
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitCreateIncident()">
+                        <i class="fas fa-plus"></i> Create Incident
+                    </button>
+                </div>
+            </div>
+
+
+            <div id="manageIncidentModal" class="modal">
+                <div class="modal-header">
+                    <h3><i class="fas fa-cog"></i> Manage Incident</h3>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="incidentDetails"></div>
+
+                    <div class="incident-actions" id="incidentActions">
+                        <button class="btn btn-warning" onclick="editIncident()">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-success" onclick="resolveIncident()">
+                            <i class="fas fa-check"></i> Mark Resolved
+                        </button>
+                        <button class="btn btn-info" onclick="addStatusUpdate()">
+                            <i class="fas fa-comment"></i> Add Update
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteIncident()">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+
+
+                    <div id="incidentUpdates" class="incident-updates-section">
+                        <h4><i class="fas fa-history"></i> Status Updates</h4>
+                        <div id="updatesList"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+
+
+            <div id="editIncidentModal" class="modal">
+                <div class="modal-header">
+                    <h3><i class="fas fa-edit"></i> Edit Incident</h3>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editIncidentForm">
+                        <input type="hidden" id="editIncidentId">
+
+                        <div class="form-group">
+                            <label for="editIncidentTitle">Title *</label>
+                            <input type="text" id="editIncidentTitle" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editIncidentDescription">Description *</label>
+                            <textarea id="editIncidentDescription" required rows="4"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editIncidentImpact">Impact Level *</label>
+                                <select id="editIncidentImpact" required>
+                                    <option value="minor">Minor</option>
+                                    <option value="major">Major</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editIncidentStatus">Status</label>
+                                <select id="editIncidentStatus">
+                                    <option value="investigating">Investigating</option>
+                                    <option value="identified">Identified</option>
+                                    <option value="monitoring">Monitoring</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editAffectedServices">Affected Services</label>
+                            <div class="checkbox-group" id="editAffectedServices">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="Dashboard"> Dashboard
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="API"> API
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="Authentication"> Authentication
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="CDN"> CDN
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="Database"> Database
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="Economy"> Economy
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditIncident()">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+
+
+            <div id="addUpdateModal" class="modal">
+                <div class="modal-header">
+                    <h3><i class="fas fa-comment"></i> Add Status Update</h3>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUpdateForm">
+                        <input type="hidden" id="updateIncidentId">
+
+                        <div class="form-group">
+                            <label for="updateMessage">Update Message *</label>
+                            <textarea id="updateMessage" required rows="4" placeholder="Describe what's happening with this incident..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="updateStatus">New Status</label>
+                            <select id="updateStatus">
+                                <option value="investigating">Investigating</option>
+                                <option value="identified">Identified</option>
+                                <option value="monitoring">Monitoring</option>
+                                <option value="resolved">Resolved</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitAddUpdate()">
+                        <i class="fas fa-plus"></i> Add Update
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentIncidentFilter = 'active';
+        let isAdmin = false;
+        let allIncidents = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatusSummary();
+            loadIncidents();
+            checkAdminStatus();
+
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                loadStatusSummary();
+                loadIncidents();
+            }, 30000);
+        });
+
+        // Check if current user is admin
+        async function checkAdminStatus() {
+            try {
+                console.log('checkAdminStatus: Checking admin status...');
+                const response = await fetch('/api/user/me');
+                console.log(`checkAdminStatus: Response status: ${response.status}`);
+
+                if (response.ok) {
+                    const user = await response.json();
+                    console.log('checkAdminStatus: User data:', user);
+                    isAdmin = user.is_admin || false;
+                    console.log(`checkAdminStatus: isAdmin = ${isAdmin}`);
+
+                    if (isAdmin) {
+                        console.log('checkAdminStatus: Showing admin panel');
+                        document.getElementById('adminPanel').style.display = 'block';
+                    } else {
+                        console.log('checkAdminStatus: User is not admin, hiding panel');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    console.log('checkAdminStatus: API error:', errorData);
+                }
+            } catch (error) {
+                console.log('checkAdminStatus: Not logged in or error checking admin status:', error);
+            }
+        }
+
+        // Load system status summary
+        async function loadStatusSummary() {
+            try {
+                const response = await fetch('/api/status/summary');
+                const data = await response.json();
+
+                if (response.ok) {
+                    renderStatusOverview(data);
+                    renderServices(data.services);
+                } else {
+                    throw new Error(data.error || 'Failed to load status');
+                }
+            } catch (error) {
+                console.error('Error loading status summary:', error);
+                showError('Failed to load system status');
+            }
+        }
+
+        // Render status overview
+        function renderStatusOverview(data) {
+            const statusOverview = document.getElementById('statusOverview');
+            const statusClass = data.overall_status.replace('_', '-');
+
+            let iconClass = 'fa-check-circle';
+            if (data.overall_status === 'degraded') iconClass = 'fa-exclamation-triangle';
+            else if (data.overall_status.includes('outage')) iconClass = 'fa-times-circle';
+
+            statusOverview.className = `status-overview fade-in ${statusClass}`;
+            statusOverview.innerHTML = `
+                <div class="status-icon">
+                    <i class="fas ${iconClass}"></i>
+                </div>
+                <h2 class="status-title">${data.status_message}</h2>
+                <p class="status-description">
+                    ${data.active_incidents_count > 0
+                        ? `${data.active_incidents_count} active incident${data.active_incidents_count !== 1 ? 's' : ''} being monitored`
+                        : 'All systems are running smoothly'
+                    }
+                </p>
+                <div class="last-updated">
+                    Last updated: ${formatTimestamp(data.last_updated)}
+                </div>
+            `;
+        }
+
+        // Render services status
+        function renderServices(services) {
+            const servicesGrid = document.getElementById('servicesGrid');
+
+            if (services.length === 0) {
+                servicesGrid.innerHTML = '<div class="no-incidents"><p>No services configured</p></div>';
+                return;
+            }
+
+            servicesGrid.innerHTML = services.map(service => {
+                let iconClass = 'fa-server';
+                if (service.name === 'API') iconClass = 'fa-code';
+                else if (service.name === 'Authentication') iconClass = 'fa-shield-alt';
+                else if (service.name === 'CDN') iconClass = 'fa-cloud';
+                else if (service.name === 'Database') iconClass = 'fa-database';
+                else if (service.name === 'Economy') iconClass = 'fa-coins';
+
+                const statusClass = service.status.replace('_', '-');
+                const statusText = service.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+                return `
+                    <div class="service-item">
+                        <div class="service-name">
+                            <i class="fas ${iconClass}"></i>
+                            ${service.name}
+                        </div>
+                        <div class="service-status ${statusClass}">
+                            <div class="status-indicator"></div>
+                            ${statusText}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Load incidents
+        async function loadIncidents() {
+            try {
+                const response = await fetch(`/api/status/incidents?status=${currentIncidentFilter}&limit=20`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    allIncidents = data.incidents;
+                    renderIncidents(data.incidents);
+                } else {
+                    throw new Error(data.error || 'Failed to load incidents');
+                }
+            } catch (error) {
+                console.error('Error loading incidents:', error);
+                showError('Failed to load incidents');
+            }
+        }
+
+        // Render incidents list
+        function renderIncidents(incidents) {
+            const incidentsList = document.getElementById('incidentsList');
+
+            if (incidents.length === 0) {
+                const filterText = currentIncidentFilter === 'active' ? 'active incidents' :
+                                 currentIncidentFilter === 'resolved' ? 'resolved incidents' : 'incidents';
+                incidentsList.innerHTML = `
+                    <div class="no-incidents">
+                        <i class="fas fa-check-circle"></i>
+                        <p>No ${filterText} to display</p>
+                    </div>
+                `;
+                return;
+            }
+
+            incidentsList.innerHTML = incidents.map(incident => `
+                <div class="incident-item" onclick="${isAdmin ? `manageIncident(${incident.id})` : `viewIncidentDetails(${incident.id})`}">
+                    <div class="incident-header">
+                        <h3 class="incident-title">${incident.title}</h3>
+                        <div class="incident-badges">
+                            <span class="incident-badge status-${incident.status}">${incident.status}</span>
+                            <span class="incident-badge impact-${incident.impact}">${incident.impact}</span>
+                        </div>
+                    </div>
+                    <p class="incident-description">${incident.description}</p>
+                    <div class="incident-meta">
+                        <span>Created ${formatTimestamp(incident.created_at)}</span>
+                        <span class="incident-duration">Duration: ${incident.duration}</span>
+                    </div>
+                    ${incident.affected_services && incident.affected_services.length > 0 ? `
+                        <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
+                            Affected: ${incident.affected_services.join(', ')}
+                        </div>
+                    ` : ''}
+                    ${incident.creator ? `
+                        <div class="incident-creator">
+                            <i class="fas fa-user"></i>Created by ${incident.creator.username}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Switch incident tab
+        function switchIncidentTab(filter, element) {
+            currentIncidentFilter = filter;
+
+            // Update tab states
+            document.querySelectorAll('.incident-tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+
+            // Show loading
+            document.getElementById('incidentsList').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading incidents...</p>
+                </div>
+            `;
+
+            // Load incidents with new filter
+            loadIncidents();
+        }
+
+        // View incident details (for non-admin users)
+        function viewIncidentDetails(incidentId) {
+            manageIncident(incidentId); // Reuse the same function but without admin actions
+        }
+
+        // Edit incident functions
+        function editIncident() {
+            if (!currentIncident) return;
+
+            // Populate edit form with current incident data
+            document.getElementById('editIncidentId').value = currentIncident.id;
+            document.getElementById('editIncidentTitle').value = currentIncident.title;
+            document.getElementById('editIncidentDescription').value = currentIncident.description;
+            document.getElementById('editIncidentImpact').value = currentIncident.impact;
+            document.getElementById('editIncidentStatus').value = currentIncident.status;
+
+            // Set affected services checkboxes
+            document.querySelectorAll('#editAffectedServices input[type="checkbox"]').forEach(cb => {
+                cb.checked = currentIncident.affected_services && currentIncident.affected_services.includes(cb.value);
+            });
+
+            showModal('editIncidentModal');
+        }
+
+        async function submitEditIncident() {
+            const incidentId = document.getElementById('editIncidentId').value;
+            const title = document.getElementById('editIncidentTitle').value.trim();
+            const description = document.getElementById('editIncidentDescription').value.trim();
+            const impact = document.getElementById('editIncidentImpact').value;
+            const status = document.getElementById('editIncidentStatus').value;
+
+            // Validate required fields
+            if (!title || !description || !impact) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+
+            // Get affected services
+            const affectedServices = Array.from(document.querySelectorAll('#editAffectedServices input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+
+            const updateData = {
+                title,
+                description,
+                impact,
+                status,
+                affected_services: affectedServices
+            };
+
+            try {
+                console.log('Updating incident:', updateData);
+
+                const response = await fetch(`/api/admin/status/incidents/${incidentId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showNotification('Incident updated successfully!', 'success');
+                    closeModal();
+                    loadIncidents();
+                    loadStatusSummary();
+                    // Refresh the manage modal if it's still open
+                    if (currentIncident) {
+                        manageIncident(incidentId);
+                    }
+                } else {
+                    showNotification('Error updating incident: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error updating incident:', error);
+                showNotification('Network error updating incident', 'error');
+            }
+        }
+
+        // Resolve incident function
+        async function resolveIncident() {
+            if (!currentIncident) return;
+
+            if (!confirm(`Are you sure you want to mark "${currentIncident.title}" as resolved?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/status/incidents/${currentIncident.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: 'resolved' })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showNotification('Incident marked as resolved!', 'success');
+                    closeModal();
+                    loadIncidents();
+                    loadStatusSummary();
+                } else {
+                    showNotification('Error resolving incident: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error resolving incident:', error);
+                showNotification('Network error resolving incident', 'error');
+            }
+        }
+
+        // Delete incident function
+        async function deleteIncident() {
+            if (!currentIncident) return;
+
+            if (!confirm(`Are you sure you want to permanently delete "${currentIncident.title}"? This cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/status/incidents/${currentIncident.id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showNotification('Incident deleted successfully!', 'success');
+                    closeModal();
+                    loadIncidents();
+                    loadStatusSummary();
+                } else {
+                    showNotification('Error deleting incident: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting incident:', error);
+                showNotification('Network error deleting incident', 'error');
+            }
+        }
+
+        // Add status update functions
+        function addStatusUpdate() {
+            if (!currentIncident) return;
+
+            document.getElementById('updateIncidentId').value = currentIncident.id;
+            document.getElementById('updateStatus').value = currentIncident.status; // Default to current status
+
+            showModal('addUpdateModal');
+        }
+
+        async function submitAddUpdate() {
+            const incidentId = document.getElementById('updateIncidentId').value;
+            const message = document.getElementById('updateMessage').value.trim();
+            const status = document.getElementById('updateStatus').value;
+
+            if (!message) {
+                showNotification('Please enter an update message', 'error');
+                return;
+            }
+
+            const updateData = {
+                message,
+                status
+            };
+
+            try {
+                console.log('Adding status update:', updateData);
+
+                const response = await fetch(`/api/admin/status/incidents/${incidentId}/updates`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showNotification('Status update added successfully!', 'success');
+                    closeModal();
+                    clearForm('addUpdateForm');
+                    loadIncidents();
+                    loadStatusSummary();
+                    // Refresh the manage modal
+                    manageIncident(incidentId);
+                } else {
+                    showNotification('Error adding update: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error adding update:', error);
+                showNotification('Network error adding update', 'error');
+            }
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check' : type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                ${message}
+            `;
+
+            // Add notification styles if not already present
+            if (!document.querySelector('#notificationStyles')) {
+                const style = document.createElement('style');
+                style.id = 'notificationStyles';
+                style.textContent = `
+                    .notification {
+                        position: fixed;
+                        top: 2rem;
+                        right: 2rem;
+                        padding: 1rem 1.5rem;
+                        border-radius: var(--radius);
+                        color: white;
+                        font-weight: 600;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        z-index: 10001;
+                        animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+                        box-shadow: var(--shadow-lg);
+                    }
+                    .notification-success { background: var(--success); }
+                    .notification-error { background: var(--error); }
+                    .notification-info { background: var(--info); }
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); }
+                        to { transform: translateX(0); }
+                    }
+                    @keyframes fadeOut {
+                        to { opacity: 0; transform: translateX(100%); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Admin functions
+        function toggleAdminMenu() {
+            const menu = document.getElementById('adminMenu');
+            menu.classList.toggle('show');
+        }
+
+        // Current incident being managed
+        let currentIncident = null;
+
+        function createIncident() {
+            showModal('createIncidentModal');
+        }
+
+        function submitCreateIncident() {
+            const form = document.getElementById('createIncidentForm');
+            const formData = new FormData(form);
+
+            // Get form values
+            const title = document.getElementById('incidentTitle').value.trim();
+            const description = document.getElementById('incidentDescription').value.trim();
+            const impact = document.getElementById('incidentImpact').value;
+            const status = document.getElementById('incidentStatus').value;
+
+            // Validate required fields
+            if (!title || !description || !impact) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+
+            // Get affected services
+            const affectedServices = Array.from(document.querySelectorAll('#affectedServices input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+
+            const incidentData = {
+                title,
+                description,
+                impact,
+                status,
+                affected_services: affectedServices
+            };
+
+            createIncidentAPI(incidentData);
+        }
+
+        async function createIncidentAPI(incidentData) {
+            try {
+                console.log('Creating incident:', incidentData);
+
+                const response = await fetch('/api/admin/status/incidents', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(incidentData)
+                });
+
+                const result = await response.json();
+                console.log('Create incident response:', result);
+
+                if (response.ok) {
+                    showNotification('Incident created successfully!', 'success');
+                    closeModal();
+                    clearForm('createIncidentForm');
+                    // Refresh the incidents list
+                    loadIncidents();
+                    loadStatusSummary();
+                } else {
+                    showNotification('Error creating incident: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error creating incident:', error);
+                showNotification('Network error creating incident', 'error');
+            }
+        }
+
+        function viewAllIncidents() {
+            switchIncidentTab('all', document.querySelector('[data-filter="all"]'));
+        }
+
+        // Modal management functions
+        function showModal(modalId) {
+            // Hide all modals first
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+
+            // Show the requested modal
+            document.getElementById(modalId).style.display = 'block';
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            setTimeout(() => {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }, 300);
+        }
+
+        function clearForm(formId) {
+            const form = document.getElementById(formId);
+            form.reset();
+            // Clear checkboxes
+            form.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+
+        // Manage incident function
+        async function manageIncident(incidentId) {
+            try {
+                console.log(`Loading incident details for ID: ${incidentId}`);
+
+                const response = await fetch(`/api/status/incidents/${incidentId}`);
+                const incident = await response.json();
+
+                if (response.ok) {
+                    currentIncident = incident;
+                    displayIncidentDetails(incident);
+                    showModal('manageIncidentModal');
+                } else {
+                    showNotification('Error loading incident details: ' + (incident.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error loading incident:', error);
+                showNotification('Network error loading incident', 'error');
+            }
+        }
+
+        function displayIncidentDetails(incident) {
+            const detailsContainer = document.getElementById('incidentDetails');
+            detailsContainer.innerHTML = `
+                <div class="incident-detail-card">
+                    <h4>${incident.title}</h4>
+                    <div class="incident-badges" style="margin: 1rem 0;">
+                        <span class="incident-badge status-${incident.status}">${incident.status}</span>
+                        <span class="incident-badge impact-${incident.impact}">${incident.impact}</span>
+                    </div>
+                    <p><strong>Description:</strong> ${incident.description}</p>
+                    <p><strong>Created:</strong> ${formatTimestamp(incident.created_at)}</p>
+                    <p><strong>Duration:</strong> ${incident.duration}</p>
+                    ${incident.resolved_at ? `<p><strong>Resolved:</strong> ${formatTimestamp(incident.resolved_at)}</p>` : ''}
+                    ${incident.affected_services && incident.affected_services.length > 0 ? `
+                        <p><strong>Affected Services:</strong> ${incident.affected_services.join(', ')}</p>
+                    ` : ''}
+                    ${incident.creator ? `
+                        <p><strong>Created by:</strong> ${incident.creator.username}</p>
+                    ` : ''}
+                </div>
+            `;
+
+            // Show/hide admin actions based on user role
+            const actionsContainer = document.getElementById('incidentActions');
+            if (isAdmin) {
+                actionsContainer.style.display = 'flex';
+                // Disable resolve button if already resolved
+                const resolveButton = actionsContainer.querySelector('button.btn-success');
+                if (incident.status === 'resolved') {
+                    resolveButton.style.display = 'none';
+                } else {
+                    resolveButton.style.display = 'inline-flex';
+                }
+            } else {
+                actionsContainer.style.display = 'none';
+            }
+
+            // Display status updates
+            const updatesList = document.getElementById('updatesList');
+            if (incident.updates && incident.updates.length > 0) {
+                updatesList.innerHTML = incident.updates.map(update => `
+                    <div class="update-item">
+                        <div class="update-header">
+                            <span>By ${update.creator ? update.creator.username : 'System'}</span>
+                            <span>${formatTimestamp(update.created_at)}</span>
+                        </div>
+                        <div class="update-status status-${update.status}">${update.status}</div>
+                        <p>${update.message}</p>
+                    </div>
+                `).join('');
+            } else {
+                updatesList.innerHTML = '<p style="color: var(--text-muted); font-style: italic;">No status updates yet.</p>';
+            }
+        }
+
+        // Utility functions
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffHours < 1) {
+                const diffMins = Math.floor(diffMs / (1000 * 60));
+                return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+            } else if (diffHours < 24) {
+                return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+            } else if (diffDays < 7) {
+                return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+
+        function showError(message) {
+            console.error(message);
+            // TODO: Implement better error handling UI
+        }
+
+        // Close admin menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const adminPanel = document.getElementById('adminPanel');
+            const adminMenu = document.getElementById('adminMenu');
+
+            if (adminPanel && !adminPanel.contains(event.target)) {
+                adminMenu.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

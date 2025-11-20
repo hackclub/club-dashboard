@@ -1,0 +1,109 @@
+
+{% extends "base.html" %}
+
+{% block title %}Help & Documentation - Hack Club Dashboard{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; margin: 0 auto; padding: 2rem;">
+    <h1 style="color: #1a202c; margin-bottom: 2rem; text-align: center;">Help & Documentation</h1>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+
+        <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <i class="fas fa-rocket" style="font-size: 2.5rem; color: #ec3750; margin-bottom: 1rem;"></i>
+                <h3 style="color: #1a202c; margin: 0;">Getting Started</h3>
+            </div>
+            <ul style="color: #64748b; line-height: 1.6;">
+                <li>Create your account</li>
+                <li>Join or link a club</li>
+                <li>Set up your profile</li>
+                <li>Connect your Hackatime account</li>
+                <li>Start collaborating!</li>
+            </ul>
+        </div>
+
+
+        <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <i class="fas fa-crown" style="font-size: 2.5rem; color: #f59e0b; margin-bottom: 1rem;"></i>
+                <h3 style="color: #1a202c; margin: 0;">For Club Leaders</h3>
+            </div>
+            <ul style="color: #64748b; line-height: 1.6;">
+                <li>Verify your club leadership</li>
+                <li>Customize your club details</li>
+                <li>Share your join code</li>
+                <li>Create assignments & meetings</li>
+                <li>Submit pizza grants</li>
+            </ul>
+        </div>
+
+
+        <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <i class="fas fa-users" style="font-size: 2.5rem; color: #10b981; margin-bottom: 1rem;"></i>
+                <h3 style="color: #1a202c; margin: 0;">For Members</h3>
+            </div>
+            <ul style="color: #64748b; line-height: 1.6;">
+                <li>Use a join code to join clubs</li>
+                <li>Complete assignments</li>
+                <li>Track your coding time</li>
+                <li>Submit projects</li>
+                <li>Participate in meetings</li>
+            </ul>
+        </div>
+
+
+        <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <i class="fas fa-star" style="font-size: 2.5rem; color: #8b5cf6; margin-bottom: 1rem;"></i>
+                <h3 style="color: #1a202c; margin: 0;">Key Features</h3>
+            </div>
+            <ul style="color: #64748b; line-height: 1.6;">
+                <li>Club management tools</li>
+                <li>Member tracking</li>
+                <li>Assignment system</li>
+                <li>Meeting scheduler</li>
+                <li>Project showcase</li>
+                <li>Pizza grant integration</li>
+            </ul>
+        </div>
+
+
+        <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <i class="fas fa-tools" style="font-size: 2.5rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                <h3 style="color: #1a202c; margin: 0;">Troubleshooting</h3>
+            </div>
+            <ul style="color: #64748b; line-height: 1.6;">
+                <li>Can't login? Check your credentials</li>
+                <li>Join code not working? Contact your leader</li>
+                <li>Missing features? Check your permissions</li>
+                <li>Need help? Join our Slack</li>
+            </ul>
+        </div>
+
+
+        <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <i class="fas fa-life-ring" style="font-size: 2.5rem; color: #06b6d4; margin-bottom: 1rem;"></i>
+                <h3 style="color: #1a202c; margin: 0;">Need More Help?</h3>
+            </div>
+            <div style="text-align: center;">
+                <a href="{{ url_for('contact') }}" class="btn btn-primary" style="margin-bottom: 1rem; display: inline-block;">
+                    <i class="fas fa-envelope"></i> Contact Support
+                </a>
+                <p style="color: #64748b; margin: 0;">
+                    Join our Slack community at <a href="https://hackclub.com/slack" target="_blank" style="color: #ec3750;">hackclub.com/slack</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center;">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}

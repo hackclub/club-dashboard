@@ -1,0 +1,1575 @@
+{% extends "base.html" %}
+{% block title %}Poster Studio Pro - {{ club.name }}{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600;700&family=Lato:wght@400;700&family=Oswald:wght@400;600&family=Raleway:wght@400;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Hide navbar on poster editor page */
+nav.navbar{display:none!important}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',system-ui,sans-serif;background:#f8f9fa;color:#333}.editor{display:flex;height:100vh;position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden}.sidebar{width:320px;background:#fff;border-right:1px solid #e0e0e0;overflow-y:auto;box-shadow:2px 0 8px rgba(0,0,0,0.08);height:100%;padding-bottom:20px}.font-item{padding:1rem;background:#f8f9fa;border:2px solid #e0e0e0;border-radius:8px;margin-bottom:0.5rem;cursor:pointer;transition:all .2s}.font-item:hover{background:#fff;border-color:#ec3750;transform:translateX(2px)}.font-item.selected{background:#fef7f7;border-color:#ec3750}.font-name{font-size:0.875rem;font-weight:600;color:#333;margin-bottom:0.25rem}.font-preview{font-size:1.25rem;color:#666}.image-result{position:relative;cursor:pointer;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#f0f0f0;transition:all .2s;border:2px solid transparent}.image-result:hover{transform:scale(1.05);border-color:#ec3750;box-shadow:0 4px 12px rgba(236,55,80,0.2)}.image-result img{width:100%;height:100%;object-fit:cover}.sidebar-header{padding:1.5rem;background:linear-gradient(135deg,#ec3750,#d63146);color:#fff}.sidebar-header h1{font-size:1.3rem;margin-bottom:0.3rem;font-weight:700}.tool-section{padding:1.25rem;border-bottom:1px solid #f0f0f0}.tool-section h3{font-size:0.75rem;text-transform:uppercase;color:#ec3750;margin-bottom:1rem;font-weight:700;letter-spacing:0.5px}.tool-btn{width:100%;padding:0.75rem;margin-bottom:0.5rem;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;color:#333;cursor:pointer;display:flex;align-items:center;gap:0.5rem;transition:all .2s;font-size:0.875rem;font-weight:500}.tool-btn:hover{background:#ec3750;border-color:#ec3750;color:#fff;transform:translateX(2px)}.tool-btn i{width:20px}.templates-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}.template-card{padding:1rem;background:#f8f9fa;border:2px solid #e0e0e0;border-radius:8px;text-align:center;cursor:pointer;transition:all .2s}.template-card:hover{background:#fff;border-color:#ec3750;box-shadow:0 4px 12px rgba(236,55,80,0.15);transform:translateY(-2px)}.template-card i{font-size:2rem;display:block;margin-bottom:0.5rem;color:#ec3750}.canvas-area{flex:1;display:flex;flex-direction:column;background:#f0f0f0;height:100%}.toolbar{height:65px;background:#fff;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;gap:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.05);flex-shrink:0}.toolbar-group{display:flex;gap:0.5rem}.toolbar-btn{padding:0.6rem 1rem;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;color:#333;cursor:pointer;display:flex;align-items:center;gap:0.5rem;transition:all .2s;font-size:0.875rem;font-weight:500}.toolbar-btn:hover{background:#fff;border-color:#ec3750;color:#ec3750}.toolbar-btn.primary{background:linear-gradient(135deg,#ec3750,#d63146);border:none;color:#fff}.toolbar-btn.primary:hover{box-shadow:0 4px 12px rgba(236,55,80,0.3)}.canvas-wrapper{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;overflow:auto}.canvas-container{box-shadow:0 8px 32px rgba(0,0,0,0.12);border-radius:4px;background:#fff;position:relative}#canvas{display:block}.sidebar-right{width:320px;background:#fff;border-left:1px solid #e0e0e0;overflow-y:auto;box-shadow:-2px 0 8px rgba(0,0,0,0.08);height:100%;padding-bottom:20px}.property-section{padding:1.25rem;border-bottom:1px solid #f0f0f0}.property-section h3{font-size:0.813rem;margin-bottom:1rem;color:#ec3750;text-transform:uppercase;font-weight:700}.property-row{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.75rem}.property-row.full{grid-template-columns:1fr}.tool-label{display:block;font-size:0.813rem;margin-bottom:0.5rem;color:#666;font-weight:600}.tool-input{width:100%;padding:0.6rem;background:#fff;border:1px solid #e0e0e0;border-radius:6px;color:#333;font-size:0.875rem}.tool-input:focus{outline:none;border-color:#ec3750;box-shadow:0 0 0 3px rgba(236,55,80,0.1)}.color-input{width:100%;height:45px;border:2px solid #e0e0e0;border-radius:8px;cursor:pointer}.layers-list{list-style:none}.layer-item{padding:0.75rem;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;margin-bottom:0.5rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all .2s}.layer-item:hover{background:#fff;border-color:#ec3750}.layer-item.active{background:#fef7f7;border-color:#ec3750}.layer-controls{display:flex;gap:0.25rem}.layer-controls button{padding:0.25rem 0.5rem;background:transparent;border:none;color:#666;cursor:pointer;font-size:0.75rem;border-radius:4px}.layer-controls button:hover{color:#fff;background:#ec3750}.shapes-grid,.icons-grid,.stickers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem}.shape-btn,.icon-btn{aspect-ratio:1;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;color:#333;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.25rem;transition:all .2s}.shape-btn:hover,.icon-btn:hover{background:#ec3750;border-color:#ec3750;color:#fff;transform:scale(1.05)}.stickers-grid{grid-template-columns:repeat(3,1fr);max-height:400px;overflow-y:auto}.sticker-item{aspect-ratio:1;background:#f8f9fa;border:2px solid #e0e0e0;border-radius:6px;cursor:pointer;transition:all .2s;overflow:hidden;padding:0.25rem}.sticker-item:hover{border-color:#ec3750;transform:scale(1.05)}.sticker-item img{width:100%;height:100%;object-fit:contain}.modal{display:none!important;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;backdrop-filter:blur(2px)}.modal.show{display:flex!important}.modal-content{background:#fff;border-radius:16px;padding:2rem;max-width:600px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalSlideIn .3s ease}@keyframes modalSlideIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #f0f0f0}.modal-header h3{margin:0;color:#333;font-size:1.5rem;font-weight:700}.modal-close{background:#f8f9fa;border:none;font-size:1.5rem;cursor:pointer;color:#666;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .2s}.modal-close:hover{background:#ec3750;color:#fff}.modal-body{margin-bottom:1.5rem}.modal-footer{display:flex;gap:0.75rem;justify-content:flex-end;padding-top:1rem;border-top:2px solid #f0f0f0}.modal-btn{padding:0.75rem 1.5rem;border-radius:8px;cursor:pointer;font-size:0.875rem;font-weight:600;transition:all .2s}.modal-btn.primary{background:linear-gradient(135deg,#ec3750,#d63146);color:#fff;border:none}.modal-btn.primary:hover{box-shadow:0 4px 12px rgba(236,55,80,0.3);transform:translateY(-1px)}.modal-btn.secondary{background:#f8f9fa;color:#333;border:1px solid #e0e0e0}.modal-btn.secondary:hover{background:#fff;border-color:#ec3750}.qr-input-group{display:flex;gap:0.5rem;margin-bottom:1rem}.qr-input-group input{flex:1}.qr-input-group button{padding:0.6rem 1rem;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;cursor:pointer;font-size:0.875rem;font-weight:500}.qr-input-group button:hover{background:#ec3750;color:#fff;border-color:#ec3750}.tabs{display:flex;gap:0.5rem;margin-bottom:1rem;border-bottom:2px solid #f0f0f0}.tab{padding:0.75rem 1.5rem;background:transparent;border:none;color:#666;cursor:pointer;font-size:0.875rem;font-weight:600;border-bottom:2px solid transparent;transition:all .2s}.tab.active{color:#ec3750;border-bottom-color:#ec3750}.tab:hover{color:#ec3750}.tab-content{display:none}.tab-content.active{display:block}@media(max-width:1024px){.sidebar-right{display:none}}@media print{.sidebar,.sidebar-right,.toolbar,.modal{display:none!important}.editor{display:block;position:static;height:auto}.canvas-area{height:auto;background:#fff}.canvas-wrapper{padding:0;height:auto;display:block;overflow:visible}.canvas-container{box-shadow:none;page-break-inside:avoid;width:8.5in!important;height:11in!important;margin:0 auto}#canvas{width:100%!important;height:auto!important}@page{size:letter portrait;margin:0.5in}body{margin:0;padding:0}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="editor">
+<div class="sidebar">
+<div class="sidebar-header">
+<h1><i class="fas fa-magic"></i> Poster Studio Pro</h1>
+<p style="margin:0;opacity:0.95;font-size:0.875rem">{{ club.name }}</p>
+</div>
+<div class="tool-section">
+<h3><i class="fas fa-file-alt"></i> Templates</h3>
+<div class="templates-grid">
+<div class="template-card" onclick="loadTemplate('recruitment')"><i class="fas fa-user-plus"></i><span style="font-size:0.813rem;font-weight:500">Join Us</span></div>
+<div class="template-card" onclick="loadTemplate('meeting')"><i class="fas fa-users"></i><span style="font-size:0.813rem;font-weight:500">Meeting</span></div>
+<div class="template-card" onclick="loadTemplate('event')"><i class="fas fa-calendar"></i><span style="font-size:0.813rem;font-weight:500">Event</span></div>
+<div class="template-card" onclick="loadTemplate('hackathon')"><i class="fas fa-trophy"></i><span style="font-size:0.813rem;font-weight:500">Hackathon</span></div>
+</div>
+</div>
+<div class="tool-section">
+<h3><i class="fas fa-plus-circle"></i> Add Elements</h3>
+<button class="tool-btn" onclick="addText()"><i class="fas fa-font"></i>Add Text</button>
+<button class="tool-btn" onclick="addHeading()"><i class="fas fa-heading"></i>Add Heading</button>
+<button class="tool-btn" onclick="addImage()"><i class="fas fa-image"></i>Upload Image</button>
+<button class="tool-btn" onclick="showImageSearchModal()"><i class="fas fa-search"></i>Search Images</button>
+<button class="tool-btn" onclick="showQRModal()"><i class="fas fa-qrcode"></i>Add QR Code</button>
+<button class="tool-btn" onclick="showStickersModal()"><i class="fas fa-sticker-mule"></i>Add Stickers</button>
+<button class="tool-btn" onclick="showIconsModal()"><i class="fas fa-icons"></i>Add Icons</button>
+</div>
+<div class="tool-section">
+<h3><i class="fas fa-shapes"></i> Shapes</h3>
+<div class="shapes-grid">
+<button class="shape-btn" onclick="addShape('rect')" title="Rectangle"><i class="fas fa-square"></i></button>
+<button class="shape-btn" onclick="addShape('circle')" title="Circle"><i class="fas fa-circle"></i></button>
+<button class="shape-btn" onclick="addShape('triangle')" title="Triangle"><i class="fas fa-play" style="transform:rotate(-90deg)"></i></button>
+<button class="shape-btn" onclick="addShape('line')" title="Line"><i class="fas fa-minus"></i></button>
+</div>
+</div>
+<div class="tool-section">
+<h3><i class="fas fa-border-style"></i> Canvas Style</h3>
+<div class="tool-group" style="margin-bottom:1rem">
+<label class="tool-label">Pattern</label>
+<select class="tool-input" id="bgPattern" onchange="applyCanvasStyle()">
+<option value="none">None</option>
+<option value="dots" selected>Dots</option>
+<option value="grid">Grid</option>
+<option value="stripes">Stripes</option>
+<option value="diagonal">Diagonal</option>
+</select>
+</div>
+<div class="tool-group" style="margin-bottom:1rem">
+<label class="tool-label">Pattern Color</label>
+<input type="color" class="color-input" id="patternColor" value="#ec3750" onchange="applyCanvasStyle()">
+</div>
+<div class="tool-group" style="margin-bottom:1rem">
+<label class="tool-label">Pattern Size: <span id="patternSizeValue">20px</span></label>
+<input type="range" min="10" max="50" value="20" id="patternSize" oninput="applyCanvasStyle()">
+</div>
+<div class="tool-group" style="margin-bottom:1rem">
+<label class="tool-label">Pattern Thickness: <span id="patternThicknessValue">2px</span></label>
+<input type="range" min="1" max="5" value="2" id="patternThickness" oninput="applyCanvasStyle()">
+</div>
+<div class="tool-group" style="margin-bottom:1rem">
+<label class="tool-label">Border Style</label>
+<select class="tool-input" id="borderStyle" onchange="applyCanvasStyle()">
+<option value="none">None</option>
+<option value="solid">Solid</option>
+<option value="dashed">Dashed</option>
+<option value="dotted" selected>Dotted</option>
+<option value="double">Double</option>
+</select>
+</div>
+<div class="tool-group" style="margin-bottom:1rem">
+<label class="tool-label">Border Color</label>
+<input type="color" class="color-input" id="borderColor" value="#ec3750" onchange="applyCanvasStyle()">
+</div>
+<div class="tool-group">
+<label class="tool-label">Border Width: <span id="borderWidthValue">5px</span></label>
+<input type="range" min="1" max="15" value="5" id="borderWidth" oninput="applyCanvasStyle()">
+</div>
+</div>
+<div class="tool-section">
+<a href="{{ url_for('club_dashboard', club_id=club.id) }}" class="tool-btn" style="text-decoration:none"><i class="fas fa-arrow-left"></i>Back to Dashboard</a>
+</div>
+</div>
+<div class="canvas-area">
+<div class="toolbar">
+<div class="toolbar-group">
+<button class="toolbar-btn" onclick="undo()" title="Undo"><i class="fas fa-undo"></i>Undo</button>
+<button class="toolbar-btn" onclick="redo()" title="Redo"><i class="fas fa-redo"></i>Redo</button>
+<button class="toolbar-btn" onclick="deleteSelected()" title="Delete"><i class="fas fa-trash"></i>Delete</button>
+</div>
+<div class="toolbar-group">
+<button class="toolbar-btn" onclick="duplicateSelected()"><i class="fas fa-copy"></i>Duplicate</button>
+<button class="toolbar-btn" onclick="bringToFront()"><i class="fas fa-arrow-up"></i>Front</button>
+<button class="toolbar-btn" onclick="sendToBack()"><i class="fas fa-arrow-down"></i>Back</button>
+</div>
+<div class="toolbar-group">
+<button class="toolbar-btn" onclick="zoomIn()"><i class="fas fa-search-plus"></i></button>
+<button class="toolbar-btn" onclick="zoomOut()"><i class="fas fa-search-minus"></i></button>
+<button class="toolbar-btn" onclick="resetZoom()"><i class="fas fa-expand"></i></button>
+</div>
+<div class="toolbar-group">
+<button class="toolbar-btn primary" onclick="showExportModal()"><i class="fas fa-download"></i>Export</button>
+</div>
+</div>
+<div class="canvas-wrapper">
+<div class="canvas-container" id="canvasContainer">
+<canvas id="canvas"></canvas>
+</div>
+</div>
+</div>
+<div class="sidebar-right">
+<div class="property-section">
+<h3>Canvas Settings</h3>
+<div class="property-row full">
+<label class="tool-label">Size</label>
+<select class="tool-input" id="canvasSize" onchange="updateCanvasSize()">
+<option value="600x900">Poster (600×900)</option>
+<option value="800x1200">Large Poster</option>
+<option value="1080x1080">Instagram Square</option>
+<option value="1080x1920">Instagram Story</option>
+<option value="1200x630">Facebook Post</option>
+</select>
+</div>
+<div class="property-row full">
+<label class="tool-label">Background</label>
+<input type="color" class="color-input" id="bgColor" value="#ffffff" onchange="updateBackground()">
+</div>
+</div>
+<div class="property-section" id="objectProps" style="display:none">
+<h3>Object</h3>
+<div class="property-row">
+<div><label class="tool-label">X</label><input type="number" class="tool-input" id="objX" oninput="updateObjectPosition()"></div>
+<div><label class="tool-label">Y</label><input type="number" class="tool-input" id="objY" oninput="updateObjectPosition()"></div>
+</div>
+<div class="property-row">
+<div><label class="tool-label">Width</label><input type="number" class="tool-input" id="objWidth" oninput="updateObjectSize()"></div>
+<div><label class="tool-label">Height</label><input type="number" class="tool-input" id="objHeight" oninput="updateObjectSize()"></div>
+</div>
+<div class="property-row full">
+<label class="tool-label">Rotation: <span id="rotationValue">0°</span></label>
+<input type="range" min="0" max="360" value="0" id="objRotation" oninput="updateRotation()">
+</div>
+<div class="property-row full">
+<label class="tool-label">Opacity: <span id="opacityValue">100%</span></label>
+<input type="range" min="0" max="100" value="100" id="objOpacity" oninput="updateOpacity()">
+</div>
+</div>
+<div class="property-section" id="textProps" style="display:none">
+<h3>Text</h3>
+<div class="property-row full">
+<label class="tool-label">Font</label>
+<button class="tool-btn" onclick="showFontModal()" id="currentFontBtn" style="margin-bottom:0.75rem">
+<i class="fas fa-font"></i>
+<span id="currentFontName">Inter</span>
+</button>
+</div>
+<div class="property-row full">
+<label class="tool-label">Size: <span id="fontSizeValue">24px</span></label>
+<input type="range" min="12" max="150" value="24" id="fontSize" oninput="updateTextProps()">
+</div>
+<div class="property-row full">
+<label class="tool-label">Color</label>
+<input type="color" class="color-input" id="textColor" value="#000000" onchange="updateTextProps()">
+</div>
+</div>
+<div class="property-section" id="shapeProps" style="display:none">
+<h3>Shape</h3>
+<div class="property-row full">
+<label class="tool-label">Fill</label>
+<input type="color" class="color-input" id="fillColor" value="#ec3750" onchange="updateShapeProps()">
+</div>
+<div class="property-row full">
+<label class="tool-label">Stroke</label>
+<input type="color" class="color-input" id="strokeColor" value="#000000" onchange="updateShapeProps()">
+</div>
+<div class="property-row full">
+<label class="tool-label">Width: <span id="strokeWidthValue">0px</span></label>
+<input type="range" min="0" max="20" value="0" id="strokeWidth" oninput="updateShapeProps()">
+</div>
+</div>
+<div class="property-section" id="qrProps" style="display:none">
+<h3>QR Code</h3>
+<div class="property-row full">
+<label class="tool-label">URL</label>
+<input type="text" class="tool-input" id="qrURL" oninput="updateQRCode()" placeholder="https://example.com">
+</div>
+<div class="property-row full">
+<button class="tool-btn" onclick="regenerateQR()"><i class="fas fa-sync"></i>Regenerate QR</button>
+</div>
+</div>
+<div class="property-section">
+<h3>Layers</h3>
+<ul class="layers-list" id="layersList">
+<li style="color:#999;font-size:0.813rem;padding:0.5rem;text-align:center">No objects</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="qrModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<h3><i class="fas fa-qrcode"></i> Add QR Code</h3>
+<button class="modal-close" onclick="closeQRModal()">&times;</button>
+</div>
+<div class="modal-body">
+<div class="tabs">
+<button class="tab active" onclick="switchQRTab('club')">Club Join</button>
+<button class="tab" onclick="switchQRTab('custom')">Custom</button>
+</div>
+<div class="tab-content active" id="qrClubTab">
+<div class="qr-input-group">
+<input type="text" class="tool-input" value="{{ request.url_root }}join-club?code={{ club.join_code }}" readonly>
+<button onclick="addQRCodeWithLink('{{ request.url_root }}join-club?code={{ club.join_code }}')"><i class="fas fa-plus"></i> Add</button>
+</div>
+</div>
+<div class="tab-content" id="qrCustomTab">
+<div class="qr-input-group">
+<input type="text" class="tool-input" id="customQRInput" placeholder="https://example.com">
+<button onclick="addQRCodeCustom()"><i class="fas fa-plus"></i> Add</button>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="modal-btn secondary" onclick="closeQRModal()">Cancel</button>
+</div>
+</div>
+</div>
+
+
+<div id="stickersModal" class="modal">
+<div class="modal-content" style="max-width:700px">
+<div class="modal-header">
+<h3><i class="fas fa-sticker-mule"></i> Stickers</h3>
+<button class="modal-close" onclick="closeStickersModal()">&times;</button>
+</div>
+<div class="modal-body">
+<div class="stickers-grid" id="stickersGrid"></div>
+</div>
+<div class="modal-footer">
+<button class="modal-btn secondary" onclick="closeStickersModal()">Close</button>
+</div>
+</div>
+</div>
+
+
+<div id="iconsModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<h3><i class="fas fa-icons"></i> Icons</h3>
+<button class="modal-close" onclick="closeIconsModal()">&times;</button>
+</div>
+<div class="modal-body">
+<div class="icons-grid" id="iconsGrid"></div>
+</div>
+<div class="modal-footer">
+<button class="modal-btn secondary" onclick="closeIconsModal()">Close</button>
+</div>
+</div>
+</div>
+
+
+<div id="exportModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<h3><i class="fas fa-download"></i> Export</h3>
+<button class="modal-close" onclick="closeExportModal()">&times;</button>
+</div>
+<div class="modal-body">
+<button class="tool-btn" onclick="exportPoster('png')" style="margin-bottom:0.5rem"><i class="fas fa-file-image"></i>PNG - High Quality</button>
+<button class="tool-btn" onclick="exportPoster('jpg')"><i class="fas fa-file-image"></i>JPG - Compressed</button>
+<button class="tool-btn" onclick="exportPoster('pdf')"><i class="fas fa-file-pdf"></i>PDF - Print Ready</button>
+<button class="tool-btn" onclick="exportPoster('svg')"><i class="fas fa-file-code"></i>SVG - Vector</button>
+</div>
+<div class="modal-footer">
+<button class="modal-btn secondary" onclick="closeExportModal()">Cancel</button>
+</div>
+</div>
+</div>
+
+
+<div id="successModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<h3><i class="fas fa-check-circle" style="color:#10b981"></i> Success</h3>
+<button class="modal-close" onclick="closeSuccessModal()">&times;</button>
+</div>
+<div class="modal-body">
+<p id="successMessage" style="color:#666"></p>
+</div>
+<div class="modal-footer">
+<button class="modal-btn primary" onclick="closeSuccessModal()">OK</button>
+</div>
+</div>
+</div>
+
+<div id="fontModal" class="modal">
+<div class="modal-content" style="max-width:700px;max-height:80vh">
+<div class="modal-header">
+<h3><i class="fas fa-font"></i> Choose Font</h3>
+<button class="modal-close" onclick="closeFontModal()">&times;</button>
+</div>
+<div class="modal-body" style="padding:0">
+<div style="padding:1rem;padding-bottom:0">
+<input type="text" class="tool-input" id="fontSearch" placeholder="Search fonts..." oninput="searchFonts()" style="margin-bottom:1rem">
+<p style="color:#666;font-size:0.813rem;margin-bottom:0.5rem">Popular Fonts</p>
+</div>
+<div id="fontList" style="max-height:400px;overflow-y:auto;padding:1rem"></div>
+<div id="fontLoading" style="text-align:center;padding:1rem;color:#666;display:none">
+<i class="fas fa-spinner fa-spin"></i> Loading more fonts...
+</div>
+</div>
+</div>
+</div>
+
+<div id="imageSearchModal" class="modal">
+<div class="modal-content" style="max-width:800px;max-height:85vh">
+<div class="modal-header">
+<h3><i class="fas fa-search"></i> Search Images</h3>
+<button class="modal-close" onclick="closeImageSearchModal()">&times;</button>
+</div>
+<div class="modal-body" style="padding:0">
+<div style="padding:1rem">
+<div style="display:flex;gap:0.5rem;margin-bottom:1rem">
+<input type="text" class="tool-input" id="imageSearchInput" placeholder="Search for images..." style="flex:1" onkeypress="if(event.key==='Enter')searchImages()">
+<button class="modal-btn primary" onclick="searchImages()" style="padding:0.6rem 1.5rem"><i class="fas fa-search"></i> Search</button>
+</div>
+<p style="color:#666;font-size:0.75rem;margin-bottom:0.5rem">Powered by <a href="https://unsplash.com" target="_blank" style="color:#ec3750;text-decoration:none">Unsplash</a> - Free high-quality images</p>
+</div>
+<div id="imageSearchResults" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.75rem;padding:1rem;max-height:450px;overflow-y:auto"></div>
+<div id="imageSearchLoading" style="text-align:center;padding:2rem;color:#666;display:none">
+<i class="fas fa-spinner fa-spin"></i> Searching...
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// Wait for fonts to load before initializing
+if (document.fonts && document.fonts.ready) {
+document.fonts.ready.then(function() {
+initializeEditor();
+});
+} else {
+// Fallback for browsers without FontFace API
+window.addEventListener('load', function() {
+setTimeout(initializeEditor, 100);
+});
+}
+
+function initializeEditor() {
+if (typeof fabric === 'undefined') { console.error('Fabric.js not loaded'); return; }
+
+const canvas = new fabric.Canvas('canvas', {width: 550, height: 800, backgroundColor: '#ffffff'});
+const CLUB_JOIN_LINK = '{{ request.url_root }}join-club?code={{ club.join_code }}';
+const STATIC_URL = '{{ url_for("static", filename="") }}';
+let history = [], historyStep = 0, hackClubFlag = null;
+
+// Font management
+let allGoogleFonts = [];
+let displayedFonts = [];
+let currentFontFamily = 'Inter';
+let fontSearchQuery = '';
+let isLoadingFonts = false;
+
+const stickers = ["0318016-8380173-Super-Matte-5000-Uncoated-Vinyl-Stickers_11.png","0318024-8706261-Super-Matte-5000-Uncoated-Vinyl-Stickers_11.png","0c7bf843-2b3b-41d1-a171-88905372303e_thumb.png","13756150.png","16332315_working.png","44d6d530-6a20-4543-8d15-57d02ec7831c_thumb.png","862905_1.png","ArtisanProduction.png","Artist_202501282025052.png","CleanShot2025-01-28at12.55.412x.png","CleanShot2025-01-28at12.56.342x.png","CleanShot2025-01-28at12.57.062x.png","CleanShot2025-01-28at12.57.392x.png","CleanShot2025-01-28at12.57.562x.png","CleanShot2025-01-28at12.58.332x.png","CleanShot2025-01-28at12.58.522x.png","CleanShot2025-01-28at12.59.172x.png","CleanShot2025-01-28at13.00.022x.png","CleanShot2025-01-28at13.00.392x.png","CleanShot2025-01-28at13.02.102x.png","CleanShot2025-01-28at13.02.502x.png","flag-orpheus-top.png","flag-standalone.png","Group152.png","hcb-dark.png","hcb-light.png","highseassticker2.png","icon-rounded.png","image12.png","image13.png","nest_1.png","nest_2.png","ProofforR047107314.png","ProofforR6201338011.png","ProofforR620133801.png","ProofforR840222152.png","ProofforR8437368311.png","ProofforR843736831.png","purpleno11.png","Screenshot2024-06-10at1.22.49PM.png","spookyorph.png","StickerMuleProof.png","terrifiedheidi.png","unnamed7.png","Untitled-28.png","white_untitled103_202502212246142.png","working.png"];
+
+const icons = ["heart","star","fire","rocket","trophy","crown","code","laptop","robot","lightbulb","brain","book","music","camera","paint-brush","pizza-slice","coffee"];
+
+const templates = {
+recruitment: {title: 'Join {{ club.name }}!', subtitle: 'Become a Member', desc: 'Learn to code, build projects,\nand join our community!', bg: '#ffffff', color: '#ec3750', icon: 'user-plus'},
+meeting: {title: 'Club Meeting', subtitle: '{{ club.name }}', desc: 'Join us this week for coding,\ncollaboration, and fun!', bg: '#f0f9ff', color: '#3b82f6', icon: 'users'},
+event: {title: 'Special Event', subtitle: 'You\'re Invited!', desc: 'Don\'t miss our exciting event.\nPrizes, fun, and more!', bg: '#fef3c7', color: '#f59e0b', icon: 'calendar'},
+hackathon: {title: 'Hackathon 2025', subtitle: 'Build. Code. Win.', desc: '24 hours of innovation,\ncreativity, and prizes!', bg: '#1e1b4b', color: '#fbbf24', icon: 'trophy'}
+};
+
+// Init stickers and icons
+const stickersGrid = document.getElementById('stickersGrid');
+stickers.forEach(s => {
+const div = document.createElement('div');
+div.className = 'sticker-item';
+div.innerHTML = `<img src="${STATIC_URL}assets/stickers/${s}" alt="">`;
+div.onclick = () => addSticker(s);
+stickersGrid.appendChild(div);
+});
+
+const iconsGrid = document.getElementById('iconsGrid');
+icons.forEach(icon => {
+const btn = document.createElement('button');
+btn.className = 'icon-btn';
+btn.innerHTML = `<i class="fas fa-${icon}"></i>`;
+btn.onclick = () => addIconToCanvas(icon);
+iconsGrid.appendChild(btn);
+});
+
+// Add permanent Hack Club flag
+fabric.Image.fromURL(STATIC_URL + 'assets/stickers/flag-standalone.png', function(img) {
+img.scale(0.15);
+img.set({
+left: canvas.width - 80,
+top: 20,
+opacity: 0.5,
+selectable: false,
+evented: false,
+hasControls: false,
+hasBorders: false,
+lockMovementX: true,
+lockMovementY: true,
+lockRotation: true,
+lockScalingX: true,
+lockScalingY: true
+});
+hackClubFlag = img;
+canvas.add(img);
+canvas.renderAll();
+});
+
+window.loadTemplate = function(name) {
+const t = templates[name];
+if (!t) return;
+canvas.clear();
+canvas.backgroundColor = t.bg;
+
+// Set dots pattern and dotted border as default
+document.getElementById('bgPattern').value = 'dots';
+document.getElementById('borderStyle').value = 'dotted';
+
+// Re-add flag
+if (hackClubFlag) {
+canvas.add(hackClubFlag);
+}
+
+// Add icon
+const iconText = new fabric.Text('', {
+fontFamily: 'Font Awesome 6 Free',
+fontWeight: 900,
+fontSize: 80,
+fill: t.color,
+left: canvas.width / 2,
+top: 100,
+originX: 'center',
+originY: 'center'
+});
+// Use Unicode for icon
+const iconUnicode = {
+'user-plus': '\uf234',
+'users': '\uf0c0',
+'calendar': '\uf073',
+'trophy': '\uf091'
+};
+iconText.text = iconUnicode[t.icon] || '\uf005';
+canvas.add(iconText);
+
+const title = new fabric.Textbox(t.title, {
+left: canvas.width / 2,
+top: 200,
+width: 500,
+fontSize: 44,
+fontWeight: 'bold',
+fill: t.color,
+fontFamily: 'Poppins',
+originX: 'center',
+originY: 'center',
+textAlign: 'center',
+textBaseline: 'alphabetic'
+});
+canvas.add(title);
+
+const subtitle = new fabric.Textbox(t.subtitle, {
+left: canvas.width / 2,
+top: 280,
+width: 500,
+fontSize: 26,
+fill: t.bg === '#1e1b4b' ? '#ffffff' : '#1a1a1a',
+fontFamily: 'Inter',
+originX: 'center',
+originY: 'center',
+textAlign: 'center',
+textBaseline: 'alphabetic'
+});
+canvas.add(subtitle);
+
+const desc = new fabric.Textbox(t.desc, {
+left: canvas.width / 2,
+top: 350,
+width: 480,
+fontSize: 18,
+fill: t.bg === '#1e1b4b' ? '#d1d5db' : '#4a5568',
+fontFamily: 'Inter',
+originX: 'center',
+originY: 'center',
+textAlign: 'center',
+textBaseline: 'alphabetic'
+});
+canvas.add(desc);
+
+// Add QR code centered below text
+if (typeof QRCode !== 'undefined') {
+QRCode.toDataURL(CLUB_JOIN_LINK, {width: 180, margin: 1}, function(err, url) {
+if (!err) {
+fabric.Image.fromURL(url, function(img) {
+img.set({
+left: canvas.width / 2 - 90,
+top: 540,
+qrData: CLUB_JOIN_LINK
+});
+canvas.add(img);
+canvas.renderAll();
+saveState();
+updateLayers();
+applyCanvasStyle();
+});
+}
+});
+} else {
+canvas.renderAll();
+saveState();
+updateLayers();
+applyCanvasStyle();
+}
+};
+
+window.addText = function() {
+loadFontDynamically('Inter', function() {
+const text = new fabric.IText('Double click to edit', {
+left: canvas.width / 2,
+top: canvas.height / 2,
+fontSize: 24,
+fill: '#000000',
+fontFamily: 'Inter',
+originX: 'center',
+originY: 'center',
+textBaseline: 'alphabetic'
+});
+canvas.add(text);
+canvas.setActiveObject(text);
+canvas.renderAll();
+saveState();
+updateLayers();
+});
+};
+
+window.addHeading = function() {
+loadFontDynamically('Poppins', function() {
+const h = new fabric.IText('Heading', {
+left: canvas.width / 2,
+top: canvas.height / 2,
+fontSize: 48,
+fontWeight: 'bold',
+fill: '#ec3750',
+fontFamily: 'Poppins',
+originX: 'center',
+originY: 'center',
+textBaseline: 'alphabetic'
+});
+canvas.add(h);
+canvas.setActiveObject(h);
+canvas.renderAll();
+saveState();
+updateLayers();
+});
+};
+
+window.addImage = function() {
+const input = document.createElement('input');
+input.type = 'file';
+input.accept = 'image/*';
+input.onchange = function(e) {
+const file = e.target.files[0];
+if (!file) return;
+const reader = new FileReader();
+reader.onload = function(event) {
+fabric.Image.fromURL(event.target.result, function(img) {
+img.scaleToWidth(250);
+img.set({left: canvas.width / 2 - 125, top: canvas.height / 2 - 125});
+canvas.add(img);
+canvas.setActiveObject(img);
+canvas.renderAll();
+saveState();
+updateLayers();
+});
+};
+reader.readAsDataURL(file);
+};
+input.click();
+};
+
+window.showQRModal = function() { document.getElementById('qrModal').classList.add('show'); };
+window.closeQRModal = function() { document.getElementById('qrModal').classList.remove('show'); };
+window.switchQRTab = function(tab) {
+document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+event.target.classList.add('active');
+document.getElementById(tab === 'club' ? 'qrClubTab' : 'qrCustomTab').classList.add('active');
+};
+
+window.addQRCodeWithLink = function(link) { addQRCodeInternal(link); closeQRModal(); };
+window.addQRCodeCustom = function() {
+const link = document.getElementById('customQRInput').value.trim();
+if (!link) { showSuccess('Please enter a URL'); return; }
+addQRCodeInternal(link);
+closeQRModal();
+};
+
+function addQRCodeInternal(link) {
+if (typeof QRCode === 'undefined') { showSuccess('QRCode library loading...'); return; }
+QRCode.toDataURL(link, {width: 180, margin: 1}, function(err, url) {
+if (!err) {
+fabric.Image.fromURL(url, function(img) {
+img.set({left: canvas.width - 220, top: canvas.height - 220, qrData: link});
+canvas.add(img);
+canvas.setActiveObject(img);
+canvas.renderAll();
+saveState();
+updateLayers();
+});
+}
+});
+}
+
+window.showStickersModal = function() { document.getElementById('stickersModal').classList.add('show'); };
+window.closeStickersModal = function() { document.getElementById('stickersModal').classList.remove('show'); };
+
+function addSticker(name) {
+fabric.Image.fromURL(STATIC_URL + 'assets/stickers/' + name, function(img) {
+img.scaleToWidth(120);
+img.set({left: canvas.width / 2 - 60, top: canvas.height / 2 - 60});
+canvas.add(img);
+canvas.setActiveObject(img);
+canvas.renderAll();
+saveState();
+updateLayers();
+});
+closeStickersModal();
+}
+
+window.showIconsModal = function() { document.getElementById('iconsModal').classList.add('show'); };
+window.closeIconsModal = function() { document.getElementById('iconsModal').classList.remove('show'); };
+
+function addIconToCanvas(iconName) {
+fabric.Image.fromURL(`https://api.iconify.design/fa-solid/${iconName}.svg?color=%23ec3750&width=80&height=80`, function(img) {
+img.set({left: canvas.width / 2 - 40, top: canvas.height / 2 - 40});
+canvas.add(img);
+canvas.setActiveObject(img);
+canvas.renderAll();
+saveState();
+updateLayers();
+});
+closeIconsModal();
+}
+
+window.addShape = function(type) {
+let shape;
+const cx = canvas.width / 2, cy = canvas.height / 2;
+switch(type) {
+case 'rect': shape = new fabric.Rect({left: cx - 60, top: cy - 60, width: 120, height: 120, fill: '#ec3750'}); break;
+case 'circle': shape = new fabric.Circle({left: cx - 60, top: cy - 60, radius: 60, fill: '#ec3750'}); break;
+case 'triangle': shape = new fabric.Triangle({left: cx - 60, top: cy - 60, width: 120, height: 120, fill: '#ec3750'}); break;
+case 'line': shape = new fabric.Line([0, 0, 180, 0], {left: cx - 90, top: cy, stroke: '#ec3750', strokeWidth: 3}); break;
+}
+if (shape) {
+canvas.add(shape);
+canvas.setActiveObject(shape);
+canvas.renderAll();
+saveState();
+updateLayers();
+}
+};
+
+window.applyCanvasStyle = function() {
+const pattern = document.getElementById('bgPattern').value;
+const patternColor = document.getElementById('patternColor').value;
+const patternSize = parseInt(document.getElementById('patternSize').value);
+const patternThickness = parseInt(document.getElementById('patternThickness').value);
+const border = document.getElementById('borderStyle').value;
+const borderColor = document.getElementById('borderColor').value;
+const borderWidth = parseInt(document.getElementById('borderWidth').value);
+const container = document.getElementById('canvasContainer');
+
+// Update display values
+document.getElementById('patternSizeValue').textContent = patternSize + 'px';
+document.getElementById('patternThicknessValue').textContent = patternThickness + 'px';
+document.getElementById('borderWidthValue').textContent = borderWidth + 'px';
+
+// Remove existing pattern rect if it exists
+const existingPattern = canvas.getObjects().find(obj => obj.patternRect);
+if (existingPattern) {
+canvas.remove(existingPattern);
+}
+
+// Create pattern on canvas if not 'none'
+if (pattern !== 'none') {
+const patternCanvas = document.createElement('canvas');
+const ctx = patternCanvas.getContext('2d');
+
+// Convert hex to rgba with opacity
+const hex = patternColor.replace('#', '');
+const r = parseInt(hex.substr(0, 2), 16);
+const g = parseInt(hex.substr(2, 2), 16);
+const b = parseInt(hex.substr(4, 2), 16);
+const colorWithOpacity = `rgba(${r}, ${g}, ${b}, 0.15)`;
+
+switch(pattern) {
+case 'dots':
+patternCanvas.width = patternSize;
+patternCanvas.height = patternSize;
+ctx.fillStyle = colorWithOpacity;
+ctx.beginPath();
+ctx.arc(patternSize / 2, patternSize / 2, patternThickness, 0, Math.PI * 2);
+ctx.fill();
+break;
+case 'grid':
+patternCanvas.width = patternSize;
+patternCanvas.height = patternSize;
+ctx.strokeStyle = colorWithOpacity;
+ctx.lineWidth = patternThickness;
+ctx.beginPath();
+ctx.moveTo(0, 0);
+ctx.lineTo(patternSize, 0);
+ctx.moveTo(0, 0);
+ctx.lineTo(0, patternSize);
+ctx.stroke();
+break;
+case 'stripes':
+patternCanvas.width = patternSize;
+patternCanvas.height = patternSize;
+ctx.fillStyle = colorWithOpacity;
+ctx.fillRect(0, 0, patternSize, patternThickness);
+break;
+case 'diagonal':
+patternCanvas.width = patternSize;
+patternCanvas.height = patternSize;
+ctx.strokeStyle = colorWithOpacity;
+ctx.lineWidth = patternThickness;
+ctx.beginPath();
+ctx.moveTo(0, 0);
+ctx.lineTo(patternSize, patternSize);
+ctx.stroke();
+break;
+}
+
+const fabricPattern = new fabric.Pattern({
+source: patternCanvas,
+repeat: 'repeat'
+});
+
+const patternRect = new fabric.Rect({
+left: 0,
+top: 0,
+width: canvas.width,
+height: canvas.height,
+fill: fabricPattern,
+selectable: false,
+evented: false,
+patternRect: true
+});
+
+canvas.add(patternRect);
+canvas.sendToBack(patternRect);
+
+// Make sure flag stays on top
+if (hackClubFlag) {
+canvas.bringToFront(hackClubFlag);
+}
+}
+
+// Apply border
+if (border === 'none') {
+container.style.border = 'none';
+} else if (border === 'double') {
+container.style.border = `${borderWidth}px double ${borderColor}`;
+} else {
+container.style.border = `${borderWidth}px ${border} ${borderColor}`;
+}
+
+canvas.renderAll();
+};
+
+function saveState() {
+if (historyStep < history.length - 1) history = history.slice(0, historyStep + 1);
+const canvasData = canvas.toJSON(['qrData', 'patternRect', 'selectable', 'evented']);
+const state = {
+canvas: canvasData,
+pattern: document.getElementById('bgPattern').value,
+patternColor: document.getElementById('patternColor').value,
+patternSize: document.getElementById('patternSize').value,
+patternThickness: document.getElementById('patternThickness').value,
+borderStyle: document.getElementById('borderStyle').value,
+borderColor: document.getElementById('borderColor').value,
+borderWidth: document.getElementById('borderWidth').value
+};
+history.push(JSON.stringify(state));
+if (history.length > 50) history.shift(); else historyStep++;
+}
+
+window.undo = function() {
+if (historyStep > 0) {
+historyStep--;
+const state = JSON.parse(history[historyStep]);
+canvas.loadFromJSON(state.canvas || state, function() {
+// Re-add flag after loading
+if (hackClubFlag && !canvas.getObjects().find(obj => obj === hackClubFlag)) {
+canvas.add(hackClubFlag);
+canvas.bringToFront(hackClubFlag);
+}
+// Restore pattern settings if they exist
+if (state.pattern) {
+document.getElementById('bgPattern').value = state.pattern;
+document.getElementById('patternColor').value = state.patternColor;
+document.getElementById('patternSize').value = state.patternSize;
+document.getElementById('patternThickness').value = state.patternThickness;
+document.getElementById('borderStyle').value = state.borderStyle;
+document.getElementById('borderColor').value = state.borderColor;
+document.getElementById('borderWidth').value = state.borderWidth;
+applyCanvasStyle();
+}
+canvas.renderAll();
+updateLayers();
+});
+}
+};
+
+window.redo = function() {
+if (historyStep < history.length - 1) {
+historyStep++;
+const state = JSON.parse(history[historyStep]);
+canvas.loadFromJSON(state.canvas || state, function() {
+// Re-add flag after loading
+if (hackClubFlag && !canvas.getObjects().find(obj => obj === hackClubFlag)) {
+canvas.add(hackClubFlag);
+canvas.bringToFront(hackClubFlag);
+}
+// Restore pattern settings if they exist
+if (state.pattern) {
+document.getElementById('bgPattern').value = state.pattern;
+document.getElementById('patternColor').value = state.patternColor;
+document.getElementById('patternSize').value = state.patternSize;
+document.getElementById('patternThickness').value = state.patternThickness;
+document.getElementById('borderStyle').value = state.borderStyle;
+document.getElementById('borderColor').value = state.borderColor;
+document.getElementById('borderWidth').value = state.borderWidth;
+applyCanvasStyle();
+}
+canvas.renderAll();
+updateLayers();
+});
+}
+};
+
+window.deleteSelected = function() {
+const objs = canvas.getActiveObjects();
+if (objs.length) {
+canvas.discardActiveObject();
+objs.forEach(obj => {
+if (obj !== hackClubFlag && !obj.patternRect) {
+canvas.remove(obj);
+}
+});
+canvas.renderAll();
+saveState();
+updateLayers();
+}
+};
+
+window.duplicateSelected = function() {
+const obj = canvas.getActiveObject();
+if (obj && obj !== hackClubFlag) {
+obj.clone(function(cloned) {
+cloned.set({left: cloned.left + 15, top: cloned.top + 15});
+canvas.add(cloned);
+canvas.setActiveObject(cloned);
+canvas.renderAll();
+saveState();
+updateLayers();
+});
+}
+};
+
+window.bringToFront = function() {
+const obj = canvas.getActiveObject();
+if (obj && obj !== hackClubFlag) { canvas.bringToFront(obj); canvas.renderAll(); saveState(); updateLayers(); }
+};
+
+window.sendToBack = function() {
+const obj = canvas.getActiveObject();
+if (obj && obj !== hackClubFlag) { canvas.sendToBack(obj); canvas.renderAll(); saveState(); updateLayers(); }
+};
+
+window.zoomIn = function() { canvas.setZoom(canvas.getZoom() * 1.1); };
+window.zoomOut = function() { canvas.setZoom(canvas.getZoom() / 1.1); };
+window.resetZoom = function() { canvas.setZoom(1); };
+
+window.updateCanvasSize = function() {
+const size = document.getElementById('canvasSize').value;
+const [w, h] = size.split('x').map(Number);
+canvas.setDimensions({width: w, height: h});
+if (hackClubFlag) { hackClubFlag.set({left: w - 80, top: 20}); }
+
+// Update pattern rect size if it exists
+const patternRect = canvas.getObjects().find(obj => obj.patternRect);
+if (patternRect) {
+patternRect.set({width: w, height: h});
+}
+canvas.renderAll();
+saveState();
+};
+
+window.updateBackground = function() {
+canvas.backgroundColor = document.getElementById('bgColor').value;
+canvas.renderAll();
+saveState();
+};
+
+window.updateObjectPosition = function() {
+const obj = canvas.getActiveObject();
+if (obj && obj !== hackClubFlag) {
+obj.set({left: parseInt(document.getElementById('objX').value) || 0, top: parseInt(document.getElementById('objY').value) || 0});
+canvas.renderAll();
+saveState();
+}
+};
+
+window.updateObjectSize = function() {
+const obj = canvas.getActiveObject();
+if (obj && obj !== hackClubFlag) {
+const w = parseInt(document.getElementById('objWidth').value);
+const h = parseInt(document.getElementById('objHeight').value);
+obj.set({scaleX: w / obj.width, scaleY: h / obj.height});
+canvas.renderAll();
+saveState();
+}
+};
+
+window.updateRotation = function() {
+const obj = canvas.getActiveObject();
+if (obj && obj !== hackClubFlag) {
+const r = document.getElementById('objRotation').value;
+obj.set('angle', parseFloat(r));
+document.getElementById('rotationValue').textContent = r + '°';
+canvas.renderAll();
+saveState();
+}
+};
+
+window.updateOpacity = function() {
+const obj = canvas.getActiveObject();
+if (obj && obj !== hackClubFlag) {
+const o = document.getElementById('objOpacity').value / 100;
+obj.set('opacity', o);
+document.getElementById('opacityValue').textContent = Math.round(o * 100) + '%';
+canvas.renderAll();
+saveState();
+}
+};
+
+window.updateTextProps = function() {
+const obj = canvas.getActiveObject();
+if (obj && (obj.type === 'i-text' || obj.type === 'text' || obj.type === 'textbox')) {
+const fs = parseInt(document.getElementById('fontSize').value);
+const textColor = document.getElementById('textColor').value;
+
+// Make sure the current font is loaded before applying
+loadFontDynamically(currentFontFamily, function() {
+obj.set({
+fontFamily: currentFontFamily,
+fontSize: fs,
+fill: textColor
+});
+document.getElementById('fontSizeValue').textContent = fs + 'px';
+// Force text object to recalculate and re-render
+obj.initDimensions();
+obj.setCoords();
+canvas.renderAll();
+saveState();
+});
+}
+};
+
+window.updateShapeProps = function() {
+const obj = canvas.getActiveObject();
+if (obj && obj.type !== 'i-text' && obj.type !== 'text' && obj.type !== 'textbox') {
+const sw = parseInt(document.getElementById('strokeWidth').value);
+obj.set({
+fill: document.getElementById('fillColor').value,
+stroke: document.getElementById('strokeColor').value,
+strokeWidth: sw
+});
+document.getElementById('strokeWidthValue').textContent = sw + 'px';
+canvas.renderAll();
+saveState();
+}
+};
+
+function updateLayers() {
+const list = document.getElementById('layersList');
+list.innerHTML = '';
+const objs = canvas.getObjects().reverse().filter(obj => obj !== hackClubFlag && !obj.patternRect);
+if (objs.length === 0) {
+list.innerHTML = '<li style="color:#999;font-size:0.813rem;padding:0.5rem;text-align:center">No objects</li>';
+return;
+}
+objs.forEach((obj, i) => {
+let typeName = obj.type;
+if (obj.type === 'i-text' || obj.type === 'textbox') typeName = 'Text';
+else if (obj.type === 'image') typeName = obj.qrData ? 'QR Code' : 'Image';
+else if (obj.type === 'rect') typeName = 'Rectangle';
+else if (obj.type === 'circle') typeName = 'Circle';
+else if (obj.type === 'triangle') typeName = 'Triangle';
+else if (obj.type === 'line') typeName = 'Line';
+const li = document.createElement('li');
+li.className = 'layer-item';
+const realIndex = canvas.getObjects().filter(o => o !== hackClubFlag && !o.patternRect).length - 1 - i;
+li.innerHTML = `<span>${typeName}</span><div class="layer-controls"><button onclick="selectLayer(${realIndex})" title="Select"><i class="fas fa-hand-pointer"></i></button><button onclick="deleteLayer(${realIndex})" title="Delete"><i class="fas fa-trash"></i></button></div>`;
+list.appendChild(li);
+});
+}
+
+window.selectLayer = function(i) {
+const objs = canvas.getObjects().filter(obj => obj !== hackClubFlag && !obj.patternRect);
+canvas.setActiveObject(objs[i]);
+canvas.renderAll();
+};
+
+window.deleteLayer = function(i) {
+const objs = canvas.getObjects().filter(obj => obj !== hackClubFlag && !obj.patternRect);
+canvas.remove(objs[i]);
+canvas.renderAll();
+saveState();
+updateLayers();
+};
+
+window.showExportModal = function() { document.getElementById('exportModal').classList.add('show'); };
+window.closeExportModal = function() { document.getElementById('exportModal').classList.remove('show'); };
+
+window.exportPoster = function(format) {
+closeExportModal();
+if (format === 'png' || format === 'jpg') {
+const dataURL = canvas.toDataURL({format: format, quality: 1, multiplier: 2});
+const link = document.createElement('a');
+link.download = `poster-${Date.now()}.${format}`;
+link.href = dataURL;
+link.click();
+showSuccess(`Exported as ${format.toUpperCase()}!`);
+} else if (format === 'pdf') {
+if (typeof window.jspdf === 'undefined') { showSuccess('PDF library loading...'); return; }
+const { jsPDF } = window.jspdf;
+const imgData = canvas.toDataURL('image/png', 1.0);
+const pdf = new jsPDF({orientation: canvas.width > canvas.height ? 'l' : 'p', unit: 'px', format: [canvas.width, canvas.height]});
+pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+pdf.save(`poster-${Date.now()}.pdf`);
+showSuccess('Exported as PDF!');
+} else if (format === 'svg') {
+const svg = canvas.toSVG();
+const blob = new Blob([svg], {type: 'image/svg+xml'});
+const url = URL.createObjectURL(blob);
+const link = document.createElement('a');
+link.download = `poster-${Date.now()}.svg`;
+link.href = url;
+link.click();
+URL.revokeObjectURL(url);
+showSuccess('Exported as SVG!');
+}
+};
+
+function showSuccess(msg) {
+document.getElementById('successMessage').textContent = msg;
+document.getElementById('successModal').classList.add('show');
+}
+
+window.closeSuccessModal = function() { document.getElementById('successModal').classList.remove('show'); };
+
+// Font modal functions
+window.showFontModal = function() {
+console.log('showFontModal called');
+const modal = document.getElementById('fontModal');
+console.log('Modal element:', modal);
+if (modal) {
+modal.classList.add('show');
+console.log('Added show class, allGoogleFonts.length:', allGoogleFonts.length);
+if (allGoogleFonts.length === 0) {
+loadGoogleFonts();
+}
+} else {
+console.error('Font modal not found!');
+}
+};
+
+window.closeFontModal = function() {
+document.getElementById('fontModal').classList.remove('show');
+};
+
+function loadGoogleFonts() {
+document.getElementById('fontLoading').style.display = 'block';
+// Use server-side proxy to keep API key secure
+fetch('/api/fonts/google?sort=popularity')
+.then(response => response.json())
+.then(data => {
+allGoogleFonts = data.items || [];
+displayedFonts = [];
+document.getElementById('fontLoading').style.display = 'none';
+loadMoreFonts();
+})
+.catch(error => {
+console.error('Error loading fonts:', error);
+document.getElementById('fontLoading').style.display = 'none';
+// Fallback to basic fonts
+allGoogleFonts = [
+{family: 'Inter'}, {family: 'Poppins'}, {family: 'Roboto'},
+{family: 'Playfair Display'}, {family: 'Montserrat'}, {family: 'Lato'},
+{family: 'Oswald'}, {family: 'Raleway'}, {family: 'Open Sans'},
+{family: 'Merriweather'}, {family: 'Nunito'}, {family: 'Ubuntu'},
+{family: 'PT Sans'}, {family: 'Noto Sans'}, {family: 'Roboto Condensed'},
+{family: 'Source Sans Pro'}, {family: 'Mukta'}, {family: 'Rubik'},
+{family: 'Karla'}, {family: 'Quicksand'}, {family: 'Fira Sans'},
+{family: 'Work Sans'}, {family: 'Barlow'}, {family: 'Oxygen'},
+{family: 'Manrope'}, {family: 'DM Sans'}, {family: 'IBM Plex Sans'},
+{family: 'Libre Franklin'}, {family: 'Bebas Neue'}, {family: 'Pacifico'},
+{family: 'Lobster'}, {family: 'Dancing Script'}, {family: 'Satisfy'},
+{family: 'Great Vibes'}, {family: 'Caveat'}, {family: 'Amatic SC'},
+{family: 'Indie Flower'}, {family: 'Permanent Marker'}, {family: 'Righteous'},
+{family: 'Abril Fatface'}, {family: 'Anton'}, {family: 'Alfa Slab One'},
+{family: 'Cinzel'}, {family: 'Cormorant'}, {family: 'EB Garamond'},
+{family: 'Crimson Text'}, {family: 'Libre Baskerville'}, {family: 'Vollkorn'},
+{family: 'Bitter'}, {family: 'Arvo'}, {family: 'Zilla Slab'}
+];
+loadMoreFonts();
+});
+}
+
+function loadMoreFonts() {
+console.log('loadMoreFonts called, isLoadingFonts:', isLoadingFonts);
+if (isLoadingFonts) return;
+isLoadingFonts = true;
+const startIndex = displayedFonts.length;
+const fontsToLoad = fontSearchQuery
+? allGoogleFonts.filter(f => f.family.toLowerCase().includes(fontSearchQuery.toLowerCase())).slice(startIndex, startIndex + 10)
+: allGoogleFonts.slice(startIndex, startIndex + 10);
+
+console.log('Fonts to load:', fontsToLoad.length);
+
+const fontList = document.getElementById('fontList');
+if (!fontList) {
+console.error('fontList element not found!');
+isLoadingFonts = false;
+return;
+}
+
+fontsToLoad.forEach(font => {
+displayedFonts.push(font);
+const fontItem = document.createElement('div');
+fontItem.className = 'font-item';
+if (font.family === currentFontFamily) {
+fontItem.classList.add('selected');
+}
+
+const fontNameDiv = document.createElement('div');
+fontNameDiv.className = 'font-name';
+fontNameDiv.textContent = font.family;
+
+const fontPreviewDiv = document.createElement('div');
+fontPreviewDiv.className = 'font-preview';
+fontPreviewDiv.textContent = 'Loading...';
+fontPreviewDiv.style.fontFamily = 'sans-serif';
+
+fontItem.appendChild(fontNameDiv);
+fontItem.appendChild(fontPreviewDiv);
+fontItem.onclick = () => selectFont(font.family);
+fontList.appendChild(fontItem);
+
+// Load the font dynamically and update preview when ready
+loadFontDynamically(font.family, function() {
+fontPreviewDiv.textContent = 'The quick brown fox jumps';
+fontPreviewDiv.style.fontFamily = `'${font.family}', sans-serif`;
+});
+});
+
+console.log('Loaded', fontsToLoad.length, 'fonts. Total displayed:', displayedFonts.length);
+isLoadingFonts = false;
+}
+
+function loadFontDynamically(fontFamily, callback) {
+// Create a link element to load the font
+const fontKey = fontFamily.replace(/ /g, '+');
+const existingLink = document.querySelector(`link[href*="${fontKey}"]`);
+
+if (!existingLink) {
+const link = document.createElement('link');
+link.href = `https://fonts.googleapis.com/css2?family=${fontKey}:wght@400;700&display=swap`;
+link.rel = 'stylesheet';
+document.head.appendChild(link);
+
+// Wait for the font to actually load
+if (document.fonts && document.fonts.load) {
+document.fonts.load(`16px "${fontFamily}"`).then(function() {
+console.log('Font loaded:', fontFamily);
+if (callback) callback();
+}).catch(function(err) {
+console.warn('Font load failed:', fontFamily, err);
+if (callback) callback(); // Still callback even if it fails
+});
+} else {
+// Fallback: wait a bit
+setTimeout(function() {
+if (callback) callback();
+}, 500);
+}
+} else {
+// Font already loaded, wait for it to be ready
+if (document.fonts && document.fonts.load) {
+document.fonts.load(`16px "${fontFamily}"`).then(function() {
+if (callback) callback();
+}).catch(function() {
+if (callback) callback();
+});
+} else {
+if (callback) callback();
+}
+}
+}
+
+function selectFont(fontFamily) {
+currentFontFamily = fontFamily;
+document.getElementById('currentFontName').textContent = fontFamily;
+
+// Update selected state in modal
+document.querySelectorAll('.font-item').forEach(item => {
+item.classList.remove('selected');
+if (item.querySelector('.font-name').textContent === fontFamily) {
+item.classList.add('selected');
+}
+});
+
+// Show loading state
+const obj = canvas.getActiveObject();
+if (obj && (obj.type === 'i-text' || obj.type === 'text' || obj.type === 'textbox')) {
+// Store original font temporarily
+const originalFont = obj.fontFamily;
+
+console.log('Applying font:', fontFamily);
+
+// Load font first, then apply
+loadFontDynamically(fontFamily, function() {
+console.log('Font ready, applying to canvas:', fontFamily);
+
+// Double-check the font is really loaded
+if (document.fonts && document.fonts.check) {
+const fontSize = obj.fontSize || 24;
+const isLoaded = document.fonts.check(`${fontSize}px "${fontFamily}"`);
+console.log('Font check result:', isLoaded);
+}
+
+// Apply the font
+obj.set('fontFamily', fontFamily);
+obj.initDimensions();
+obj.setCoords();
+canvas.renderAll();
+saveState();
+});
+}
+
+closeFontModal();
+}
+
+window.searchFonts = function() {
+fontSearchQuery = document.getElementById('fontSearch').value;
+displayedFonts = [];
+const fontList = document.getElementById('fontList');
+if (fontList) {
+fontList.innerHTML = '';
+}
+loadMoreFonts();
+};
+
+// Infinite scroll for fonts - add listener safely
+const fontListElement = document.getElementById('fontList');
+if (fontListElement) {
+fontListElement.addEventListener('scroll', function() {
+if (this.scrollTop + this.clientHeight >= this.scrollHeight - 50) {
+loadMoreFonts();
+}
+});
+console.log('Infinite scroll listener added');
+} else {
+console.error('Could not add infinite scroll listener - fontList not found');
+}
+
+// Image search functions
+window.showImageSearchModal = function() {
+document.getElementById('imageSearchModal').classList.add('show');
+document.getElementById('imageSearchInput').focus();
+};
+
+window.closeImageSearchModal = function() {
+document.getElementById('imageSearchModal').classList.remove('show');
+};
+
+window.searchImages = function() {
+const query = document.getElementById('imageSearchInput').value.trim();
+if (!query) {
+showSuccess('Please enter a search term');
+return;
+}
+
+const resultsDiv = document.getElementById('imageSearchResults');
+const loadingDiv = document.getElementById('imageSearchLoading');
+
+resultsDiv.innerHTML = '';
+loadingDiv.style.display = 'block';
+
+// Use server-side proxy to keep API key secure
+fetch(`/api/images/search?query=${encodeURIComponent(query)}&per_page=20`)
+.then(response => {
+if (!response.ok && response.status === 503) {
+throw new Error('API not configured');
+}
+return response.json();
+})
+.then(data => {
+loadingDiv.style.display = 'none';
+
+if (data.error) {
+resultsDiv.innerHTML = `<p style="text-align:center;padding:2rem;color:#666">${data.error}</p>`;
+return;
+}
+
+if (!data.results || data.results.length === 0) {
+resultsDiv.innerHTML = '<p style="text-align:center;padding:2rem;color:#666">No images found. Try a different search term.</p>';
+return;
+}
+
+data.results.forEach(photo => {
+const imgContainer = document.createElement('div');
+imgContainer.className = 'image-result';
+
+const img = document.createElement('img');
+img.src = photo.urls.small;
+img.alt = photo.alt_description || 'Unsplash image';
+
+imgContainer.onclick = () => addImageFromURL(photo.urls.regular, photo.user.name);
+imgContainer.appendChild(img);
+resultsDiv.appendChild(imgContainer);
+});
+})
+.catch(error => {
+loadingDiv.style.display = 'none';
+console.error('Image search error:', error);
+resultsDiv.innerHTML = '<p style="text-align:center;padding:2rem;color:#666">Image search is not configured. Please add your Unsplash API key to environment variables.</p>';
+});
+};
+
+function addImageFromURL(url, credit) {
+fabric.Image.fromURL(url, function(img) {
+img.scaleToWidth(250);
+img.set({
+left: canvas.width / 2 - 125,
+top: canvas.height / 2 - 125
+});
+canvas.add(img);
+canvas.setActiveObject(img);
+canvas.renderAll();
+saveState();
+updateLayers();
+closeImageSearchModal();
+showSuccess('Image added! Photo by ' + credit + ' on Unsplash');
+}, {crossOrigin: 'anonymous'});
+}
+
+canvas.on('selection:created', updatePropertiesPanel);
+canvas.on('selection:updated', updatePropertiesPanel);
+canvas.on('selection:cleared', function() {
+document.getElementById('objectProps').style.display = 'none';
+document.getElementById('textProps').style.display = 'none';
+document.getElementById('shapeProps').style.display = 'none';
+document.getElementById('qrProps').style.display = 'none';
+});
+canvas.on('object:modified', function() { saveState(); updateLayers(); });
+
+function updatePropertiesPanel() {
+const obj = canvas.getActiveObject();
+if (!obj || obj === hackClubFlag) return;
+document.getElementById('objectProps').style.display = 'block';
+document.getElementById('objX').value = Math.round(obj.left);
+document.getElementById('objY').value = Math.round(obj.top);
+document.getElementById('objWidth').value = Math.round(obj.width * obj.scaleX);
+document.getElementById('objHeight').value = Math.round(obj.height * obj.scaleY);
+document.getElementById('objRotation').value = obj.angle;
+document.getElementById('rotationValue').textContent = obj.angle + '°';
+document.getElementById('objOpacity').value = Math.round(obj.opacity * 100);
+document.getElementById('opacityValue').textContent = Math.round(obj.opacity * 100) + '%';
+
+// Check if it's a QR code (has qrData property)
+if (obj.qrData) {
+document.getElementById('textProps').style.display = 'none';
+document.getElementById('shapeProps').style.display = 'none';
+document.getElementById('qrProps').style.display = 'block';
+document.getElementById('qrURL').value = obj.qrData;
+} else if (obj.type === 'i-text' || obj.type === 'text' || obj.type === 'textbox') {
+document.getElementById('textProps').style.display = 'block';
+document.getElementById('shapeProps').style.display = 'none';
+document.getElementById('qrProps').style.display = 'none';
+currentFontFamily = obj.fontFamily || 'Inter';
+document.getElementById('currentFontName').textContent = currentFontFamily;
+document.getElementById('fontSize').value = obj.fontSize;
+document.getElementById('fontSizeValue').textContent = obj.fontSize + 'px';
+const fillColor = obj.fill || '#000000';
+document.getElementById('textColor').value = fillColor.startsWith('#') ? fillColor : (fillColor.startsWith('rgb') ? rgbToHex(fillColor) : '#000000');
+} else {
+document.getElementById('textProps').style.display = 'none';
+document.getElementById('shapeProps').style.display = 'block';
+document.getElementById('qrProps').style.display = 'none';
+const fillColor = obj.fill || '#ec3750';
+document.getElementById('fillColor').value = fillColor.startsWith('#') ? fillColor : '#ec3750';
+const strokeColor = obj.stroke || '#000000';
+document.getElementById('strokeColor').value = strokeColor.startsWith('#') ? strokeColor : '#000000';
+document.getElementById('strokeWidth').value = obj.strokeWidth || 0;
+document.getElementById('strokeWidthValue').textContent = (obj.strokeWidth || 0) + 'px';
+}
+}
+
+function rgbToHex(rgb) {
+const result = rgb.match(/\d+/g);
+if (!result || result.length < 3) return '#000000';
+return '#' + result.slice(0, 3).map(x => {
+const hex = parseInt(x).toString(16);
+return hex.length === 1 ? '0' + hex : hex;
+}).join('');
+}
+
+window.regenerateQR = function() {
+const obj = canvas.getActiveObject();
+if (!obj || !obj.qrData) return;
+const newURL = document.getElementById('qrURL').value.trim();
+if (!newURL) { showSuccess('Please enter a URL'); return; }
+if (typeof QRCode === 'undefined') { showSuccess('QR library loading...'); return; }
+const oldLeft = obj.left;
+const oldTop = obj.top;
+const oldAngle = obj.angle;
+const oldScale = obj.scaleX;
+QRCode.toDataURL(newURL, {width: 180, margin: 1}, function(err, url) {
+if (!err) {
+fabric.Image.fromURL(url, function(newImg) {
+newImg.set({
+left: oldLeft,
+top: oldTop,
+angle: oldAngle,
+scaleX: oldScale,
+scaleY: oldScale,
+qrData: newURL
+});
+canvas.remove(obj);
+canvas.add(newImg);
+canvas.setActiveObject(newImg);
+canvas.renderAll();
+saveState();
+updateLayers();
+updatePropertiesPanel();
+showSuccess('QR code updated!');
+});
+}
+});
+};
+
+document.addEventListener('keydown', function(e) {
+if (e.ctrlKey || e.metaKey) {
+if (e.key === 'z') { e.preventDefault(); undo(); }
+else if (e.key === 'y') { e.preventDefault(); redo(); }
+else if (e.key === 'd') { e.preventDefault(); duplicateSelected(); }
+else if (e.key === 'p') {
+e.preventDefault();
+// Create print-friendly version
+const printWindow = window.open('', '_blank');
+const dataURL = canvas.toDataURL({format: 'png', quality: 1, multiplier: 3});
+const aspectRatio = canvas.height / canvas.width;
+printWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<title>Print Poster - ${document.querySelector('.sidebar-header p').textContent}</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+@page {
+size: letter portrait;
+margin: 0.25in;
+}
+html, body {
+height: 100%;
+margin: 0;
+padding: 0;
+}
+body {
+display: flex;
+align-items: center;
+justify-content: center;
+background: white;
+}
+.poster-container {
+max-width: 7.5in;
+max-height: 10in;
+width: 100%;
+height: auto;
+}
+img {
+width: 100%;
+height: auto;
+display: block;
+object-fit: contain;
+}
+@media print {
+html, body {
+height: 100%;
+overflow: hidden;
+}
+body {
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.poster-container {
+page-break-inside: avoid;
+page-break-after: avoid;
+page-break-before: avoid;
+max-width: 100%;
+max-height: 100%;
+}
+img {
+page-break-inside: avoid;
+max-width: 100%;
+max-height: 100%;
+}
+}
+</style>
+</head>
+<body>
+<div class="poster-container">
+<img src="${dataURL}" alt="Poster"/>
+</div>
+</body>
+</html>
+`);
+printWindow.document.close();
+setTimeout(() => printWindow.print(), 500);
+}
+} else if (e.key === 'Delete' || e.key === 'Backspace') {
+if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+e.preventDefault();
+deleteSelected();
+}
+}
+});
+
+loadTemplate('recruitment');
+// Set defaults
+document.getElementById('bgPattern').value = 'dots';
+document.getElementById('borderStyle').value = 'dotted';
+document.getElementById('patternColor').value = '#ec3750';
+document.getElementById('borderColor').value = '#ec3750';
+applyCanvasStyle();
+saveState();
+}
+</script>
+{% endblock %}

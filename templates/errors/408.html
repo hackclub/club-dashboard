@@ -1,0 +1,11 @@
+{% extends "errors/base_error.html" %}
+
+{% block error_icon %}
+<i class="fas fa-clock"></i>
+{% endblock %}
+
+{% block error_title %}Request Timeout{% endblock %}
+
+{% block error_message %}
+The request took too long to complete. Please try again.
+{% endblock %}

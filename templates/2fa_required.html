@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}2FA Required - Hack Club Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+    .requirement-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: var(--background);
+    }
+
+    .requirement-card {
+        background: var(--surface);
+        border-radius: 16px;
+        box-shadow: var(--shadow-xl);
+        padding: 3rem;
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+        animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .requirement-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(236, 55, 80, 0.3);
+    }
+
+    .requirement-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 1rem;
+    }
+
+    .requirement-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .security-notice {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: 2px solid #fbbf24;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+    .security-notice-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 700;
+        color: #92400e;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .security-notice-title i {
+        font-size: 1.5rem;
+    }
+
+    .security-notice-content {
+        color: #78350f;
+        line-height: 1.6;
+    }
+
+    .roles-list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+    }
+
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--surface-elevated);
+        color: var(--primary);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        margin: 0.25rem;
+        border: 2px solid var(--primary);
+        font-size: 0.95rem;
+    }
+
+    .btn-2fa-setup {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(236, 55, 80, 0.3);
+        margin-top: 1rem;
+    }
+
+    .btn-2fa-setup:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(236, 55, 80, 0.4);
+        background: linear-gradient(135deg, #d63146, #c02a3c);
+    }
+
+    .btn-2fa-setup i {
+        font-size: 1.25rem;
+    }
+
+    .info-list {
+        text-align: left;
+        background: var(--background);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .info-list-item {
+        display: flex;
+        align-items: start;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        color: var(--text);
+    }
+
+    .info-list-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-list-item i {
+        color: var(--primary);
+        font-size: 1.25rem;
+        margin-top: 0.25rem;
+        flex-shrink: 0;
+    }
+
+    .info-list-text {
+        flex: 1;
+    }
+
+    .info-list-title {
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 0.25rem;
+    }
+
+    .info-list-desc {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+    }
+
+    .logout-link {
+        display: inline-block;
+        margin-top: 1.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: color 0.2s;
+    }
+
+    .logout-link:hover {
+        color: var(--primary);
+    }
+
+    @media (max-width: 768px) {
+        .requirement-container {
+            padding: 1rem;
+        }
+
+        .requirement-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .requirement-title {
+            font-size: 1.5rem;
+        }
+
+        .requirement-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="requirement-container">
+    <div class="requirement-card">
+        <div class="requirement-icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+
+        <h1 class="requirement-title">Two-Factor Authentication Required</h1>
+        <p class="requirement-subtitle">
+            For security reasons, your account requires two-factor authentication (2FA) to be enabled.
+        </p>
+
+        <div class="security-notice">
+            <div class="security-notice-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Why is 2FA required?</span>
+            </div>
+            <div class="security-notice-content">
+                <p style="margin: 0 0 1rem 0;">
+                    You have been assigned the following role(s) that require additional security:
+                </p>
+                <div style="text-align: center;">
+                    {% for role_name in required_roles %}
+                    <span class="role-badge">
+                        <i class="fas fa-user-shield"></i>
+                        {{ role_name }}
+                    </span>
+                    {% endfor %}
+                </div>
+                <p style="margin: 1rem 0 0 0; font-size: 0.9rem;">
+                    These roles grant access to sensitive features and data. Two-factor authentication helps protect your account and the organization from unauthorized access.
+                </p>
+            </div>
+        </div>
+
+        <a href="{{ url_for('auth.setup_2fa') }}" class="btn-2fa-setup">
+            <i class="fas fa-lock"></i>
+            <span>Set Up 2FA Now</span>
+        </a>
+
+        <div class="info-list">
+            <div class="info-list-item">
+                <i class="fas fa-mobile-alt"></i>
+                <div class="info-list-text">
+                    <div class="info-list-title">Authenticator App Required</div>
+                    <div class="info-list-desc">You'll need an authenticator app like Google Authenticator, Authy, or Microsoft Authenticator on your phone.</div>
+                </div>
+            </div>
+
+            <div class="info-list-item">
+                <i class="fas fa-clock"></i>
+                <div class="info-list-text">
+                    <div class="info-list-title">Quick Setup Process</div>
+                    <div class="info-list-desc">Setting up 2FA takes less than 2 minutes. Just scan a QR code with your authenticator app.</div>
+                </div>
+            </div>
+
+            <div class="info-list-item">
+                <i class="fas fa-key"></i>
+                <div class="info-list-text">
+                    <div class="info-list-title">Backup Codes Provided</div>
+                    <div class="info-list-desc">You'll receive backup codes to access your account if you lose your phone.</div>
+                </div>
+            </div>
+        </div>
+
+        <a href="{{ url_for('auth.logout') }}" class="logout-link">
+            <i class="fas fa-sign-out-alt"></i> Log out instead
+        </a>
+    </div>
+</div>
+{% endblock %}

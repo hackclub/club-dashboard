@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Authorize Application - Hack Clubs Dash{% endblock %}
+
+{% block extra_head %}
+<style>
+    .consent-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        position: relative;
+    }
+
+    .consent-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{{ url_for("static", filename="assets/Dinos.jpg") }}') center/cover;
+        filter: blur(3px);
+        z-index: 0;
+    }
+
+    .consent-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1;
+    }
+
+    .consent-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        padding: 3rem;
+        width: 100%;
+        max-width: 500px;
+        border: 1px solid #e1e8ed;
+        position: relative;
+        z-index: 2;
+    }
+
+    .consent-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .app-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .consent-header h1 {
+        color: #1a202c;
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .app-name {
+        color: #ec3750;
+        font-weight: 600;
+    }
+
+    .consent-header p {
+        color: #718096;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .permissions-section {
+        margin: 2rem 0;
+    }
+
+    .permissions-title {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .permission-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 0.75rem;
+        background: #f7fafc;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        border-left: 3px solid #ec3750;
+    }
+
+    .permission-icon {
+        color: #ec3750;
+        margin-right: 0.75rem;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+    }
+
+    .permission-text {
+        flex: 1;
+    }
+
+    .permission-name {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .permission-description {
+        color: #718096;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    .consent-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 0.875rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+
+    .btn-approve {
+        background: linear-gradient(135deg, #ec3750, #d63146);
+        color: white;
+    }
+
+    .btn-approve:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(236, 55, 80, 0.3);
+    }
+
+    .btn-deny {
+        background: #e2e8f0;
+        color: #4a5568;
+        border: 2px solid #e2e8f0;
+    }
+
+    .btn-deny:hover {
+        background: #cbd5e0;
+        border-color: #cbd5e0;
+    }
+
+    .security-note {
+        background: #fff5f5;
+        border: 1px solid #fed7d7;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        font-size: 0.875rem;
+        color: #c53030;
+    }
+
+    .security-note .icon {
+        color: #e53e3e;
+        margin-right: 0.5rem;
+    }
+
+    .permission-desc {
+        flex: 1;
+    }
+
+    .permission-desc strong {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .permission-desc span {
+        color: #718096;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="consent-container">
+    <div class="consent-card">
+        <div class="consent-header">
+            <div class="app-icon">
+                <i class="fas fa-cube"></i>
+            </div>
+            <h1><span class="app-name">{{ app.name }}</span> wants to access your account</h1>
+            <p>This will allow {{ app.name }} to access specific information from your Hack Club account</p>
+        </div>
+
+        {% if app.description %}
+        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
+            <div style="font-weight: 600; color: #0369a1; margin-bottom: 0.5rem;">
+                <i class="fas fa-info-circle"></i> About this application
+            </div>
+            <div style="color: #0284c7; font-size: 0.9rem;">{{ app.description }}</div>
+        </div>
+        {% endif %}
+
+        <div class="permissions-section">
+            <div class="permissions-title">
+                <i class="fas fa-shield-alt"></i> This application will be able to:
+            </div>
+
+            {% for scope in scopes %}
+            <div class="permission-item">
+                <div class="permission-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="permission-text">
+                    <div class="permission-name">{{ scope.name.replace(':', ' ').title() }}</div>
+                    <div class="permission-description">{{ scope.description }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="permissions-title">
+            <i class="fas fa-shield-check"></i> Required Identity Verification
+        </div>
+
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; margin-top: 1rem; font-size: 0.875rem; color: #dc2626;">
+            <div style="font-weight: 600; margin-bottom: 0.5rem;">
+                <i class="fas fa-exclamation-triangle"></i> Mandatory Identity Verification Required
+            </div>
+            <div>This application requires identity verification through Hack Club's secure verification system. By clicking "Authorize", you will be redirected to Hack Club Identity to complete the verification process. Your verified address information will be shared with {{ app.name }}.</div>
+        </div>
+
+        <form method="POST">
+            <input type="hidden" name="client_id" value="{{ client_id }}">
+            <input type="hidden" name="redirect_uri" value="{{ redirect_uri }}">
+            <input type="hidden" name="response_type" value="{{ response_type }}">
+            <input type="hidden" name="scope" value="{{ scope }}">
+            <input type="hidden" name="state" value="{{ state }}">
+            <input type="hidden" name="verify_identity" value="on">
+
+            <div class="consent-actions">
+                <button type="submit" name="action" value="deny" class="btn btn-deny">
+                    <i class="fas fa-times"></i> Deny
+                </button>
+                <button type="submit" name="action" value="approve" class="btn btn-approve">
+                    <i class="fas fa-check"></i> Authorize
+                </button>
+            </div>
+        </form>
+
+        <div class="security-note">
+            <i class="fas fa-exclamation-triangle icon"></i>
+            <strong>Security note:</strong> Only authorize applications you trust. You can revoke access at any time from your account settings.
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,199 @@
+
+{% extends "base.html" %}
+
+{% block title %}Account Suspended - Hack Clubs Dash{% endblock %}
+
+{% block extra_head %}
+<style>
+    .suspended-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: #f8fafc;
+    }
+
+    .suspended-card {
+        background: white;
+        border-radius: 16px;
+        padding: 3rem;
+        max-width: 600px;
+        width: 100%;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        animation: slideUp 0.6s ease-out;
+        border: 1px solid #e2e8f0;
+        border-top: 4px solid #ef4444;
+    }
+
+    .suspended-icon {
+        width: 80px;
+        height: 80px;
+        background: #ef4444;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .suspended-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1a202c;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .suspended-subtitle {
+        font-size: 1.1rem;
+        color: #4a5568;
+        margin-bottom: 2.5rem;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+
+    .info-box {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+    .info-box h3 {
+        color: #991b1b;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-box ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: #7f1d1d;
+        font-size: 0.95rem;
+        line-height: 1.8;
+    }
+
+    .info-box li {
+        margin-bottom: 0.5rem;
+    }
+
+    .contact-box {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+    .contact-box h3 {
+        color: #0369a1;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .contact-box p {
+        margin: 0;
+        color: #0c4a6e;
+        line-height: 1.6;
+    }
+
+    .btn {
+        background: #6b7280;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn:hover {
+        background: #4b5563;
+        transform: translateY(-1px);
+        color: white;
+        text-decoration: none;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .suspended-card {
+            padding: 2rem;
+            margin: 1rem;
+        }
+
+        .suspended-title {
+            font-size: 1.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="suspended-container">
+    <div class="suspended-card">
+        <div class="suspended-icon">
+            <i class="fas fa-ban"></i>
+        </div>
+
+        <h1 class="suspended-title">Account Suspended</h1>
+
+        <p class="suspended-subtitle">
+            Your account has been temporarily suspended and you cannot access the Hack Club Dashboard at this time.
+        </p>
+
+        <div class="info-box">
+            <h3><i class="fas fa-exclamation-triangle"></i> What this means</h3>
+            <ul>
+                <li>You cannot access your club dashboard or activities</li>
+                <li>Your projects and data remain safe</li>
+                <li>You cannot create content or join clubs during suspension</li>
+                <li>Any clubs you lead may also be affected</li>
+            </ul>
+        </div>
+
+        <div class="contact-box">
+            <h3><i class="fas fa-envelope"></i> Need Help?</h3>
+            <p>
+                If you believe this suspension was made in error or have questions about your account status,
+                please contact the Hack Club team at <strong>clubs@hackclub.com</strong> or reach out on the
+                <strong>Hack Club Slack</strong> for assistance.
+            </p>
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</div>
+{% endblock %}
